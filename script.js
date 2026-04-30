@@ -194,3 +194,37 @@ function updateClock() {
 }
 
 setInterval(updateClock, 1000);
+
+// ==================== SHARE ====================
+
+function shareToFB(){
+  const url = encodeURIComponent(window.location.href);
+
+  window.open(
+    `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+    "_blank"
+  );
+}
+
+function shareToX(){
+  const url = encodeURIComponent(window.location.href);
+  const text = encodeURIComponent("MEME CORE 系統崩壞中");
+
+  window.open(
+    `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
+    "_blank"
+  );
+}
+
+function shareToThreads(){
+  const text = "MEME CORE 系統崩壞中 " + window.location.href;
+
+  // Threads 沒正式 API → 用複製
+  navigator.clipboard.writeText(text)
+    .then(() => alert("已複製，貼到 Threads"))
+    .catch(() => alert("複製失敗"));
+}
+
+function shareToIG(){
+  alert("IG 不支援網頁分享，請用下載圖片再上傳");
+}
