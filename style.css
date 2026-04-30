@@ -1,21 +1,26 @@
 /* =========================
-   BASE
+   BASE RESET（關鍵修正）
+========================= */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: "Microsoft JhengHei", "Segoe UI", Arial, sans-serif;
+  background: radial-gradient(circle at top, #0b1220, #020617);
+  color: #e5e7eb;
+}
+
+/* =========================
+   BODY BASE
 ========================= */
 body {
-  margin: 0;
-  font-family: "Microsoft JhengHei", "Segoe UI", Arial, sans-serif;
-
-  background: radial-gradient(circle at top, #0b1220, #020617);
   min-height: 100vh;
-
   padding: 14px 10px;
-
-  color: #e5e7eb;
-
-  overflow-x: hidden;
-
-  /* ❌ 移除會造成 stacking bug 的 relative */
-  position: static;
 }
 
 /* =========================
@@ -39,12 +44,22 @@ body::before {
 }
 
 /* =========================
-   TOP / PANEL
+   LAYOUT LAYER FIX
 ========================= */
 .topbar,
-.panel {
+.panel,
+#receiptContainer {
   position: relative;
   z-index: 2;
+}
+
+/* =========================
+   PANEL（避免撐爆寬度）
+========================= */
+.panel {
+  max-width: 650px;
+  margin: 20px auto;
+  width: 100%;
 }
 
 /* =========================
@@ -69,7 +84,6 @@ body::before {
   font-weight: 800;
 
   border-radius: 10px;
-
   cursor: pointer;
 
   box-shadow:
@@ -80,11 +94,25 @@ body::before {
 }
 
 /* =========================
-   RECEIPT
+   RECEIPT CONTAINER（修寬問題核心）
 ========================= */
+#receiptContainer {
+  width: 100%;
+  max-width: 650px;
+  margin: 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* =========================
+   RECEIPT CARD
+========================= */
+.receipt,
 #receipt {
-  position: relative;
-  z-index: 2;
+  width: 100%;
+  max-width: 100%;
 
   background: rgba(255,255,255,0.97);
   color: #0f172a;
@@ -100,10 +128,8 @@ body::before {
 }
 
 /* =========================
-   MODAL FIX (核心修正)
+   MODAL FIX（最重要修正）
 ========================= */
-
-/* 🔥 1. 強制獨立 stacking context */
 .modal {
   position: fixed;
   inset: 0;
@@ -115,17 +141,16 @@ body::before {
   background: rgba(0,0,0,0.75);
   backdrop-filter: blur(8px);
 
-  /* 🔥 超穩 z-index */
-  z-index: 999999999;
+  z-index: 2147483647;
 
-  /* 🔥 關鍵：避免被父層影響 */
+  /* 防止被其他 layer 擋住 */
   isolation: isolate;
 
-  /* 🔥 防止 click 穿透 */
+  /* 關鍵：確保可點擊 */
   pointer-events: auto;
 }
 
-/* 🔥 2. modal box 強制獨立 */
+/* modal box */
 .modal-box {
   background: #0f172a;
   color: #e5e7eb;
@@ -139,14 +164,11 @@ body::before {
 
   box-shadow: 0 30px 80px rgba(0,0,0,0.7);
 
-  position: relative;
-  z-index: 1000000000;
-
   pointer-events: auto;
 }
 
 /* =========================
-   INFO / CONTENT / ETC
+   INFO
 ========================= */
 .info div {
   display: flex;
@@ -157,6 +179,9 @@ body::before {
   border-bottom: 1px dashed #e5e7eb;
 }
 
+/* =========================
+   CONTENT
+========================= */
 .content {
   margin-top: 18px;
   font-size: 16px;
@@ -165,14 +190,15 @@ body::before {
 }
 
 /* =========================
-   MOBILE
+   MOBILE FIX
 ========================= */
 @media (max-width: 600px) {
+
   .buttons button {
     flex: 1 1 100%;
   }
 
-  #receipt {
+  .receipt {
     padding: 18px;
   }
 }
