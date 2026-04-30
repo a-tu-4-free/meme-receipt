@@ -1,7 +1,20 @@
-// ==================== script.js ====================
+// ==================== script.js v2 完整版 ====================
+import {
+    genMoney,
+    genId,
+    genTime,
+    genLevel,
+    genComment,
+    generateReceipt
+} from "./generator.js";
 
+import {
+    renderReceiptsUI,
+    renderCommentUI
+} from "./ui.js";
 let memes = null;
 let memesReady = false;
+let currentReceipts = [];
 
 // ==================== INIT ====================
 function loadMemes() {
@@ -13,17 +26,15 @@ function loadMemes() {
         .then(d => {
             memes = d;
             memesReady = true;
-            console.log("✅ memes.json 載入成功");
             generate();
         })
         .catch(err => {
             console.error(err);
-            const result = document.getElementById("result");
-            if (result) result.innerHTML = "SYSTEM FAILURE: CORE DATABASE MISSING";
+            document.getElementById("receiptContainer").innerHTML = "SYSTEM FAILURE";
         });
 }
 
-// ==================== CORE TOOLS ====================
+// ==================== TOOLS ====================
 const rand = arr => arr && arr.length > 0 ? arr[Math.floor(Math.random() * arr.length)] : "【系統載入中...】";
 
 function fillTemplate(str) {
@@ -45,62 +56,33 @@ function time() {
     return new Date().toLocaleString("zh-TW");
 }
 
-// ==================== 人頭等級嘲諷系統（重點） ====================
+// ==================== 人頭等級 ====================
 function getHeadLevel() {
     const normalLevels = [
-        "特級人頭供養者",
-        "一級洗錢小草",
-        "木可認證金流師",
-        "橘子運輸中隊長",
-        "1500萬級別金主",
-        "B18姊夫唯一",
-        "兒子要結婚用的",
-        "政治獻金優化師",
-        "17年刑期預備役",
-        "偽造文書高手",
-        "容積率創意總監",
-        "雙載志工督導",
-        "A錢不難等級",
-        "系統性匿報者",
-        "黑箱作業認證",
-        "小草募款機器",
-        "柯學高級信徒",
-        "民眾堂核心金流",
-        "拉得慢等級",
-		"公雞金等級"
+        "特級人頭供養者","一級洗錢小草","木可認證金流師","橘子運輸中隊長",
+        "1500萬級別金主","B18姊夫唯一","政治獻金優化師","17年刑期預備役"
     ];
-
     const rareLevels = [
-        "🌟 神級人頭 · 連特偵組都找不到",
-        "🔥 傳說級 · 錢在木可飛",
-        "💀 地獄級 · 17年刑期收藏家",
-        "🟠 橘色等級 · 抓不到",
-        "🏆 民眾堂終身貢獻獎",
-        "⚡ 超級金主 · 謝媽媽最愛",
-        "🌋 史詩級 · 木可傳奇人物"
+        "🌟 神級人頭","🔥 傳說級","💀 地獄級","🏆 終身貢獻獎"
     ];
-
     return Math.random() > 0.82 ? rand(rareLevels) : rand(normalLevels);
 }
 
-// ==================== MODE & OUTPUT ====================
-function detectMode(text) {
-    if (!text) return "SYSTEM";
-    if (text.includes("女生") || text.includes("女人")) return "GENDER";
-    if (text.includes("政治") || text.includes("民眾") || text.includes("政府") ||
-        text.includes("木可") || text.includes("查帳") || text.includes("獻金") ||
-        text.includes("柯") || text.includes("賴") || text.includes("侯")) return "POLITICS";
-    if (text.includes("醫") || text.includes("手術")) return "MEDICAL";
-    if (text.includes("外交") || text.includes("台灣")) return "FOREIGN";
-    if (text.includes("人生") || text.includes("哲學")) return "PHILOSOPHY";
-    if (text.includes("爆料") || text.includes("系統")) return "SYSTEM";
-    return "CHAOS";
+// ==================== COMMENT ====================
+function getComment() {
+    const comments = [
+        "這筆你真的敢報？",
+        "系統判定：異常偏高",
+        "審計部已鎖定你",
+        "這不是收據，是犯罪紀錄",
+        "🔥 貪污等級上升中",
+        "這會被抓去關吧",
+        "系統：你有點太誠實了"
+    ];
+    return rand(comments);
 }
 
-function render(parts) {
-    return parts.filter(Boolean).join("<br><br>");
-}
-
+// ==================== MODE ====================
 function chaosMath() {
     const a = Math.floor(Math.random() * 900 + 100);
     const b = Math.floor(Math.random() * 900 + 10);
@@ -111,14 +93,9 @@ ${a} + ${b}<br>
 系統判定：加法已進入敘事化`;
 }
 
-// ==================== 主要功能 ====================
-window.generate = function() {
-    if (!memesReady) {
-        document.getElementById("result").innerHTML = "系統載入中...";
-        return;
-    }
-
-    const mode = rand(["NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"]);
+// ==================== 建立單張收據 ====================
+function createReceipt(input="") {
+    const mode = rand(["NORMAL","SYSTEM","GLITCH","POLITICAL_OVERFLOW","CHAOS"]);
     let parts = [];
 
     if (mode === "NORMAL") {
@@ -128,65 +105,95 @@ window.generate = function() {
             fillTemplate(rand(memes.endings))
         ];
     } else if (mode === "SYSTEM") {
-        parts = ["【SYSTEM MODE ACTIVE】", fillTemplate(rand(memes.system_weird)), fillTemplate(rand(memes.endings))];
+        parts = ["【SYSTEM MODE ACTIVE】", fillTemplate(rand(memes.system_weird))];
     } else if (mode === "GLITCH") {
-        parts = ["▓▒░ SYSTEM CORRUPTION DETECTED ░▒▓", fillTemplate(rand(memes.glitch)), fillTemplate(rand(memes.usages)), "REALITY UNSTABLE"];
+        parts = ["▓▒░ SYSTEM CORRUPTION ░▒▓", fillTemplate(rand(memes.glitch))];
     } else if (mode === "POLITICAL_OVERFLOW") {
-        parts = [fillTemplate(rand(memes.politics_glitch)), fillTemplate(rand(memes.usages)), "SYSTEM OVERRIDE ACTIVE • 2028"];
+        parts = [fillTemplate(rand(memes.politics_glitch)), "SYSTEM OVERRIDE"];
     } else {
-        parts = [fillTemplate(rand(memes.openings)), fillTemplate(rand(memes.usages)), fillTemplate(rand(memes.glitch)), chaosMath()];
+        parts = [fillTemplate(rand(memes.usages)), fillTemplate(rand(memes.glitch)), chaosMath()];
     }
 
-    document.getElementById("result").innerHTML = render(parts);
-    document.getElementById("rmoney").innerText = money();
-    document.getElementById("rid").innerText = id();
-    document.getElementById("rtime").innerText = time();
-    document.getElementById("rlevel").innerText = getHeadLevel();   // ← 人頭等級
+    if (input) parts.unshift(`【INPUT】${input}`);
+
+    return {
+        content: parts.filter(Boolean).join("<br><br>"),
+        money: money(),
+        id: id(),
+        time: time(),
+        level: getHeadLevel()
+    };
+}
+
+// ==================== 渲染 ====================
+function renderReceipts(list) {
+    const container = document.getElementById("receiptContainer");
+    const template = document.getElementById("receiptTemplate");
+
+    container.innerHTML = "";
+
+    list.forEach(r => {
+        const clone = template.content.cloneNode(true);
+
+        clone.querySelector(".result").innerHTML = r.content;
+        clone.querySelector(".rmoney").innerText = r.money;
+        clone.querySelector(".rid").innerText = r.id;
+        clone.querySelector(".rtime").innerText = r.time;
+        clone.querySelector(".rlevel").innerText = r.level;
+
+        container.appendChild(clone);
+    });
+
+    document.getElementById("systemComment").innerText = getComment();
+}
+
+// ==================== 主功能 ====================
+window.generate = function() {
+    if (!memesReady) return;
+
+    currentReceipts = [];
+    for (let i = 0; i < 3; i++) {
+        currentReceipts.push(createReceipt());
+    }
+
+    renderReceipts(currentReceipts);
 };
 
 window.buildMemeFromInput = function() {
     const input = document.getElementById("userInput")?.value.trim();
-    if (!input) {
-        document.getElementById("result").innerHTML = "SYSTEM: INPUT REQUIRED";
-        return;
+    if (!input) return;
+
+    currentReceipts = [];
+    for (let i = 0; i < 3; i++) {
+        currentReceipts.push(createReceipt(input));
     }
 
-    const parts = [
-        `【INPUT】${input}`,
-        fillTemplate(rand(memes.openings)),
-        fillTemplate(rand(memes.usages)),
-        chaosMath()
-    ];
-
-    document.getElementById("result").innerHTML = render(parts);
-    document.getElementById("rmoney").innerText = money();
-    document.getElementById("rid").innerText = id();
-    document.getElementById("rtime").innerText = time();
-    document.getElementById("rlevel").innerText = getHeadLevel();   // ← 人頭等級
+    renderReceipts(currentReceipts);
 };
 
-window.spam = function() {
-    let t = "SYSTEM SPAM MODE<br><br>";
-    for (let i = 0; i < 6; i++) {
-        t += fillTemplate(rand(memes.usages)) + "<br><br>";
-    }
-    document.getElementById("result").innerHTML = t;
-    document.getElementById("rlevel").innerText = getHeadLevel();
+// ==================== 加碼 ====================
+window.upgradeMode = function() {
+    if (!currentReceipts.length) return;
+
+    currentReceipts = currentReceipts.map(r => ({
+        ...r,
+        content: r.content + "<br><br>🔥【加碼成功】異常已升級",
+        money: (parseInt(r.money.replace(/,/g,"")) * 10).toLocaleString(),
+        level: "💀 失控等級"
+    }));
+
+    renderReceiptsUI(currentReceipts);
+	renderCommentUI(getComment());
 };
 
-window.spamBlack = function() {
-    let t = "SYSTEM OVERLOAD MODE<br><br>";
-    for (let i = 0; i < 7; i++) {
-        t += fillTemplate(rand(memes.glitch || memes.usages)) + "<br><br>";
-    }
-    document.getElementById("result").innerHTML = t;
-    document.getElementById("rlevel").innerText = getHeadLevel();
-};
+// ==================== 舊功能兼容 ====================
+window.spam = () => generate();
+window.spamBlack = () => generate();
 
+// ==================== 下載 ====================
 window.download = function() {
-    const el = document.getElementById("receipt");
-    if (!el) return alert("找不到收據元素！");
-    
+    const el = document.getElementById("receiptContainer");
+
     html2canvas(el, { scale: 2, backgroundColor: "#fff" })
         .then(canvas => {
             const a = document.createElement("a");
@@ -196,28 +203,11 @@ window.download = function() {
         });
 };
 
-// Share Functions
-window.shareToFB = function() {
-    const url = encodeURIComponent(window.location.href);
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, "_blank");
-};
-
-window.shareToX = function() {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("MEME CORE 系統崩壞中");
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, "_blank");
-};
-
-window.shareToThreads = function() {
-    const text = "MEME CORE 系統崩壞中 " + window.location.href;
-    navigator.clipboard.writeText(text)
-        .then(() => alert("已複製，可以貼到 Threads"))
-        .catch(() => alert("複製失敗"));
-};
-
-window.shareToIG = function() {
-    alert("IG 不支援網頁直接分享，請先下載圖片再上傳");
-};
+// ==================== 分享 ====================
+window.shareToFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
+window.shareToX = () => window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
+window.shareToThreads = () => alert("已複製請貼上 Threads");
+window.shareToIG = () => alert("請下載圖片上傳 IG");
 
 // ==================== CLOCK ====================
 const startDate = new Date("2024-08-29T00:00:00");
@@ -228,19 +218,17 @@ function updateClock() {
     const h = Math.floor(diff / 3600); diff %= 3600;
     const m = Math.floor(diff / 60);
     const s = diff % 60;
-    const el = document.getElementById("rclock");
-    if (el) el.innerText = `${d}天 ${h}時 ${m}分 ${s}秒`;
+
+    document.querySelectorAll(".rclock").forEach(el => {
+        el.innerText = `${d}天 ${h}時 ${m}分 ${s}秒`;
+    });
 }
 setInterval(updateClock, 1000);
 
-// Modal 控制
+// ==================== Modal ====================
 window.enterSystem = function(ok) {
     document.getElementById("introModal").style.display = "none";
-    if (ok) {
-        loadMemes();
-    } else {
-        document.getElementById("result").innerHTML = "SYSTEM OFFLINE";
-    }
+    if (ok) loadMemes();
 };
 
-console.log("✅ MEME CORE script.js 載入完成（人頭等級已強化）");
+console.log("✅ MEME CORE v2 完整版已載入");

@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-/* =====  modal  ===== */
+/* ===== modal ===== */
 .modal{
     position: fixed;
     inset: 0;
@@ -67,6 +67,13 @@
     background: #1f2937;
     color: white;
 }
+
+/* 新增：多收據排列 */
+#receiptContainer{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
 </style>
 
 </head>
@@ -87,6 +94,7 @@
         <button onclick="spam()">⚡ 系統洗版</button>
         <button onclick="spamBlack()">☠ 破壞模式</button>
         <button onclick="download()">⬇ 匯出圖像</button>
+        <button onclick="upgradeMode()">🔥 再更離譜一點</button>
     </div>
 
     <!-- ================= INPUT ================= -->
@@ -131,8 +139,27 @@
         <button onclick="shareToIG()" class="social-btn">📷</button>
     </div>
 
-    <!-- ================= OUTPUT ================= -->
-    <div id="receipt">
+    <!-- ================= 系統吐槽 ================= -->
+    <div id="systemComment" style="
+        margin:15px;
+        font-size:16px;
+        color:#fbbf24;
+        text-align:center;
+    ">
+    </div>
+
+    <!-- ================= OUTPUT（多收據） ================= -->
+    <div id="receiptContainer">
+
+        <!-- JS 會動態插入多個 receipt -->
+        
+    </div>
+
+</div>
+
+<!-- ================= TEMPLATE（隱藏模板） ================= -->
+<template id="receiptTemplate">
+    <div class="receipt">
 
         <div class="header">
             <div class="title">SYSTEM OUTPUT TERMINAL</div>
@@ -140,18 +167,16 @@
         </div>
 
         <div class="info">
-            <div>收據編號：<span id="rid"></span></div>
-            <div>收款時間：<span id="rtime"></span></div>
-            <div>對開收據：NT$ <span id="rmoney"></span></div>
-            <div>人頭等級：<span id="rlevel"></span></div>
-            <div>查帳逾時：<span id="rclock"></span></div>
+            <div>收據編號：<span class="rid"></span></div>
+            <div>收款時間：<span class="rtime"></span></div>
+            <div>對開收據：NT$ <span class="rmoney"></span></div>
+            <div>人頭等級：<span class="rlevel"></span></div>
+            <div>查帳逾時：<span class="rclock"></span></div>
         </div>
 
         <div class="divider"></div>
 
-        <div class="content" id="result">
-            SYSTEM READY // 等待輸入指令...
-        </div>
+        <div class="content result"></div>
 
         <div class="divider"></div>
 
@@ -162,7 +187,7 @@
         </div>
 
     </div>
-</div>
+</template>
 
 <!-- ================= BOOT MODAL ================= -->
 <div id="introModal" class="modal">
@@ -195,10 +220,9 @@ MEME CORE 正在啟動：
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <script>
-    // 只負責顯示 Modal
-    window.onload = () => {
-        document.getElementById("introModal").style.display = "flex";
-    };
+window.onload = () => {
+    document.getElementById("introModal").style.display = "flex";
+};
 </script>
 
 </body>
