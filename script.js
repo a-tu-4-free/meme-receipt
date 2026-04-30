@@ -3,7 +3,7 @@
 let memes = null;
 let memesReady = false;
 
-// ==================== INIT (重要修改) ====================
+// ==================== INIT ====================
 function loadMemes() {
     fetch("memes.json", { cache: "no-store" })
         .then(r => {
@@ -14,7 +14,7 @@ function loadMemes() {
             memes = d;
             memesReady = true;
             console.log("✅ memes.json 載入成功");
-            generate();           // 預設產生一次
+            generate();
         })
         .catch(err => {
             console.error(err);
@@ -43,6 +43,44 @@ function id() {
 }
 function time() {
     return new Date().toLocaleString("zh-TW");
+}
+
+// ==================== 人頭等級嘲諷系統（重點） ====================
+function getHeadLevel() {
+    const normalLevels = [
+        "特級人頭供養者",
+        "一級洗錢小草",
+        "木可認證金流師",
+        "橘子運輸中隊長",
+        "1500萬級別金主",
+        "B18姊夫唯一",
+        "兒子要結婚用的",
+        "政治獻金優化師",
+        "17年刑期預備役",
+        "偽造文書高手",
+        "容積率創意總監",
+        "雙載志工督導",
+        "A錢不難等級",
+        "系統性匿報者",
+        "黑箱作業認證",
+        "小草募款機器",
+        "柯學高級信徒",
+        "民眾堂核心金流",
+        "拉得慢等級",
+		"公雞金等級"
+    ];
+
+    const rareLevels = [
+        "🌟 神級人頭 · 連特偵組都找不到",
+        "🔥 傳說級 · 錢在木可飛",
+        "💀 地獄級 · 17年刑期收藏家",
+        "🟠 橘色等級 · 抓不到",
+        "🏆 民眾堂終身貢獻獎",
+        "⚡ 超級金主 · 謝媽媽最愛",
+        "🌋 史詩級 · 木可傳奇人物"
+    ];
+
+    return Math.random() > 0.82 ? rand(rareLevels) : rand(normalLevels);
 }
 
 // ==================== MODE & OUTPUT ====================
@@ -103,6 +141,7 @@ window.generate = function() {
     document.getElementById("rmoney").innerText = money();
     document.getElementById("rid").innerText = id();
     document.getElementById("rtime").innerText = time();
+    document.getElementById("rlevel").innerText = getHeadLevel();   // ← 人頭等級
 };
 
 window.buildMemeFromInput = function() {
@@ -123,6 +162,7 @@ window.buildMemeFromInput = function() {
     document.getElementById("rmoney").innerText = money();
     document.getElementById("rid").innerText = id();
     document.getElementById("rtime").innerText = time();
+    document.getElementById("rlevel").innerText = getHeadLevel();   // ← 人頭等級
 };
 
 window.spam = function() {
@@ -131,6 +171,7 @@ window.spam = function() {
         t += fillTemplate(rand(memes.usages)) + "<br><br>";
     }
     document.getElementById("result").innerHTML = t;
+    document.getElementById("rlevel").innerText = getHeadLevel();
 };
 
 window.spamBlack = function() {
@@ -139,6 +180,7 @@ window.spamBlack = function() {
         t += fillTemplate(rand(memes.glitch || memes.usages)) + "<br><br>";
     }
     document.getElementById("result").innerHTML = t;
+    document.getElementById("rlevel").innerText = getHeadLevel();
 };
 
 window.download = function() {
@@ -201,4 +243,4 @@ window.enterSystem = function(ok) {
     }
 };
 
-console.log("✅ MEME CORE script.js 載入完成");
+console.log("✅ MEME CORE script.js 載入完成（人頭等級已強化）");
