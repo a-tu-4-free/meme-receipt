@@ -83,11 +83,23 @@ export function chaosMath() {
     const a = Math.floor(Math.random() * 900 + 100);
     const b = Math.floor(Math.random() * 900 + 10);
 
+    // =========================
+    // 三種「真相版本」
+    // =========================
+
+    const truth = a + b;                 // 真實數學
+    const narrative = "" + a + b;        // 拼接敘事（177831）
+    const distortion = b + "" + a;       // 反轉敘事（831177）
+
     return `【系統運算模組】<br>
-${a} + ${b}<br>
-正常結果：${a + b}<br>
-政治解讀：${a + b}<br>
-系統判定：數學已敘事化`;
+數值 A：${a}<br>
+數值 B：${b}<br><br>
+
+真實結果：${truth}<br>
+政治敘事：${narrative}<br>
+系統誤讀：${distortion}<br><br>
+
+系統判定：數學已被重新定義為三種真相`;
 }
 
 // ==================== 收據生成（核心升級） ====================
