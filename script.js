@@ -2,19 +2,28 @@ let memes = null;
 
 // 載入詞庫
 fetch("memes.json")
-  .then(r => r.json())
+  .then(r => {
+    if (!r.ok) throw new Error(`HTTP error! status: ${r.status}`);
+    return r.json();
+  })
   .then(d => {
     memes = d;
     console.log("✅ 詞庫載入成功");
-    generate();        // 載入完成後自動產生一次
+    generate();           // 載入成功後自動產生一次
   })
   .catch(err => {
     console.error("❌ 載入 memes.json 失敗", err);
-    alert("詞庫載入失敗，請確認 memes.json 檔案存在！");
+    const resultEl = document.getElementById("result");
+    if (resultEl) {
+      resultEl.innerHTML = `<span style="color:red; font-weight:bold;">
+        錯誤：memes.json 詞庫載入失敗！<br>
+        請確認檔案名稱為「memes.json」且與 index.html 在同一資料夾
+      </span>`;
+    }
   });
 
 function rand(a) {
-  if (!a || a.length === 0) return "（詞庫載入異常）";
+  if (!a || a.length === 0) return "（詞庫異常）";
   return a[Math.floor(Math.random() * a.length)];
 }
 
@@ -34,35 +43,34 @@ function time() {
   return new Date().toLocaleString('zh-TW');
 }
 
-// 更黑毒版 generateMeme - 提高查帳與毒梗出現率
+// ==================== 核心：更黑毒版 generateMeme ====================
 function generateMeme() {
-  const isBlackMode = Math.random() < 0.45;   // 45% 機率進入黑毒模式
+  if (!memes) return "詞庫尚未載入...";
 
-  if (Math.random() < 0.08 && memes.rare) {
+  // 提高黑毒梗出現機率（50%）
+  const isBlackMode = Math.random() < 0.50;
+
+  // 極低機率出現 rare
+  if (Math.random() < 0.06 && memes.rare && memes.rare.length > 0) {
     return rand(memes.rare);
   }
 
   if (isBlackMode) {
-    // 黑毒模式：更容易出現查帳、17年、搞定司法等梗
-    return rand(memes.openings) +
-           "<br><br>" +
-           rand(memes.usages) +
-           "<br><br>" +
-           rand(memes.usages) +   // 第二句更容易是毒句
-           "<br><br>" +
+    // 黑毒模式：更容易出現狠句
+    return rand(memes.openings) + "<br><br>" +
+           rand(memes.usages) + "<br><br>" +
+           rand(memes.usages) + "<br><br>" +
            rand(memes.endings);
   } else {
-    // 一般模式
-    return rand(memes.openings) +
-           "<br><br>" +
-           rand(memes.usages) +
-           "<br><br>" +
-           rand(memes.usages) +
-           "<br><br>" +
+    // 普通模式
+    return rand(memes.openings) + "<br><br>" +
+           rand(memes.usages) + "<br><br>" +
+           rand(memes.usages) + "<br><br>" +
            rand(memes.endings);
   }
 }
 
+// ==================== 主要功能 ====================
 function generate() {
   if (!memes) return;
 
@@ -72,9 +80,7 @@ function generate() {
   document.getElementById("rtime").innerText = time();
 
   const rlevel = document.getElementById("rlevel");
-  if (rlevel) {
-    rlevel.innerText = level();
-  }
+  if (rlevel) rlevel.innerText = level();
 }
 
 function spam() {
@@ -87,19 +93,17 @@ function spam() {
   document.getElementById("result").innerHTML = t;
 }
 
-// 新增：專門的「查帳黑毒洗版」模式（可選）
+// 專門的黑毒洗版模式
 function spamBlack() {
   if (!memes) return;
 
   let t = "";
   for (let i = 0; i < 7; i++) {
-    // 強制使用黑毒模式
-    const text = rand(memes.openings) +
-                 "<br><br>" +
-                 rand(memes.usages) +
-                 "<br><br>" +
-                 rand(memes.usages) +
-                 "<br><br>" +
+    // 強制黑毒模式 + 提高毒句密度
+    const text = rand(memes.openings) + "<br><br>" +
+                 rand(memes.usages) + "<br><br>" +
+                 rand(memes.usages) + "<br><br>" +
+                 rand(memes.usages) + "<br><br>" +   // 多一句 usages 增加毒度
                  rand(memes.endings);
     t += text + "<br><br><br>";
   }

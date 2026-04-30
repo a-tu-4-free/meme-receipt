@@ -1,138 +1,182 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #d9e2ec;
+  font-family: "Microsoft JhengHei", "Segoe UI", Arial, sans-serif;
+  background: linear-gradient(135deg, #1e2937, #334155);
+  min-height: 100vh;
+  padding: 15px 10px;
 }
 
-/* 頂部假政府藍 */
+/* 頂部深藍黑風格 */
 .topbar {
-  background: #0b2c5a;
+  background: #0a1428;
   color: white;
   text-align: center;
-  padding: 14px;
+  padding: 16px 10px;
+  border-bottom: 4px solid #f59e0b;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
 .logo {
-  font-size: 18px;
+  font-size: 26px;
   font-weight: bold;
+  letter-spacing: 1px;
 }
 
 .sub {
-  font-size: 12px;
-  opacity: 0.7;
+  font-size: 13px;
+  opacity: 0.75;
+  margin-top: 4px;
 }
 
-/* 外層 */
+/* 主容器 */
 .panel {
-  max-width: 520px;
-  margin: 20px auto;
+  max-width: 560px;
+  margin: 25px auto;
 }
 
-/* 按鈕 */
+/* 按鈕區 */
 .buttons {
   text-align: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
 }
 
 button {
-  background: #2563eb;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  margin: 4px;
-  border-radius: 4px;
+  background: #f59e0b;
+  color: #1e2937;
+  border: 3px solid #1e2937;
+  padding: 12px 18px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
   cursor: pointer;
+  box-shadow: 3px 3px 0 #1e2937;
+  transition: all 0.2s;
 }
 
 button:hover {
-  background: #1e40af;
+  background: #fbbf24;
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 #1e2937;
 }
 
-/* 收據本體 */
+/* 收據本體 - 加強假官方感 */
 #receipt {
   position: relative;
   background: white;
-  padding: 22px;
-  border-radius: 8px;
-  border: 2px solid #cbd5e1;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  padding: 30px 35px;
+  border: 4px solid #1e2937;
+  box-shadow: 10px 10px 0 #1e2937;
   overflow: hidden;
+  line-height: 1.75;
 }
 
-/* 超KUSO浮水印 */
+/* 超大浮水印 */
 #receipt::before {
-  content: "UNTRACEABLE • MEME SYSTEM";
+  content: "UNTRACEABLE MEME SYSTEM";
   position: absolute;
-  font-size: 40px;
-  color: rgba(0,0,0,0.04);
-  transform: rotate(-25deg);
-  top: 40%;
-  left: -20%;
+  font-size: 52px;
+  font-weight: bold;
+  color: rgba(220, 38, 38, 0.06);
+  transform: rotate(-28deg);
+  top: 38%;
+  left: -80px;
   white-space: nowrap;
+  pointer-events: none;
+  z-index: 0;
 }
 
-/* 右上印章 */
+/* 右上紅色印章 */
 .stamp {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  border: 2px dashed red;
-  color: red;
-  padding: 4px 8px;
-  transform: rotate(15deg);
-  font-size: 11px;
-  opacity: 0.7;
+  top: 25px;
+  right: 25px;
+  border: 3px dashed #ef4444;
+  color: #ef4444;
+  padding: 6px 14px;
+  transform: rotate(18deg);
+  font-size: 13px;
+  font-weight: bold;
+  opacity: 0.85;
+  z-index: 2;
 }
 
 /* 標題 */
 .header {
   text-align: center;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 10px;
+  border-bottom: 3px double #1e2937;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
 }
 
 .title {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: bold;
+  color: #1e2937;
 }
 
 .warning {
-  font-size: 11px;
-  color: #e11d48;
+  font-size: 13px;
+  color: #b91c1c;
+  margin-top: 8px;
+  font-weight: bold;
 }
 
-/* info（像正式系統） */
+/* 資訊區 */
 .info {
-  margin-top: 12px;
-  font-size: 13px;
+  margin: 20px 0;
+  font-size: 15.5px;
 }
 
 .info div {
   display: flex;
   justify-content: space-between;
-  padding: 4px 0;
-  border-bottom: 1px dashed #eee;
+  padding: 6px 0;
+  border-bottom: 1px dashed #cbd5e1;
 }
 
-/* 內容 */
+.highlight {
+  color: #b91c1c;
+  font-weight: bold;
+}
+
+/* 主要內容區 */
 .content {
-  margin-top: 12px;
-  font-size: 15px;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  min-height: 80px;
+  font-size: 17.5px;
+  line-height: 1.85;
+  min-height: 220px;
+  color: #1f2937;
+  z-index: 1;
+  position: relative;
 }
 
-/* footer */
+/* 分隔線 */
+.divider {
+  height: 3px;
+  background: repeating-linear-gradient(to right, #1e2937 0, #1e2937 10px, transparent 10px, transparent 18px);
+  margin: 25px 0;
+}
+
+/* Footer */
 .footer {
-  font-size: 11px;
   text-align: center;
-  margin-top: 10px;
-  color: #666;
+  font-size: 13px;
+  color: #444;
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 2px solid #1e2937;
+  line-height: 1.5;
 }
 
-/* 超KUSO loading感（未來可用） */
-.loading {
-  font-size: 12px;
-  color: #999;
+/* 響應式 */
+@media (max-width: 600px) {
+  #receipt {
+    padding: 22px 25px;
+  }
+  .title {
+    font-size: 19px;
+  }
 }
