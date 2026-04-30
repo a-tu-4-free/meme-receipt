@@ -1,6 +1,6 @@
 let memes = null;
 
-// 載入詞庫（加強版）
+// 載入詞庫
 fetch("memes.json", { cache: "no-store" })
   .then(r => {
     if (!r.ok) throw new Error(`HTTP ${r.status} - memes.json 檔案不存在`);
@@ -48,13 +48,12 @@ function time() {
   return new Date().toLocaleString('zh-TW');
 }
 
-// 核心：生成迷因文字
+// 核心生成函數
 function generateMeme() {
   if (!memes) return "詞庫尚未載入，請稍候...";
 
-  const isBlackMode = Math.random() < 0.55;   // 55% 機率噴黑毒梗
+  const isBlackMode = Math.random() < 0.55;
 
-  // 極低機率出現 rare 梗
   if (Math.random() < 0.06 && memes.rare && memes.rare.length > 0) {
     return rand(memes.rare);
   }
@@ -78,10 +77,14 @@ function generate() {
   if (rlevel) rlevel.innerText = level();
 }
 
+// ==================== 優化後的洗版功能 ====================
 function spam() {
   if (!memes) return;
-  let t = "";
-  for (let i = 0; i < 8; i++) {
+  
+  let t = "<strong>【一般洗版】</strong><br><br>";
+  const count = 5;   // 減少到5句，避免過度重複
+
+  for (let i = 0; i < count; i++) {
     t += generateMeme() + "<br><br><br>";
   }
   document.getElementById("result").innerHTML = t;
@@ -89,18 +92,31 @@ function spam() {
 
 function spamBlack() {
   if (!memes) return;
-  let t = "";
-  for (let i = 0; i < 7; i++) {
-    const text = rand(memes.openings) + "<br><br>" +
-                 rand(memes.usages) + "<br><br>" +
-                 rand(memes.usages) + "<br><br>" +
-                 rand(memes.usages) + "<br><br>" +
-                 rand(memes.endings);
+  
+  let t = "<strong style='color:#b91c1c;'>【查帳黑毒加強版】</strong><br><br>";
+  const count = 6;
+
+  for (let i = 0; i < count; i++) {
+    // 隨機增加毒度變化
+    const extraToxic = Math.random() < 0.65;
+    let text = "";
+
+    if (extraToxic) {
+      text = rand(memes.openings) + "<br><br>" +
+             rand(memes.usages) + "<br><br>" +
+             rand(memes.usages) + "<br><br>" +
+             rand(memes.usages) + "<br><br>" +
+             rand(memes.endings);
+    } else {
+      text = generateMeme();
+    }
+    
     t += text + "<br><br><br>";
   }
   document.getElementById("result").innerHTML = t;
 }
 
+// 下載功能
 function download() {
   const receipt = document.getElementById("receipt");
   
