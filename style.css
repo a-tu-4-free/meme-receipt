@@ -403,3 +403,25 @@ body::before {
     transform: none;
   }
 }
+.modal {
+  z-index: 2147483647 !important;
+  pointer-events: auto !important;
+}
+
+.modal-box {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 2147483647;
+}
+
+/* 防止主畫面蓋住 modal */
+.panel,
+#receipt,
+#receiptContainer {
+  pointer-events: auto;
+}
+
+/* 強制 modal 不被背景干擾 */
+body {
+  position: relative;
+}
