@@ -4,357 +4,191 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>民眾堂系統 vNEXT // MEME CORE</title>
+<link rel="stylesheet" href="style.css">
+
 <style>
-    :root {
-        --primary: #f59e0b;
-        --bg: #0b1220;
-        --card: #0f172a;
-    }
-    
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-        font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;
-        background: linear-gradient(135deg, #0b1220, #1e2937);
-        color: #e2e8f0;
-        min-height: 100vh;
-        padding: 10px;
-    }
-    
-    .topbar {
-        text-align: center;
-        margin-bottom: 15px;
-        padding: 12px;
-        background: rgba(15,23,42,0.8);
-        border-radius: 12px;
-        border: 1px solid #f59e0b33;
-    }
-    .logo { 
-        font-size: 22px; 
-        font-weight: bold; 
-        color: var(--primary); 
-    }
-    .sub { 
-        font-size: 13px; 
-        opacity: 0.75; 
-        margin-top: 4px; 
-    }
+/* ===== 立即修正 modal 錯位問題（關鍵） ===== */
+.modal{
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.75);
+    z-index: 99999;
+    padding: 20px;
+}
 
-    .panel {
-        max-width: 620px;
-        margin: 0 auto;
-        background: var(--card);
-        border-radius: 16px;
-        border: 2px solid #f59e0b;
-        overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-    }
+.modal-box{
+    width: min(520px, 95%);
+    background: #0f172a;
+    color: white;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+}
 
-    .buttons {
-        padding: 15px;
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-        gap: 10px;
-        background: #1e2937;
-    }
-    button {
-        padding: 12px 16px;
-        border: none;
-        border-radius: 10px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    button:hover { transform: translateY(-2px); }
+.modal-title{
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #f59e0b;
+}
 
-    .main-btn { background: #f59e0b; color: black; }
-    .danger-btn { background: #b91c1c; color: white; }
+.modal-content{
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-line;
+    opacity: 0.9;
+}
 
-    #userInput {
-        width: 95%;
-        margin: 15px auto;
-        display: block;
-        padding: 14px;
-        background: #1e2937;
-        border: 2px solid #334155;
-        border-radius: 10px;
-        color: white;
-        font-size: 15.5px;
-        outline: none;
-    }
+.modal-buttons{
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
 
-    .ai-btn {
-        width: 95%;
-        margin: 0 auto 15px;
-        display: block;
-        padding: 15px;
-        background: linear-gradient(135deg, #1e2937, #334155);
-        color: #fbbf24;
-        border: 2px solid #f59e0b;
-        border-radius: 10px;
-        font-size: 16.5px;
-        font-weight: bold;
-    }
+.modal-buttons button{
+    flex: 1;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 8px;
+}
 
-    /* 分享按鈕區域 */
-    .share-area {
-        text-align: center;
-        padding: 10px 15px 15px;
-    }
+.modal-buttons button:first-child{
+    background: #f59e0b;
+    color: black;
+}
 
-    #receipt {
-        margin: 15px;
-        background: #02050f;
-        border: 1px solid #334155;
-        border-radius: 12px;
-        padding: 18px;
-        font-family: monospace;
-        line-height: 1.6;
-    }
-    .header { 
-        text-align: center; 
-        margin-bottom: 12px; 
-        padding-bottom: 12px; 
-        border-bottom: 1px dashed #f59e0b55; 
-    }
-    .title { 
-        font-size: 18px; 
-        color: #f59e0b; 
-        font-weight: bold; 
-    }
-    .warning { 
-        font-size: 12px; 
-        color: #ef4444; 
-        margin-top: 6px; 
-    }
-
-    .info {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px 12px;
-        font-size: 14px;
-        margin: 15px 0;
-    }
-
-    .divider {
-        height: 1px;
-        background: linear-gradient(to right, transparent, #f59e0b88, transparent);
-        margin: 15px 0;
-    }
-
-    .content {
-        min-height: 180px;
-        font-size: 15.5px;
-        white-space: pre-line;
-        color: #e2e8f0;
-    }
-
-    .footer {
-        text-align: center;
-        font-size: 12px;
-        opacity: 0.6;
-        margin-top: 15px;
-        line-height: 1.5;
-    }
-
-    /* Modal */
-    .modal{
-        position: fixed;
-        inset: 0;
-        display: none;
-        justify-content: center;
-        align-items: center;
-        background: rgba(0,0,0,0.85);
-        z-index: 99999;
-        padding: 20px;
-    }
-    .modal-box{
-        width: min(520px, 95%);
-        background: #0f172a;
-        color: white;
-        border: 2px solid #f59e0b;
-        border-radius: 14px;
-        padding: 24px;
-        box-shadow: 0 0 40px rgba(245,158,11,0.3);
-    }
-    .modal-title{
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 15px;
-        color: #f59e0b;
-    }
-    .modal-buttons{
-        margin-top: 20px;
-        display: flex;
-        gap: 12px;
-    }
-    .modal-buttons button{
-        flex: 1;
-        padding: 14px;
-        border: none;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+.modal-buttons button:last-child{
+    background: #1f2937;
+    color: white;
+}
 </style>
+
 </head>
+
 <body>
 
+<!-- ================= TOP ================= -->
 <div class="topbar">
     <div class="logo">MEME CORE SYSTEM vNEXT</div>
     <div class="sub">崩壞生成器 • 語意污染模式 • 非真實運算</div>
 </div>
 
 <div class="panel">
-    <!-- 操作按鈕 -->
+
+    <!-- ================= 操作 ================= -->
     <div class="buttons">
-        <button class="main-btn" onclick="generate()">🎲 隨機崩壞</button>
+        <button onclick="generate()">🎲 隨機崩壞</button>
         <button onclick="spam()">⚡ 系統洗版</button>
-        <button class="danger-btn" onclick="spamBlack()">☠ 破壞模式</button>
+        <button onclick="spamBlack()">☠ 破壞模式</button>
         <button onclick="download()">⬇ 匯出圖像</button>
     </div>
 
-    <!-- AI 輸入區 -->
+    <!-- ================= INPUT ================= -->
     <div style="margin-top:15px; text-align:center;">
+
         <input id="userInput"
-               placeholder="輸入內容（例如：系統正在查帳 / 我懷疑異常 / 政策出現錯誤）">
-        <button onclick="buildMemeFromInput()" class="ai-btn">
+               placeholder="輸入內容（例如：系統正在查帳 / 我懷疑異常 / 政策出現錯誤）"
+               style="
+                    width: 95%;
+                    padding: 14px;
+                    border: 2px solid #1e2937;
+                    border-radius: 10px;
+                    font-size: 15px;
+                    outline: none;
+                    background: #0b1220;
+                    color: white;
+               ">
+
+        <button onclick="buildMemeFromInput()"
+                style="
+                    margin-top:10px;
+                    width:95%;
+                    background: linear-gradient(135deg,#111827,#1f2937);
+                    color:#fbbf24;
+                    border:none;
+                    padding:14px;
+                    font-size:16px;
+                    border-radius:10px;
+                    font-weight:bold;
+                    cursor:pointer;
+                ">
             🤖 AI 崩壞解析系統
         </button>
+
     </div>
 
-    <!-- 社群分享區域 -->
-    <div class="share-area">
-        <button onclick="shareImage()" 
-                style="background:#1d9bf0; color:white; padding:11px 22px; border:none; border-radius:8px; margin:0 6px; font-size:15px;">
-            𝕏 分享到 X
-        </button>
-        <button onclick="copyShareText()" 
-                style="background:#333; color:white; padding:11px 22px; border:none; border-radius:8px; margin:0 6px; font-size:15px;">
-            📋 複製文字
-        </button>
+    <!-- ================= SHARE ================= -->
+    <div class="share-buttons">
+        <button onclick="shareToFB()" class="social-btn">f</button>
+        <button onclick="shareToX()" class="social-btn">𝕏</button>
+        <button onclick="shareToThreads()" class="social-btn">t</button>
+        <button onclick="shareToIG()" class="social-btn">📷</button>
     </div>
 
-    <!-- 輸出區域 -->
+    <!-- ================= OUTPUT ================= -->
     <div id="receipt">
+
         <div class="header">
             <div class="title">SYSTEM OUTPUT TERMINAL</div>
             <div class="warning">MEME ENGINE ACTIVE • REALITY DISTORTION ENABLED</div>
         </div>
+
         <div class="info">
-            <div>系統ID：<span id="rid">MC-20260430</span></div>
+            <div>系統ID：<span id="rid"></span></div>
             <div>時間戳：<span id="rtime"></span></div>
             <div>隨機收據：NT$ <span id="rmoney"></span></div>
-            <div>匿名等級：<span id="rlevel">LEVEL 7</span></div>
-            <div>崩壞起點：2024/08/29</div>
-            <div>崩壞時間：<span id="rclock">已崩壞 <strong>609</strong> 天</span></div>
+            <div>匿名等級：<span id="rlevel"></span></div>
+            <div>崩壞時間：<span id="rclock"></span></div>
         </div>
+
         <div class="divider"></div>
+
         <div class="content" id="result">
             SYSTEM READY // 等待輸入指令...
         </div>
+
         <div class="divider"></div>
+
         <div class="footer">
             MEME CORE SYSTEM<br>
             「你看到的不是資料，是敘事」<br>
             「系統正在重新定義現實」
         </div>
+
     </div>
 </div>
 
-<!-- 啟動 Modal -->
+<!-- ================= BOOT MODAL ================= -->
 <div id="introModal" class="modal">
   <div class="modal-box">
+
     <div class="modal-title">SYSTEM BOOT SEQUENCE</div>
+
     <div class="modal-content">
 偵測到非正常語意流
+
 MEME CORE 正在啟動：
+
 - 會計師顧問系統
 - 律師訴訟系統
 - 2026民眾堂募款計劃
 
 是否進入崩壞系統？
     </div>
+
     <div class="modal-buttons">
-      <button onclick="enterSystem(true)" style="background:#f59e0b; color:black;">進入系統</button>
-      <button onclick="enterSystem(false)" style="background:#334155; color:white;">關閉</button>
+      <button onclick="enterSystem(true)">進入系統</button>
+      <button onclick="enterSystem(false)">關閉</button>
     </div>
+
   </div>
 </div>
-
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-<script>
-// ==================== 崩壞時間計算 ====================
-function getCollapseDays() {
-    const startDate = new Date('2024-08-29');
-    const today = new Date();
-    const diffTime = Math.abs(today - startDate);
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-}
-
-// 更新時間
-function updateTime() {
-    const now = new Date();
-    document.getElementById('rtime').textContent = now.toLocaleString('zh-TW');
-    document.getElementById('rclock').innerHTML = `已崩壞 <strong>${getCollapseDays()}</strong> 天`;
-}
-
-// ==================== 社群分享功能 ====================
-async function shareImage() {
-    const receipt = document.getElementById('receipt');
-    
-    try {
-        const canvas = await html2canvas(receipt, {
-            scale: 2,
-            backgroundColor: "#02050f",
-            logging: false
-        });
-
-        const link = document.createElement('a');
-        link.download = `民眾堂崩壞紀錄_${new Date().toISOString().slice(0,10)}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-
-        alert("✅ 截圖已產生並下載！\n你可以直接將圖片上傳到 X、Facebook 或 Threads。");
-        
-    } catch (err) {
-        alert("截圖失敗，請稍後再試");
-        console.error(err);
-    }
-}
-
-function copyShareText() {
-    const content = document.getElementById('result').innerText.trim() || "SYSTEM READY";
-    const textToCopy = `【民眾堂系統 vNEXT】\n\n${content}\n\n已崩壞 ${getCollapseDays()} 天\n#民眾堂 #MEMECORE #語意污染 #崩壞生成器`;
-
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        alert("✅ 分享文字已複製到剪貼簿！\n可直接貼到社群平台");
-    }).catch(() => {
-        alert("複製失敗，請手動複製");
-    });
-}
-
-// ==================== 原有系統功能 ====================
-window.onload = () => {
-    document.getElementById("introModal").style.display = "flex";
-    updateTime();
-    setInterval(updateTime, 30000);   // 每30秒更新一次時間
-};
-
-function enterSystem(ok){
-    document.getElementById("introModal").style.display = "none";
-    if(ok){
-        initSystem();
-    }else{
-        document.getElementById("result").innerHTML = "SYSTEM OFFLINE";
-    }
-}
-
-function initSystem(){
-    updateTime();
-    if (typeof generate === "function") {
-        generate();
-    }
-}
 
 <!-- ================= scripts ================= -->
 <script src="script.js"></script>
