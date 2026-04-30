@@ -3,38 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>民眾堂迷因收據產生器</title>
+
+<title>民眾堂收據系統</title>
 
 <link rel="stylesheet" href="style.css">
-
-<!-- 截圖用 -->
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 
 <body>
 
-<h1>🧾 民眾堂迷因收據產生器</h1>
-
-<div class="controls">
-  <button onclick="generate()">產生一句</button>
-  <button onclick="spam()">洗版10句</button>
-  <button onclick="download()">下載圖片分享</button>
+<div class="topbar">
+  <div class="logo">民眾堂捐款收據系統</div>
+  <div class="sub">Receipt Generation System v1.0</div>
 </div>
 
-<!-- 收據（會被截圖） -->
-<div id="receipt">
-  <div class="title">民眾堂 收據</div>
+<div class="panel">
 
-  <div class="row">編號：<span id="rid"></span></div>
-  <div class="row">時間：<span id="rtime"></span></div>
-  <div class="row">金額：NT$ <span id="rmoney"></span></div>
-
-  <div class="content" id="result"></div>
-
-  <div class="footer">
-    本文件為迷因產生器生成，純屬娛樂用途<br>
-    github.io
+  <div class="buttons">
+    <button onclick="generate()">產生收據</button>
+    <button onclick="spam()">迷因洗版</button>
+    <button onclick="download()">下載圖片</button>
   </div>
+
+  <!-- 收據 -->
+  <div id="receipt">
+
+    <div class="header">
+      <div class="title">捐款收據（非正式）</div>
+      <div class="warning">※本文件為系統自動生成</div>
+    </div>
+
+    <div class="info">
+      <div>收據編號：<span id="rid"></span></div>
+      <div>生成時間：<span id="rtime"></span></div>
+      <div>捐款金額：NT$ <span id="rmoney"></span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="content" id="result"></div>
+
+    <div class="divider"></div>
+
+    <div class="footer">
+      民眾堂資料處理中心<br>
+      本文件僅供娛樂用途，請勿作正式用途
+    </div>
+
+  </div>
+
 </div>
 
 </body>

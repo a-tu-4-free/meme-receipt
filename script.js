@@ -60,3 +60,39 @@ function download(){
     link.click();
   });
 }
+
+function randomMoney(){
+  return Math.floor(Math.random()*500000).toLocaleString();
+}
+
+function randomId(){
+  return "MT-" + Math.floor(Math.random()*9999999);
+}
+
+function nowTime(){
+  return new Date().toLocaleString();
+}
+
+function generate(){
+  document.getElementById("result").innerText = generateMeme();
+  document.getElementById("rmoney").innerText = randomMoney();
+  document.getElementById("rid").innerText = randomId();
+  document.getElementById("rtime").innerText = nowTime();
+}
+
+function spam(){
+  let text = "";
+  for(let i=0;i<8;i++){
+    text += generateMeme() + "\n\n";
+  }
+  document.getElementById("result").innerText = text;
+}
+
+function download(){
+  html2canvas(document.getElementById("receipt")).then(canvas=>{
+    let a = document.createElement("a");
+    a.download = "receipt.png";
+    a.href = canvas.toDataURL();
+    a.click();
+  });
+}
