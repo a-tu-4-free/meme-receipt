@@ -195,27 +195,10 @@ MEME CORE 正在啟動：
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <script>
-
-window.onload = () => {
-    document.getElementById("introModal").style.display = "flex";
-};
-
-function enterSystem(ok){
-    document.getElementById("introModal").style.display = "none";
-
-    if(ok){
-        initSystem();
-    }else{
-        document.getElementById("result").innerHTML =
-        "SYSTEM OFFLINE";
-    }
-}
-
-function initSystem(){
-    updateClock?.();
-    generate?.();
-}
-
+    // 只負責顯示 Modal
+    window.onload = () => {
+        document.getElementById("introModal").style.display = "flex";
+    };
 </script>
 
 </body>

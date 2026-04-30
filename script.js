@@ -3,15 +3,7 @@
 let memes = null;
 let memesReady = false;
 
-// ==================== INIT ====================
-window.onload = function() {
-    // 讓 Modal 可以正常顯示
-    const modal = document.getElementById("introModal");
-    if (modal) modal.style.display = "flex";
-
-    loadMemes();
-};
-
+// ==================== INIT (重要修改) ====================
 function loadMemes() {
     fetch("memes.json", { cache: "no-store" })
         .then(r => {
@@ -22,7 +14,7 @@ function loadMemes() {
             memes = d;
             memesReady = true;
             console.log("✅ memes.json 載入成功");
-            generate();        // 預設產生一次
+            generate();           // 預設產生一次
         })
         .catch(err => {
             console.error(err);
@@ -81,7 +73,7 @@ ${a} + ${b}<br>
 系統判定：加法已進入敘事化`;
 }
 
-// ==================== 主要功能（重要：全部加上 window.） ====================
+// ==================== 主要功能 ====================
 window.generate = function() {
     if (!memesReady) {
         document.getElementById("result").innerHTML = "系統載入中...";
@@ -152,7 +144,7 @@ window.spamBlack = function() {
 window.download = function() {
     const el = document.getElementById("receipt");
     if (!el) return alert("找不到收據元素！");
-
+    
     html2canvas(el, { scale: 2, backgroundColor: "#fff" })
         .then(canvas => {
             const a = document.createElement("a");
@@ -199,11 +191,11 @@ function updateClock() {
 }
 setInterval(updateClock, 1000);
 
-// Modal 函數
+// Modal 控制
 window.enterSystem = function(ok) {
     document.getElementById("introModal").style.display = "none";
     if (ok) {
-        loadMemes();   // 載入資料並產生
+        loadMemes();
     } else {
         document.getElementById("result").innerHTML = "SYSTEM OFFLINE";
     }
