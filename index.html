@@ -1,59 +1,55 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>民眾堂收據系統</title>
-
-<link rel="stylesheet" href="style.css">
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>民眾堂捐款收據系統</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div class="topbar">
-  <div class="logo">民眾堂捐款收據系統</div>
-  <div class="sub">Receipt Generation System v1.0</div>
+    <div class="logo">民眾堂捐款收據系統</div>
+    <div class="sub">v2.0 • 已自動匿名化 • 資料模糊化處理中</div>
 </div>
 
 <div class="panel">
-
-  <div class="buttons">
-    <button onclick="generate()">產生收據</button>
-    <button onclick="spam()">迷因洗版</button>
-    <button onclick="download()">下載圖片</button>
-  </div>
-
-  <!-- 收據 -->
-  <div id="receipt">
-
-    <div class="header">
-      <div class="title">捐款收據（非正式）</div>
-      <div class="warning">※本文件為系統自動生成</div>
+    <div class="buttons">
+        <button onclick="generate()">產生神聖收據</button>
+        <button onclick="spam()">迷因洗版</button>
+        <button onclick="download()">下載圖片</button>
     </div>
 
-    <div class="info">
-      <div>收據編號：<span id="rid"></span></div>
-      <div>生成時間：<span id="rtime"></span></div>
-      <div>捐款金額：NT$ <span id="rmoney"></span></div>
+    <div id="receipt">
+        <div class="header">
+            <div class="title">民眾堂政治獻金收據（非正式）</div>
+            <div class="warning">※ 本文件為系統自動生成 • 已進入不可追溯模式</div>
+        </div>
+        
+        <div class="info">
+            <div>收據編號：<span id="rid">MT-20260430-XXXXXX</span></div>
+            <div>生成時間：<span id="rtime"></span></div>
+            <div>捐款金額：NT$ <span id="rmoney" class="highlight">8888</span></div>
+            <div>捐款人姓名：<span id="donor">已匿名化處理</span></div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="content" id="result">
+            點擊上方按鈕開始生成...
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="footer">
+            民眾堂資料處理中心<br>
+            「我從來沒有改變立場」<br>
+            本文件僅供娛樂用途
+        </div>
     </div>
-
-    <div class="divider"></div>
-
-    <div class="content" id="result"></div>
-
-    <div class="divider"></div>
-
-    <div class="footer">
-      民眾堂資料處理中心<br>
-      本文件僅供娛樂用途，請勿作正式用途
-    </div>
-
-  </div>
-
 </div>
 
-</body>
 <script src="script.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</body>
 </html>
