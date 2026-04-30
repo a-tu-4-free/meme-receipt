@@ -1,15 +1,15 @@
 body {
-  font-family: "Arial", sans-serif;
-  background: #e9ecef;
   margin: 0;
+  font-family: Arial, sans-serif;
+  background: #d9e2ec;
 }
 
-/* 上方藍條（政府感） */
+/* 頂部假政府藍 */
 .topbar {
-  background: #1e3a8a;
+  background: #0b2c5a;
   color: white;
-  padding: 15px;
   text-align: center;
+  padding: 14px;
 }
 
 .logo {
@@ -19,14 +19,13 @@ body {
 
 .sub {
   font-size: 12px;
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
-/* 主面板 */
+/* 外層 */
 .panel {
-  max-width: 500px;
+  max-width: 520px;
   margin: 20px auto;
-  padding: 10px;
 }
 
 /* 按鈕 */
@@ -36,31 +35,60 @@ body {
 }
 
 button {
-  padding: 8px 12px;
-  margin: 3px;
-  border: none;
   background: #2563eb;
   color: white;
+  border: none;
+  padding: 8px 12px;
+  margin: 4px;
   border-radius: 4px;
   cursor: pointer;
 }
 
 button:hover {
-  background: #1d4ed8;
+  background: #1e40af;
 }
 
-/* 收據本體（核心） */
+/* 收據本體 */
 #receipt {
+  position: relative;
   background: white;
-  padding: 20px;
-  border: 1px solid #cbd5e1;
+  padding: 22px;
   border-radius: 8px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border: 2px solid #cbd5e1;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
-/* 收據標題 */
+/* 超KUSO浮水印 */
+#receipt::before {
+  content: "UNTRACEABLE • MEME SYSTEM";
+  position: absolute;
+  font-size: 40px;
+  color: rgba(0,0,0,0.04);
+  transform: rotate(-25deg);
+  top: 40%;
+  left: -20%;
+  white-space: nowrap;
+}
+
+/* 右上印章 */
+.stamp {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 2px dashed red;
+  color: red;
+  padding: 4px 8px;
+  transform: rotate(15deg);
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* 標題 */
 .header {
   text-align: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
 }
 
 .title {
@@ -69,46 +97,42 @@ button:hover {
 }
 
 .warning {
-  font-size: 12px;
-  color: #dc2626;
+  font-size: 11px;
+  color: #e11d48;
 }
 
-/* 資訊區 */
+/* info（像正式系統） */
 .info {
+  margin-top: 12px;
   font-size: 13px;
-  margin-top: 10px;
-  line-height: 1.6;
 }
 
-/* 分隔線 */
-.divider {
-  border-top: 1px dashed #999;
-  margin: 10px 0;
+.info div {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dashed #eee;
 }
 
-/* 內容（迷因區） */
+/* 內容 */
 .content {
+  margin-top: 12px;
   font-size: 15px;
   line-height: 1.6;
-  min-height: 60px;
   white-space: pre-wrap;
+  min-height: 80px;
 }
 
 /* footer */
 .footer {
   font-size: 11px;
   text-align: center;
-  color: #666;
   margin-top: 10px;
+  color: #666;
 }
 
-/* 偽浮水印（超加分🔥） */
-#receipt::after {
-  content: "MINZHONGTANG";
-  position: absolute;
-  opacity: 0.05;
-  font-size: 40px;
-  transform: rotate(-20deg);
-  top: 50%;
-  left: 20%;
+/* 超KUSO loading感（未來可用） */
+.loading {
+  font-size: 12px;
+  color: #999;
 }

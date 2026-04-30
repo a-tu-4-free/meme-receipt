@@ -1,22 +1,26 @@
 let memes;
 
 fetch("memes.json")
-  .then(res => res.json())
-  .then(data => memes = data);
+  .then(r => r.json())
+  .then(d => memes = d);
 
-function rand(arr){
-  return arr[Math.floor(Math.random()*arr.length)];
+function rand(a){
+  return a[Math.floor(Math.random()*a.length)];
 }
 
-function randomMoney(){
-  return Math.floor(Math.random()*1000000).toLocaleString();
+function money(){
+  return Math.floor(Math.random()*800000).toLocaleString();
 }
 
-function randomId(){
-  return "MT-" + Math.floor(Math.random()*999999);
+function id(){
+  return "MT-" + Math.floor(Math.random()*9999999);
 }
 
-function nowTime(){
+function level(){
+  return rand(["LEVEL 1 可識別","LEVEL 2 模糊","LEVEL 3 匿名","LEVEL 4 不存在"]);
+}
+
+function time(){
   return new Date().toLocaleString();
 }
 
@@ -34,65 +38,25 @@ function generateMeme(){
 
 function generate(){
   document.getElementById("result").innerText = generateMeme();
-  document.getElementById("rmoney").innerText = randomMoney();
-  document.getElementById("rid").innerText = randomId();
-  document.getElementById("rtime").innerText = nowTime();
+  document.getElementById("rmoney").innerText = money();
+  document.getElementById("rid").innerText = id();
+  document.getElementById("rtime").innerText = time();
+  document.getElementById("rlevel").innerText = level();
 }
 
 function spam(){
-  let text = "";
-  for(let i=0;i<10;i++){
-    text += generateMeme() + "\n\n";
-  }
-  document.getElementById("result").innerText = text;
-  document.getElementById("rmoney").innerText = randomMoney();
-  document.getElementById("rid").innerText = randomId();
-  document.getElementById("rtime").innerText = nowTime();
-}
-
-function download(){
-  const receipt = document.getElementById("receipt");
-
-  html2canvas(receipt).then(canvas => {
-    const link = document.createElement("a");
-    link.download = "meme_receipt.png";
-    link.href = canvas.toDataURL();
-    link.click();
-  });
-}
-
-function randomMoney(){
-  return Math.floor(Math.random()*500000).toLocaleString();
-}
-
-function randomId(){
-  return "MT-" + Math.floor(Math.random()*9999999);
-}
-
-function nowTime(){
-  return new Date().toLocaleString();
-}
-
-function generate(){
-  document.getElementById("result").innerText = generateMeme();
-  document.getElementById("rmoney").innerText = randomMoney();
-  document.getElementById("rid").innerText = randomId();
-  document.getElementById("rtime").innerText = nowTime();
-}
-
-function spam(){
-  let text = "";
+  let t = "";
   for(let i=0;i<8;i++){
-    text += generateMeme() + "\n\n";
+    t += generateMeme()+"\n\n";
   }
-  document.getElementById("result").innerText = text;
+  document.getElementById("result").innerText = t;
 }
 
 function download(){
-  html2canvas(document.getElementById("receipt")).then(canvas=>{
-    let a = document.createElement("a");
-    a.download = "receipt.png";
-    a.href = canvas.toDataURL();
+  html2canvas(document.getElementById("receipt")).then(c=>{
+    let a=document.createElement("a");
+    a.download="meme_receipt.png";
+    a.href=c.toDataURL();
     a.click();
   });
 }
