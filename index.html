@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民眾堂迷因收據產生器</title>
+
+<link rel="stylesheet" href="style.css">
+
+<!-- 截圖用 -->
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+</head>
+
+<body>
+
+<h1>🧾 民眾堂迷因收據產生器</h1>
+
+<div class="controls">
+  <button onclick="generate()">產生一句</button>
+  <button onclick="spam()">洗版10句</button>
+  <button onclick="download()">下載圖片分享</button>
+</div>
+
+<!-- 收據（會被截圖） -->
+<div id="receipt">
+  <div class="title">民眾堂 收據</div>
+
+  <div class="row">編號：<span id="rid"></span></div>
+  <div class="row">時間：<span id="rtime"></span></div>
+  <div class="row">金額：NT$ <span id="rmoney"></span></div>
+
+  <div class="content" id="result"></div>
+
+  <div class="footer">
+    本文件為迷因產生器生成，純屬娛樂用途<br>
+    github.io
+  </div>
+</div>
+
+</body>
+<script src="script.js"></script>
+</html>
