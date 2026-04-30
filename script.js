@@ -212,7 +212,7 @@ function updateClock() {
 
 setInterval(updateClock, 1000);
 
-// ==================== MODAL FIX（關鍵修正） ====================
+// ==================== MODAL FIX ====================
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("introModal");
 
@@ -221,15 +221,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-window.enterSystem = function (ok) {
+console.log("✅ MEME CORE v2 FIXED FULL LOADED");
+
+window.enterSystem = function(ok) {
     document.getElementById("introModal").style.display = "none";
 
     if (ok) {
         loadMemes();
     } else {
-        document.getElementById("receiptContainer").innerHTML =
-            "SYSTEM OFFLINE";
+        document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
     }
 };
-
-console.log("✅ MEME CORE v2 FIXED FULL LOADED");
