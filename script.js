@@ -45,8 +45,8 @@ function time() {
 function detectMode(text) {
   if (!text) return "SYSTEM";
   if (text.includes("女生") || text.includes("女人")) return "GENDER";
-  if (text.includes("政治") || text.includes("民眾") || text.includes("政府") || 
-      text.includes("木可") || text.includes("查帳") || text.includes("獻金") || 
+  if (text.includes("政治") || text.includes("民眾") || text.includes("政府") ||
+      text.includes("木可") || text.includes("查帳") || text.includes("獻金") ||
       text.includes("柯") || text.includes("賴") || text.includes("侯")) return "POLITICS";
   if (text.includes("醫") || text.includes("手術")) return "MEDICAL";
   if (text.includes("外交") || text.includes("台灣")) return "FOREIGN";
@@ -192,13 +192,18 @@ function download() {
     alert("找不到收據元素！");
     return;
   }
-  html2canvas(el, { scale: 2, backgroundColor: "#fff" })
-    .then(canvas => {
-      const a = document.createElement("a");
-      a.download = `SYSTEM_${Date.now()}.png`;
-      a.href = canvas.toDataURL("image/png");
-      a.click();
-    });
+  html2canvas(el, { 
+    scale: 2, 
+    backgroundColor: "#fff",
+    useCORS: true
+  }).then(canvas => {
+    const a = document.createElement("a");
+    a.download = `SYSTEM_${Date.now()}.png`;
+    a.href = canvas.toDataURL("image/png");
+    a.click();
+  }).catch(err => {
+    alert("下載失敗：" + err.message);
+  });
 }
 
 // ==================== CLOCK ====================
