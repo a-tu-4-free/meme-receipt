@@ -1,27 +1,61 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>民眾堂捐款收據系統</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>民眾堂系統 vNEXT</title>
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <div class="topbar">
-    <div class="logo">民眾堂捐款收據系統</div>
-    <div class="sub">v9.60.11.0 • 捐款自動匿名化 • 資料模糊化處理中 • 憑證補正進行式</div>
+    <div class="logo">民眾堂系統終端 vNEXT</div>
+    <div class="sub">AI迷因生成 • 系統模擬中 • 非現實運算模式</div>
 </div>
 
 <div class="panel">
+
+    <!-- ================= 操作區 ================= -->
     <div class="buttons">
-        <button onclick="generate()">產生神聖收據</button>
-        <button onclick="spam()">一般洗版</button>
-        <button onclick="spamBlack()">查帳黑毒洗版</button>
-        <button onclick="download()">下載圖片</button>
+
+        <button onclick="generate()">🎲 隨機生成</button>
+        <button onclick="spam()">⚡ 系統洗版</button>
+        <button onclick="spamBlack()">☠ 崩壞模式</button>
+        <button onclick="download()">⬇ 下載圖像</button>
+
     </div>
 
-    <!-- 社群分享（獨立一行） -->
+    <!-- ================= 新增：玩家輸入 ================= -->
+    <div style="margin-top:15px; text-align:center;">
+
+        <input id="userInput"
+               placeholder="輸入一句話，例如：系統正在查帳 / 我懷疑有問題"
+               style="
+                    width: 95%;
+                    padding: 12px;
+                    border: 2px solid #1e2937;
+                    border-radius: 8px;
+                    font-size: 15px;
+               ">
+
+        <button onclick="buildMemeFromInput()"
+                style="
+                    margin-top:10px;
+                    width:95%;
+                    background:#111827;
+                    color:white;
+                    border:none;
+                    padding:12px;
+                    font-size:16px;
+                    border-radius:8px;
+                ">
+            🤖 AI 系統解析
+        </button>
+
+    </div>
+
+    <!-- ================= 社群 ================= -->
     <div class="share-buttons">
         <button onclick="shareToFB()" class="social-btn">f</button>
         <button onclick="shareToX()" class="social-btn">𝕏</button>
@@ -29,123 +63,88 @@
         <button onclick="shareToIG()" class="social-btn">📷</button>
     </div>
 
+    <!-- ================= 收據 ================= -->
     <div id="receipt">
+
         <div class="header">
-            <div class="title">民眾堂政治獻金收據（非正式・查帳進行中）</div>
-            <div class="warning">※ 本文件由系統自動生成 • 已進入不可追溯模式 • 有人會搞定司法</div>
+            <div class="title">系統運算輸出介面</div>
+            <div class="warning">SYSTEM MODE ACTIVE • MEME ENGINE RUNNING</div>
         </div>
 
         <div class="info">
-            <div>收據編號：<span id="rid"></span></div>
-            <div>生成時間：<span id="rtime"></span></div>
-            <div>捐款金額：NT$ <span id="rmoney" class="highlight"></span></div>
-            <div>捐款人姓名：<span id="donor">已匿名化處理</span></div>
-            <div>匿名等級：<span id="rlevel" class="highlight"></span></div>
+            <div>系統編號：<span id="rid"></span></div>
+            <div>執行時間：<span id="rtime"></span></div>
+            <div>隨機數值：NT$ <span id="rmoney"></span></div>
+            <div>匿名等級：<span id="rlevel"></span></div>
+            <div>系統運行時間：<span id="rclock"></span></div>
         </div>
 
         <div class="divider"></div>
 
         <div class="content" id="result">
-            點擊上方按鈕開始生成柯學金句...
+            請輸入內容或按下生成開始運算...
         </div>
 
         <div class="divider"></div>
 
         <div class="footer">
-            民眾堂資料處理中心<br>
-            「我從來沒有改變立場」<br>
-            「士可殺不可辱 • 我會很快樂」<br>
-            本文件僅供娛樂與迷因用途 • 認真的你就輸了
+            SYSTEM CORE<br>
+            「資料正在被重新定義」<br>
+            「你看到的不一定是真實」
         </div>
+
     </div>
 </div>
 
-<!-- ==================== 🔥 新增 Modal ==================== -->
+<!-- ================= 初始 Modal ================= -->
 <div id="introModal" class="modal">
   <div class="modal-box">
-    <div class="modal-title">民眾堂系統緊急警報</div>
+
+    <div class="modal-title">SYSTEM BOOT SEQUENCE</div>
 
     <div class="modal-content">
-偵測到政治獻金帳務嚴重異常！
-系統已自動進入「不可追溯模式」……
+偵測到非正常資料流...
 
-記者會現場直播：
-立耑木：「這只是帳務處理的小瑕疵而已」
-蚵蚊折：「方向是對的，只是憑證還沒對齊」
-應小微：「我會很快樂，真的！」
-李蚊蹤：「我必須很負責任地跟大家報告，我完全不知情」
+SYSTEM正在初始化迷因運算核心
 
-目前正在滾動式補正憑證中……
-有人會搞定司法，請放心。
+- 模糊資料已啟用
+- 敘事重構中
+- 語意漂移允許
 
-是否繼續進入「神聖收據生成系統」？
+是否進入系統？
     </div>
 
     <div class="modal-buttons">
       <button onclick="enterSystem(true)">進入系統</button>
-      <button onclick="enterSystem(false)">離開</button>
+      <button onclick="enterSystem(false)">退出</button>
     </div>
+
   </div>
 </div>
 
+<!-- ================= scripts ================= -->
 <script src="script.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <script>
-// ==================== Modal 控制 ====================
-window.onload = function () {
+
+// modal
+window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
 };
 
-function enterSystem(ok) {
+function enterSystem(ok){
     document.getElementById("introModal").style.display = "none";
-
-    if (ok) {
-        console.log("✅ 使用者進入系統");
-        initSystem();
-    } else {
-        document.getElementById("result").innerHTML = `
-            <span style="color:#b91c1c; font-size:18px; line-height:1.8;">
-                已取消進入系統。<br><br>
-                「士可殺不可辱」<br>
-                「我不會屈服」
-            </span>`;
-    }
+    if(ok) initSystem();
+    else document.getElementById("result").innerHTML =
+        "SYSTEM SHUTDOWN";
 }
 
-// 初始化系統
-function initSystem() {
-    if (typeof generate === "function") {
-        generate();
-    } else {
-        document.getElementById("result").innerHTML =
-        "系統初始化完成，請點擊上方按鈕開始生成。";
-    }
+function initSystem(){
+    updateClock();
+    generate();
 }
 
-// ==================== 社群分享 ====================
-function shareToFB() {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("民眾堂查帳收據生成器 😂");
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`, '_blank');
-}
-
-function shareToX() {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("民眾堂收據系統太荒謬了 😂");
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
-}
-
-function shareToThreads() {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("民眾堂收據生成器超好笑 😂");
-    window.open(`https://www.threads.net/intent/post?text=${text}%20${url}`, '_blank');
-}
-
-function shareToIG() {
-    const url = encodeURIComponent(window.location.href);
-    window.open(`https://www.instagram.com/?url=${url}`, '_blank');
-}
 </script>
 
 </body>

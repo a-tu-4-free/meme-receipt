@@ -1,130 +1,180 @@
 let memes = null;
 let memesReady = false;
 
-// ==================== 載入詞庫 ====================
+// ==================== 初始化 ====================
 fetch("memes.json", { cache: "no-store" })
   .then(r => {
-    if (!r.ok) throw new Error(`HTTP ${r.status} - memes.json 檔案不存在`);
+    if (!r.ok) throw new Error("memes.json not found");
     return r.json();
   })
   .then(d => {
     memes = d;
     memesReady = true;
-
-    console.log("✅ 詞庫載入成功！共", d.usages ? d.usages.length : 0, "條用法");
-
-    // 避免重複觸發
-    setTimeout(() => {
-      generate();
-    }, 200);
+    generate();
   })
   .catch(err => {
-    console.error("❌ 載入失敗:", err);
-
-    const resultEl = document.getElementById("result");
-    if (resultEl) {
-      resultEl.innerHTML = `
-        <span style="color:#dc2626; font-weight:bold;">
-          【詞庫載入失敗】<br><br>
-          ${err.message}<br><br>
-          • 檔案需為 memes.json<br>
-          • 與 index.html 同資料夾<br>
-          • GitHub Pages 請 Ctrl+Shift+R
-        </span>`;
-    }
+    document.getElementById("result").innerHTML =
+      "SYSTEM ERROR: memes.json missing";
   });
 
-// ==================== 工具函數 ====================
-function rand(a) {
-  if (!a || a.length === 0) return "（詞庫異常）";
-  return a[Math.floor(Math.random() * a.length)];
+// ==================== 工具 ====================
+function rand(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
 function money() {
-  return Math.floor(Math.random() * 800000 + 1000).toLocaleString();
+  return Math.floor(Math.random() * 900000 + 1000).toLocaleString();
 }
 
 function id() {
-  return "MT-" + String(Math.floor(Math.random() * 9000000) + 1000000).padStart(7, '0');
-}
-
-function level() {
-  return rand([
-    "LEVEL 1 可識別",
-    "LEVEL 2 模糊",
-    "LEVEL 3 匿名",
-    "LEVEL 4 不存在",
-    "LEVEL 5 正在補正"
-  ]);
+  return "SYS-" + Math.floor(Math.random() * 9999999);
 }
 
 function time() {
-  return new Date().toLocaleString('zh-TW');
+  return new Date().toLocaleString("zh-TW");
 }
 
-// ==================== 核心生成 ====================
-function generateMeme() {
-  if (!memesReady || !memes) return "詞庫尚未載入，請稍候...";
+// ==================== 使用者輸入 AI（核心） ====================
+function buildMemeFromInput() {
+  const input = document.getElementById("userInput")?.value;
 
-  if (Math.random() < 0.06 && memes.rare?.length > 0) {
-    return rand(memes.rare);
+  if (!input) {
+    document.getElementById("result").innerHTML =
+      "SYSTEM: 請輸入內容";
+    return;
   }
 
-  return (
-    rand(memes.openings) + "<br><br>" +
-    rand(memes.usages) + "<br><br>" +
-    rand(memes.usages) + "<br><br>" +
-    rand(memes.endings)
-  );
+  const mode = rand([
+    "SYSTEM_LOG",
+    "SYSTEM_ANALYSIS",
+    "SYSTEM_CORRECTION",
+    "SYSTEM_WARNING",
+    "SYSTEM_GLITCH"
+  ]);
+
+  let chaos = Math.random(); // 0~1
+
+  let output = "";
+
+  // ================= 系統紀錄 =================
+  if (mode === "SYSTEM_LOG") {
+    output =
+      `【SYSTEM LOG】<br><br>` +
+      `INPUT: ${input}<br><br>` +
+      `STATUS: 已記錄<br>` +
+      `→ 正在進入資料庫`;
+  }
+
+  // ================= 分析模式 =================
+  else if (mode === "SYSTEM_ANALYSIS") {
+    output =
+      `【SYSTEM ANALYSIS】<br><br>` +
+      `「${input}」<br><br>` +
+      `分析結果：<br>` +
+      rand(memes.usages) +
+      `<br><br>→ 結論：資料不完整`;
+  }
+
+  // ================= 補正模式 =================
+  else if (mode === "SYSTEM_CORRECTION") {
+    output =
+      `【SYSTEM CORRECTION】<br><br>` +
+      `INPUT: ${input}<br><br>` +
+      rand(memes.openings) +
+      `<br>` +
+      rand(memes.usages) +
+      `<br><br>→ 系統正在自動補正`;
+  }
+
+  // ================= 警告模式 =================
+  else if (mode === "SYSTEM_WARNING") {
+    output =
+      `【SYSTEM WARNING】<br><br>` +
+      `偵測到輸入：${input}<br><br>` +
+      `→ 已觸發模糊化處理<br>` +
+      `→ 系統建議停止查詢`;
+  }
+
+  // ================= 崩壞模式（最有趣） =================
+  else {
+    output =
+      `【SYSTEM GLITCH MODE】<br><br>` +
+      `>>> ${input} <<<` +
+      `<br><br>` +
+      rand(memes.usages) +
+      `<br>` +
+      rand(memes.usages) +
+      `<br><br>` +
+      `ERROR: SYSTEM REALITY UNSTABLE`;
+  }
+
+  // ================= 亂數加強（互動核心） =================
+  if (chaos > 0.7) {
+    output += `<br><br>⚠ CHAOS BOOST ACTIVATED ⚠<br>` +
+              `SYSTEM OVERDRIVE`;
+  }
+
+  document.getElementById("result").innerHTML = output;
+
+  // 更新資訊欄
+  document.getElementById("rmoney").innerText = money();
+  document.getElementById("rid").innerText = id();
+  document.getElementById("rtime").innerText = time();
 }
 
 // ==================== 主生成 ====================
 function generate() {
-  if (!memesReady) {
-    document.getElementById("result").innerHTML =
-      "⏳ 詞庫載入中...請稍候";
-    return;
+  if (!memesReady) return;
+
+  const mode = rand(["NORMAL", "SYSTEM", "GLITCH"]);
+
+  let output = "";
+
+  if (mode === "NORMAL") {
+    output =
+      rand(memes.openings) + "<br><br>" +
+      rand(memes.usages) + "<br><br>" +
+      rand(memes.endings);
   }
 
-  document.getElementById("result").innerHTML = generateMeme();
+  else if (mode === "SYSTEM") {
+    output =
+      "【SYSTEM MODE】<br><br>" +
+      rand(memes.usages) +
+      "<br><br>→ processed";
+  }
+
+  else {
+    output =
+      "【GLITCH MODE】<br><br>" +
+      rand(memes.usages) + "<br>" +
+      rand(memes.usages) +
+      "<br><br>ERROR";
+  }
+
+  document.getElementById("result").innerHTML = output;
+
   document.getElementById("rmoney").innerText = money();
   document.getElementById("rid").innerText = id();
   document.getElementById("rtime").innerText = time();
-
-  const rlevel = document.getElementById("rlevel");
-  if (rlevel) rlevel.innerText = level();
 }
 
-// ==================== 洗版 ====================
+// ==================== 洗版（娛樂模式） ====================
 function spam() {
-  if (!memesReady) return;
-
-  let t = "<strong>【一般洗版】</strong><br><br>";
+  let t = "SYSTEM SPAM MODE<br><br>";
 
   for (let i = 0; i < 5; i++) {
-    t += generateMeme() + "<br><br><br>";
+    t += generateMeme() + "<br><br>";
   }
 
   document.getElementById("result").innerHTML = t;
 }
 
 function spamBlack() {
-  if (!memesReady) return;
-
-  let t = "<strong style='color:#b91c1c;'>【查帳黑毒加強版】</strong><br><br>";
+  let t = "SYSTEM OVERLOAD MODE<br><br>";
 
   for (let i = 0; i < 6; i++) {
-    const extra = Math.random() < 0.65;
-
-    let text = extra
-      ? rand(memes.openings) + "<br><br>" +
-        rand(memes.usages) + "<br><br>" +
-        rand(memes.usages) + "<br><br>" +
-        rand(memes.usages) + "<br><br>" +
-        rand(memes.endings)
-      : generateMeme();
-
-    t += text + "<br><br><br>";
+    t += generateMeme() + "<br><br>";
   }
 
   document.getElementById("result").innerHTML = t;
@@ -132,36 +182,41 @@ function spamBlack() {
 
 // ==================== 下載 ====================
 function download() {
-  const receipt = document.getElementById("receipt");
+  const el = document.getElementById("receipt");
 
-  html2canvas(receipt, {
+  html2canvas(el, {
     scale: 2,
-    backgroundColor: "#ffffff"
+    backgroundColor: "#fff"
   }).then(canvas => {
     const a = document.createElement("a");
-    a.download = `民眾堂收據_${Date.now()}.png`;
-    a.href = canvas.toDataURL("image/png");
+    a.download = `SYSTEM_${Date.now()}.png`;
+    a.href = canvas.toDataURL();
     a.click();
   });
 }
 
-// ==================== 🔥 新增：分享文案工具 ====================
-function getShareText() {
-  const text =
-`民眾堂政治獻金收據生成器
+// ==================== 時間系統 ====================
+const startDate = new Date("2024-08-29T00:00:00");
 
-收據編號：${id()}
-金額：NT$ ${money()}
-匿名等級：${level()}
+function updateClock() {
+  const now = new Date();
 
-「方向是對的，只是憑證還沒對齊」
+  let diff = Math.floor((now - startDate) / 1000);
 
-#迷因 #查帳 #系統生成`;
+  const days = Math.floor(diff / 86400);
+  diff %= 86400;
 
-  return encodeURIComponent(text);
+  const hours = Math.floor(diff / 3600);
+  diff %= 3600;
+
+  const minutes = Math.floor(diff / 60);
+  const seconds = diff % 60;
+
+  const el = document.getElementById("rclock");
+
+  if (el) {
+    el.innerText = `${days}天 ${hours}時 ${minutes}分 ${seconds}秒`;
+  }
 }
 
-// （給你之後 IG / Threads / X 可直接用）
-function shareTextOnly() {
-  return getShareText();
-}
+setInterval(updateClock, 1000);
