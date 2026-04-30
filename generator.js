@@ -92,8 +92,8 @@ export function chaosMath() {
     const distortion = b + "" + a;       // 反轉敘事（831177）
 
     return `【系統運算模組】<br>
-數值 A：${a}<br>
-數值 B：${b}<br><br>
+收據 A：${a}<br>
+收據 B：${b}<br><br>
 
 真實結果：${truth}<br>
 政治敘事：${narrative}<br>
