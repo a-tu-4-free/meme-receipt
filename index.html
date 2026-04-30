@@ -65,6 +65,7 @@
     button:hover { transform: translateY(-2px); }
     .main-btn { background: #f59e0b; color: black; }
     .danger-btn { background: #b91c1c; color: white; }
+
     #userInput {
         width: 95%;
         margin: 15px auto;
@@ -89,10 +90,35 @@
         font-size: 16.5px;
         font-weight: bold;
     }
+
+    /* 分享按鈕區域 - 新增 */
     .share-area {
         text-align: center;
-        padding: 10px 15px 15px;
+        padding: 15px;
+        background: #1e2937;
     }
+    .share-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+    .social-btn {
+        width: 52px;
+        height: 52px;
+        border: none;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .social-btn:hover {
+        transform: scale(1.12);
+    }
+
     #receipt {
         margin: 15px;
         background: #02050f;
@@ -143,6 +169,7 @@
         margin-top: 15px;
         line-height: 1.5;
     }
+
     .modal{
         position: fixed;
         inset: 0;
@@ -191,6 +218,7 @@
 </div>
 
 <div class="panel">
+    <!-- 操作按鈕 -->
     <div class="buttons">
         <button class="main-btn" onclick="generate()">🎲 隨機崩壞</button>
         <button onclick="spam()">⚡ 系統洗版</button>
@@ -198,6 +226,7 @@
         <button onclick="download()">⬇ 匯出圖像</button>
     </div>
 
+    <!-- AI 輸入區 -->
     <div style="margin-top:15px; text-align:center;">
         <input id="userInput"
                placeholder="輸入內容（例如：系統正在查帳 / 我懷疑異常 / 政策出現錯誤）">
@@ -206,17 +235,38 @@
         </button>
     </div>
 
+    <!-- 社群分享區域（已修改） -->
     <div class="share-area">
-        <button onclick="shareImage()" 
-                style="background:#1d9bf0; color:white; padding:11px 22px; border:none; border-radius:8px; margin:0 6px; font-size:15px;">
-            𝕏 分享到 X
-        </button>
-        <button onclick="copyShareText()" 
-                style="background:#333; color:white; padding:11px 22px; border:none; border-radius:8px; margin:0 6px; font-size:15px;">
-            📋 複製文字
-        </button>
+        <div class="share-buttons">
+            <!-- Facebook -->
+            <button onclick="shareToPlatform('facebook')" class="social-btn" style="background:#1877F2; color:white;">
+                f
+            </button>
+
+            <!-- Instagram -->
+            <button onclick="shareToPlatform('instagram')" class="social-btn" style="background: linear-gradient(135deg, #f56040, #c13584, #833ab4); color:white;">
+                📷
+            </button>
+
+            <!-- X -->
+            <button onclick="shareToPlatform('x')" class="social-btn" style="background:#000; color:white;">
+                𝕏
+            </button>
+
+            <!-- Threads -->
+            <button onclick="shareToPlatform('threads')" class="social-btn" style="background:#000; color:white;">
+                t
+            </button>
+
+            <!-- 下載截圖 -->
+            <button onclick="shareImage()" 
+                    style="background:#f59e0b; color:black; padding:0 24px; border-radius:12px; font-weight:bold;">
+                ⬇ 下載截圖
+            </button>
+        </div>
     </div>
 
+    <!-- 輸出區域 -->
     <div id="receipt">
         <div class="header">
             <div class="title">SYSTEM OUTPUT TERMINAL</div>
@@ -294,30 +344,30 @@ async function shareImage() {
         link.download = `民眾堂崩壞紀錄_${new Date().toISOString().slice(0,10)}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-        alert("✅ 截圖已產生並下載！\n你可以直接將圖片上傳到 X、Facebook 或 Threads。");
-       
+        alert("✅ 截圖已下載！\n\n請將圖片上傳到你想發文的社群平台。");
     } catch (err) {
         alert("截圖失敗，請稍後再試");
         console.error(err);
     }
 }
 
-function copyShareText() {
-    const content = document.getElementById('result').innerText.trim() || "SYSTEM READY";
-    const textToCopy = `【民眾堂系統 vNEXT】\n\n${content}\n\n已崩壞 ${getCollapseDays()} 天\n#民眾堂 #MEMECORE #語意污染 #崩壞生成器`;
+function shareToPlatform(platform) {
+    shareImage();   // 點任何社群按鈕都先下載截圖
+    
+    let platformName = "";
+    if(platform === 'facebook') platformName = "Facebook";
+    else if(platform === 'instagram') platformName = "Instagram";
+    else if(platform === 'x') platformName = "X";
+    else if(platform === 'threads') platformName = "Threads";
 
-    navigator.clipboard.writeText(textToCopy).then(() => {
-        alert("✅ 分享文字已複製到剪貼簿！\n可直接貼到社群平台");
-    }).catch(() => {
-        alert("複製失敗，請手動複製");
-    });
+    alert(`✅ 截圖已下載！\n\n請上傳到 ${platformName}`);
 }
 
-// ==================== 系統功能 ====================
+// ==================== 原有系統功能 ====================
 window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
     updateTime();
-    setInterval(updateTime, 30000);   // 每30秒更新一次時間
+    setInterval(updateTime, 30000); 
 };
 
 function enterSystem(ok){
@@ -335,7 +385,7 @@ function initSystem(){
         generate();
     }
 }
-
 </script>
+
 </body>
 </html>
