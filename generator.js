@@ -91,13 +91,18 @@ export function chaosMath() {
     const narrative = "" + a + b;        // 拼接敘事（177831）
     const distortion = b + "" + a;       // 反轉敘事（831177）
 
-    return `【系統運算模組】<br>
-收據 A：${a}<br>
-收據 B：${b}<br><br>
+    // =========================
+    // 千分位格式化
+    // =========================
+    const format = (n) => n.toLocaleString("zh-TW");
 
-真實結果：${truth}<br>
-政治敘事：${narrative}<br>
-系統誤讀：${distortion}<br><br>
+    return `【系統運算模組】<br>
+收據 A：${format(a)}元<br>
+收據 B：${format(b)}元<br><br>
+
+真實結果：${format(truth)}元<br>
+政治敘事：${narrative}元<br>
+系統誤讀：${distortion}元<br><br>
 
 系統判定：數學已被重新定義為三種真相`;
 }
