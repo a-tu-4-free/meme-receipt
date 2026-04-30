@@ -15,16 +15,19 @@
 
 <div class="panel">
     <div class="buttons">
-        <button onclick="generate()">產生神聖收據</button>
-        <button onclick="spam()">一般洗版</button>
-        <button onclick="spamBlack()">查帳黑毒洗版</button>
-        <button onclick="download()">下載圖片</button>
-        
-        <!-- 社群分享按鈕 -->
-        <button onclick="shareToFB()" style="background:#1877f2; color:white;">FB</button>
-        <button onclick="shareToX()" style="background:#000; color:white;">𝕏</button>
-        <button onclick="shareToThreads()" style="background:#000; color:white;">Threads</button>
-    </div>
+		<button onclick="generate()">產生神聖收據</button>
+		<button onclick="spam()">一般洗版</button>
+		<button onclick="spamBlack()">查帳黑毒洗版</button>
+		<button onclick="download()">下載圖片</button>
+	</div>
+
+	<!-- 社群分享（獨立一行） -->
+	<div class="share-buttons">
+		<button onclick="shareToFB()" class="social-btn">f</button>
+		<button onclick="shareToX()" class="social-btn">𝕏</button>
+		<button onclick="shareToThreads()" class="social-btn">t</button>
+		<button onclick="shareToIG()" class="social-btn">📷</button>
+	</div>
 
     <div id="receipt">
         <div class="header">
