@@ -1,4 +1,4 @@
-// ==================== script.js v2 FIXED FULL ====================
+// ==================== MEME CORE v3 FULL ====================
 
 import {
     rand,
@@ -7,19 +7,26 @@ import {
     genTime,
     genLevel,
     genComment,
-    generateReceipt,
     fillTemplate,
     chaosMath
 } from "./generator.js";
 
 import {
-    renderReceiptsUI,
     renderCommentUI
 } from "./ui.js";
 
+// ==================== STATE ====================
 let memes = null;
 let memesReady = false;
 let currentReceipts = [];
+
+let gameState = {
+    chaos: 0,
+    stability: 100,
+    level: 1,
+    clicks: 0,
+    modeLock: null
+};
 
 // ==================== INIT ====================
 function loadMemes() {
@@ -40,15 +47,23 @@ function loadMemes() {
         });
 }
 
-// ==================== 建立收據 ====================
+// ==================== CORE ====================
 function createReceipt(input = "") {
-    const mode = rand([
+
+    const modePool = [
         "NORMAL",
         "SYSTEM",
         "GLITCH",
         "POLITICAL_OVERFLOW",
         "CHAOS"
-    ]);
+    ];
+
+    let mode = rand(modePool);
+
+    // 🔥 系統鎖模式（進化機制）
+    if (gameState.chaos > 80) mode = "GLITCH";
+    if (gameState.stability < 40) mode = "SYSTEM";
+    if (gameState.modeLock) mode = gameState.modeLock;
 
     let parts = [];
 
@@ -94,7 +109,7 @@ function createReceipt(input = "") {
     };
 }
 
-// ==================== 渲染 ====================
+// ==================== RENDER ====================
 function render() {
     const container = document.getElementById("receiptContainer");
     const template = document.getElementById("receiptTemplate");
@@ -114,11 +129,47 @@ function render() {
     });
 
     renderCommentUI(genComment());
+
+    updateHUD();
 }
 
-// ==================== 主功能 ====================
+// ==================== HUD ====================
+function updateHUD() {
+    const levelEl = document.getElementById("hudLevel");
+    const chaosEl = document.getElementById("hudChaos");
+    const stabEl = document.getElementById("hudStability");
+
+    if (levelEl) levelEl.innerText = "LV" + gameState.level;
+    if (chaosEl) chaosEl.innerText = gameState.chaos;
+    if (stabEl) stabEl.innerText = gameState.stability + "%";
+
+    // 🔥 視覺崩壞效果
+    document.body.style.filter = "";
+
+    if (gameState.chaos > 60) {
+        document.body.style.filter = "hue-rotate(90deg)";
+    }
+
+    if (gameState.stability < 50) {
+        document.body.style.filter = "contrast(1.2)";
+    }
+
+    if (gameState.stability < 20) {
+        document.body.style.animation = "shake 0.2s infinite";
+    }
+}
+
+// ==================== MAIN ====================
 window.generate = function () {
     if (!memesReady) return;
+
+    gameState.clicks++;
+    gameState.chaos += 5;
+    gameState.stability -= 2;
+
+    if (gameState.clicks > 10) {
+        gameState.level = 2;
+    }
 
     currentReceipts = [];
 
@@ -138,6 +189,10 @@ window.buildMemeFromInput = function () {
         return;
     }
 
+    gameState.clicks++;
+    gameState.chaos += 10;
+    gameState.stability -= 5;
+
     currentReceipts = [];
 
     for (let i = 0; i < 3; i++) {
@@ -147,26 +202,33 @@ window.buildMemeFromInput = function () {
     render();
 };
 
-// ==================== 加碼系統 ====================
+// ==================== UPGRADE (核心爆炸點) ====================
 window.upgradeMode = function () {
     if (!currentReceipts.length) return;
 
+    gameState.chaos += 50;
+    gameState.stability -= 30;
+    gameState.level++;
+
+    gameState.modeLock = "GLITCH";
+
     currentReceipts = currentReceipts.map(r => ({
         ...r,
-        content: r.content + "<br><br>🔥【加碼成功】系統已升級",
+        content: r.content + "<br><br>🔥【系統已失控】",
         money: (parseInt(r.money.replace(/,/g, "")) * 10).toLocaleString(),
         level: "💀 失控等級"
     }));
 
-    renderCommentUI("🔥 系統判定：完全失控");
+    renderCommentUI("🔥 系統判定：已進入崩壞模式");
+
     render();
 };
 
-// ==================== 舊功能 ====================
+// ==================== OLD ====================
 window.spam = () => generate();
 window.spamBlack = () => generate();
 
-// ==================== 下載 ====================
+// ==================== DOWNLOAD ====================
 window.download = function () {
     const el = document.getElementById("receiptContainer");
 
@@ -179,7 +241,7 @@ window.download = function () {
         });
 };
 
-// ==================== 分享 ====================
+// ==================== SHARE ====================
 window.shareToFB = () =>
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
 
@@ -212,23 +274,21 @@ function updateClock() {
 
 setInterval(updateClock, 1000);
 
-// ==================== MODAL FIX ====================
+// ==================== MODAL ====================
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("introModal");
-
-    if (modal) {
-        modal.style.display = "flex";
-    }
+    if (modal) modal.style.display = "flex";
 });
 
-console.log("✅ MEME CORE v2 FIXED FULL LOADED");
-
-window.enterSystem = function(ok) {
+window.enterSystem = function (ok) {
     document.getElementById("introModal").style.display = "none";
 
     if (ok) {
         loadMemes();
     } else {
-        document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
+        document.getElementById("receiptContainer").innerHTML =
+            "SYSTEM OFFLINE";
     }
 };
+
+console.log("🔥 MEME CORE v3 LOADED (STATE SYSTEM ACTIVE)");

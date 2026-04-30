@@ -1,3 +1,6 @@
+/* =========================
+   BASE
+========================= */
 body {
   margin: 0;
   font-family: "Microsoft JhengHei", "Segoe UI", Arial, sans-serif;
@@ -10,10 +13,13 @@ body {
   color: #e5e7eb;
 
   overflow-x: hidden;
+
+  /* ❌ 移除會造成 stacking bug 的 relative */
+  position: static;
 }
 
 /* =========================
-   微 glitch 背景感（輕量）
+   glitch background
 ========================= */
 body::before {
   content: "";
@@ -33,44 +39,10 @@ body::before {
 }
 
 /* =========================
-   TOPBAR
+   TOP / PANEL
 ========================= */
-.topbar {
-  position: relative;
-  z-index: 2;
-
-  background: rgba(2, 6, 23, 0.85);
-
-  color: white;
-
-  text-align: center;
-
-  padding: 18px 10px;
-
-  border-bottom: 1px solid #f59e0b;
-
-  backdrop-filter: blur(14px);
-}
-
-.logo {
-  font-size: 24px;
-  font-weight: 900;
-  letter-spacing: 2px;
-}
-
-.sub {
-  font-size: 12.5px;
-  opacity: 0.7;
-  margin-top: 5px;
-}
-
-/* =========================
-   PANEL
-========================= */
+.topbar,
 .panel {
-  max-width: 650px;
-  margin: 20px auto;
-
   position: relative;
   z-index: 2;
 }
@@ -88,11 +60,9 @@ body::before {
   flex: 1 1 45%;
 
   background: linear-gradient(145deg, #f59e0b, #b45309);
-
   color: #0b1220;
 
   border: none;
-
   padding: 12px 14px;
 
   font-size: 14px;
@@ -109,63 +79,17 @@ body::before {
   transition: all 0.12s ease;
 }
 
-.buttons button:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.05);
-}
-
-.buttons button:active {
-  transform: translateY(3px);
-  box-shadow: 0 2px 0 #0b1220;
-}
-
 /* =========================
-   SHARE
-========================= */
-.share-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.social-btn {
-  width: 42px;
-  height: 42px;
-
-  background: #0f172a;
-  color: #e5e7eb;
-
-  border: 1px solid #334155;
-  border-radius: 10px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-
-  box-shadow: 0 4px 0 #020617;
-
-  transition: all 0.12s;
-}
-
-.social-btn:active {
-  transform: translateY(2px);
-}
-
-/* =========================
-   RECEIPT（核心升級）
+   RECEIPT
 ========================= */
 #receipt {
   position: relative;
+  z-index: 2;
 
   background: rgba(255,255,255,0.97);
-
   color: #0f172a;
 
   padding: 28px;
-
   border-radius: 16px;
 
   box-shadow:
@@ -175,136 +99,33 @@ body::before {
   overflow: hidden;
 }
 
-/* 偽文件浮水印 */
-#receipt::before {
-  content: "MEME SYSTEM / CLASSIFIED OUTPUT";
-
-  position: absolute;
-
-  font-size: 48px;
-  font-weight: 900;
-
-  color: rgba(0,0,0,0.05);
-
-  transform: rotate(-25deg);
-
-  top: 45%;
-  left: -120px;
-
-  white-space: nowrap;
-
-  pointer-events: none;
-}
-
 /* =========================
-   HEADER
+   MODAL FIX (核心修正)
 ========================= */
-.header {
-  text-align: center;
 
-  border-bottom: 1px solid #e5e7eb;
-
-  padding-bottom: 14px;
-
-  margin-bottom: 18px;
-}
-
-.title {
-  font-size: 19px;
-  font-weight: 900;
-}
-
-.warning {
-  font-size: 12px;
-  color: #b91c1c;
-  margin-top: 6px;
-  font-weight: 700;
-}
-
-/* =========================
-   INFO
-========================= */
-.info {
-  font-size: 14px;
-}
-
-.info div {
-  display: flex;
-  justify-content: space-between;
-
-  padding: 6px 0;
-
-  border-bottom: 1px dashed #e5e7eb;
-}
-
-.highlight {
-  color: #b91c1c;
-  font-weight: 800;
-}
-
-/* =========================
-   CONTENT（崩壞感）
-========================= */
-.content {
-  margin-top: 18px;
-
-  font-size: 16px;
-  line-height: 1.9;
-
-  min-height: 200px;
-
-  letter-spacing: 0.2px;
-}
-
-/* =========================
-   DIVIDER
-========================= */
-.divider {
-  height: 2px;
-
-  margin: 22px 0;
-
-  background: repeating-linear-gradient(
-    to right,
-    #0f172a 0,
-    #0f172a 10px,
-    transparent 10px,
-    transparent 18px
-  );
-}
-
-/* =========================
-   FOOTER
-========================= */
-.footer {
-  text-align: center;
-
-  font-size: 12px;
-
-  color: #64748b;
-
-  margin-top: 22px;
-}
-
-/* =========================
-   MODAL（修正版 + 系統感）
-========================= */
+/* 🔥 1. 強制獨立 stacking context */
 .modal {
-  display: none;
-
   position: fixed;
   inset: 0;
 
-  background: rgba(0,0,0,0.75);
-
-  backdrop-filter: blur(6px);
-
-  z-index: 99999;
-
+  display: none;
   justify-content: center;
   align-items: center;
+
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+
+  /* 🔥 超穩 z-index */
+  z-index: 999999999;
+
+  /* 🔥 關鍵：避免被父層影響 */
+  isolation: isolate;
+
+  /* 🔥 防止 click 穿透 */
+  pointer-events: auto;
 }
 
+/* 🔥 2. modal box 強制獨立 */
 .modal-box {
   background: #0f172a;
   color: #e5e7eb;
@@ -314,65 +135,39 @@ body::before {
   padding: 22px;
 
   border-radius: 14px;
-
   border: 1px solid #334155;
 
   box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+
+  position: relative;
+  z-index: 1000000000;
+
+  pointer-events: auto;
 }
 
-.modal-title {
-  font-size: 16px;
-  font-weight: 900;
-
-  color: #fbbf24;
-
-  margin-bottom: 10px;
-}
-
-.modal-content {
-  white-space: pre-line;
-
-  font-size: 13.5px;
-  line-height: 1.7;
-
-  opacity: 0.9;
-}
-
-.modal-buttons {
-  margin-top: 16px;
-
+/* =========================
+   INFO / CONTENT / ETC
+========================= */
+.info div {
   display: flex;
-  gap: 10px;
-  justify-content: flex-end;
+  justify-content: space-between;
+
+  padding: 6px 0;
+
+  border-bottom: 1px dashed #e5e7eb;
 }
 
-.modal-buttons button {
-  padding: 10px 14px;
-
-  border: none;
-
-  border-radius: 8px;
-
-  font-weight: 800;
-
-  cursor: pointer;
-}
-
-.modal-buttons button:first-child {
-  background: #f59e0b;
-  color: #0b1220;
-}
-
-.modal-buttons button:last-child {
-  background: #1f2937;
-  color: #e5e7eb;
+.content {
+  margin-top: 18px;
+  font-size: 16px;
+  line-height: 1.9;
+  min-height: 200px;
 }
 
 /* =========================
    MOBILE
 ========================= */
 @media (max-width: 600px) {
-
   .buttons button {
     flex: 1 1 100%;
   }
@@ -380,48 +175,4 @@ body::before {
   #receipt {
     padding: 18px;
   }
-
-  .logo {
-    font-size: 20px;
-  }
-
-  .title {
-    font-size: 16px;
-  }
-
-  .content {
-    font-size: 15px;
-  }
-}
-
-/* =========================
-   disable hover bug
-========================= */
-@media (hover: none) {
-  .buttons button:hover,
-  .social-btn:hover {
-    transform: none;
-  }
-}
-.modal {
-  z-index: 2147483647 !important;
-  pointer-events: auto !important;
-}
-
-.modal-box {
-  pointer-events: auto !important;
-  position: relative;
-  z-index: 2147483647;
-}
-
-/* 防止主畫面蓋住 modal */
-.panel,
-#receipt,
-#receiptContainer {
-  pointer-events: auto;
-}
-
-/* 強制 modal 不被背景干擾 */
-body {
-  position: relative;
 }

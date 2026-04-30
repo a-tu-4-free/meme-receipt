@@ -138,6 +138,21 @@
         <button onclick="shareToThreads()" class="social-btn">t</button>
         <button onclick="shareToIG()" class="social-btn">📷</button>
     </div>
+	
+	<div id="playerHUD" style="
+		margin:15px;
+		padding:10px;
+		background:#0f172a;
+		border:1px solid #334155;
+		border-radius:10px;
+		color:#fbbf24;
+		font-size:13px;
+		text-align:center;
+	">
+		等級：<span id="hudLevel">LV1</span> |
+		混亂值：<span id="hudChaos">0</span> |
+		系統穩定度：<span id="hudStability">100%</span>
+	</div>
 
     <!-- ================= 系統吐槽 ================= -->
     <div id="systemComment" style="
@@ -149,11 +164,11 @@
     </div>
 
     <!-- ================= OUTPUT（多收據） ================= -->
-    <div id="receiptContainer">
+	<div id="receiptContainer"></div>
 
-        <!-- JS 會動態插入多個 receipt -->
-        
-    </div>
+	<div style="text-align:center;margin-top:10px;color:#64748b;font-size:12px;">
+		點擊「收據」可以觸發系統反應
+	</div>
 
 </div>
 
@@ -209,7 +224,7 @@ MEME CORE 正在啟動：
 
     <div class="modal-buttons">
       <button onclick="enterSystem(true)">進入系統</button>
-      <button onclick="enterSystem(false)">關閉</button>
+      <button onclick="enterSystem(false)">拒絕進入（系統會記住你）</button>
     </div>
 
   </div>
