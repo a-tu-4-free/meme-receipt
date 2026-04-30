@@ -3,59 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>民眾堂系統 vNEXT</title>
+<title>民眾堂系統 vNEXT // MEME CORE</title>
 <link rel="stylesheet" href="style.css">
+
+<style>
+/* ===== 立即修正 modal 錯位問題（關鍵） ===== */
+.modal{
+    position: fixed;
+    inset: 0;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.75);
+    z-index: 99999;
+    padding: 20px;
+}
+
+.modal-box{
+    width: min(520px, 95%);
+    background: #0f172a;
+    color: white;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+}
+
+.modal-title{
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #f59e0b;
+}
+
+.modal-content{
+    font-size: 14px;
+    line-height: 1.7;
+    white-space: pre-line;
+    opacity: 0.9;
+}
+
+.modal-buttons{
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+.modal-buttons button{
+    flex: 1;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 8px;
+}
+
+.modal-buttons button:first-child{
+    background: #f59e0b;
+    color: black;
+}
+
+.modal-buttons button:last-child{
+    background: #1f2937;
+    color: white;
+}
+</style>
+
 </head>
 
 <body>
 
+<!-- ================= TOP ================= -->
 <div class="topbar">
-    <div class="logo">民眾堂系統終端 vNEXT</div>
-    <div class="sub">AI迷因生成 • 系統模擬中 • 非現實運算模式</div>
+    <div class="logo">MEME CORE SYSTEM vNEXT</div>
+    <div class="sub">AI 崩壞生成器 • 語意污染模式 • 非真實運算</div>
 </div>
 
 <div class="panel">
 
-    <!-- ================= 操作區 ================= -->
+    <!-- ================= 操作 ================= -->
     <div class="buttons">
-
-        <button onclick="generate()">🎲 隨機生成</button>
+        <button onclick="generate()">🎲 隨機崩壞</button>
         <button onclick="spam()">⚡ 系統洗版</button>
-        <button onclick="spamBlack()">☠ 崩壞模式</button>
-        <button onclick="download()">⬇ 下載圖像</button>
-
+        <button onclick="spamBlack()">☠ 破壞模式</button>
+        <button onclick="download()">⬇ 匯出圖像</button>
     </div>
 
-    <!-- ================= 新增：玩家輸入 ================= -->
+    <!-- ================= AI INPUT ================= -->
     <div style="margin-top:15px; text-align:center;">
 
         <input id="userInput"
-               placeholder="輸入一句話，例如：系統正在查帳 / 我懷疑有問題"
+               placeholder="輸入內容（例如：系統正在查帳 / 我懷疑異常 / 政策出現錯誤）"
                style="
                     width: 95%;
-                    padding: 12px;
+                    padding: 14px;
                     border: 2px solid #1e2937;
-                    border-radius: 8px;
+                    border-radius: 10px;
                     font-size: 15px;
+                    outline: none;
+                    background: #0b1220;
+                    color: white;
                ">
 
         <button onclick="buildMemeFromInput()"
                 style="
                     margin-top:10px;
                     width:95%;
-                    background:#111827;
-                    color:white;
+                    background: linear-gradient(135deg,#111827,#1f2937);
+                    color:#fbbf24;
                     border:none;
-                    padding:12px;
+                    padding:14px;
                     font-size:16px;
-                    border-radius:8px;
+                    border-radius:10px;
+                    font-weight:bold;
+                    cursor:pointer;
                 ">
-            🤖 AI 系統解析
+            🤖 AI 崩壞解析系統
         </button>
 
     </div>
 
-    <!-- ================= 社群 ================= -->
+    <!-- ================= SHARE ================= -->
     <div class="share-buttons">
         <button onclick="shareToFB()" class="social-btn">f</button>
         <button onclick="shareToX()" class="social-btn">𝕏</button>
@@ -63,60 +131,60 @@
         <button onclick="shareToIG()" class="social-btn">📷</button>
     </div>
 
-    <!-- ================= 收據 ================= -->
+    <!-- ================= OUTPUT ================= -->
     <div id="receipt">
 
         <div class="header">
-            <div class="title">系統運算輸出介面</div>
-            <div class="warning">SYSTEM MODE ACTIVE • MEME ENGINE RUNNING</div>
+            <div class="title">SYSTEM OUTPUT TERMINAL</div>
+            <div class="warning">MEME ENGINE ACTIVE • REALITY DISTORTION ENABLED</div>
         </div>
 
         <div class="info">
-            <div>系統編號：<span id="rid"></span></div>
-            <div>執行時間：<span id="rtime"></span></div>
-            <div>隨機數值：NT$ <span id="rmoney"></span></div>
+            <div>系統ID：<span id="rid"></span></div>
+            <div>時間戳：<span id="rtime"></span></div>
+            <div>隨機值：NT$ <span id="rmoney"></span></div>
             <div>匿名等級：<span id="rlevel"></span></div>
-            <div>系統運行時間：<span id="rclock"></span></div>
+            <div>崩壞時間：<span id="rclock"></span></div>
         </div>
 
         <div class="divider"></div>
 
         <div class="content" id="result">
-            請輸入內容或按下生成開始運算...
+            SYSTEM READY // 等待輸入指令...
         </div>
 
         <div class="divider"></div>
 
         <div class="footer">
-            SYSTEM CORE<br>
-            「資料正在被重新定義」<br>
-            「你看到的不一定是真實」
+            MEME CORE SYSTEM<br>
+            「你看到的不是資料，是敘事」<br>
+            「系統正在重新定義現實」
         </div>
 
     </div>
 </div>
 
-<!-- ================= 初始 Modal ================= -->
+<!-- ================= BOOT MODAL ================= -->
 <div id="introModal" class="modal">
   <div class="modal-box">
 
     <div class="modal-title">SYSTEM BOOT SEQUENCE</div>
 
     <div class="modal-content">
-偵測到非正常資料流...
+偵測到非正常語意流
 
-SYSTEM正在初始化迷因運算核心
+MEME CORE 正在啟動：
 
-- 模糊資料已啟用
-- 敘事重構中
-- 語意漂移允許
+- 語意重構中
+- 敘事污染允許
+- 現實偏移啟用
 
-是否進入系統？
+是否進入崩壞系統？
     </div>
 
     <div class="modal-buttons">
       <button onclick="enterSystem(true)">進入系統</button>
-      <button onclick="enterSystem(false)">退出</button>
+      <button onclick="enterSystem(false)">關閉</button>
     </div>
 
   </div>
@@ -128,21 +196,24 @@ SYSTEM正在初始化迷因運算核心
 
 <script>
 
-// modal
 window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
 };
 
 function enterSystem(ok){
     document.getElementById("introModal").style.display = "none";
-    if(ok) initSystem();
-    else document.getElementById("result").innerHTML =
-        "SYSTEM SHUTDOWN";
+
+    if(ok){
+        initSystem();
+    }else{
+        document.getElementById("result").innerHTML =
+        "SYSTEM OFFLINE";
+    }
 }
 
 function initSystem(){
-    updateClock();
-    generate();
+    updateClock?.();
+    generate?.();
 }
 
 </script>
