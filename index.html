@@ -10,7 +10,7 @@
         --bg: #0b1220;
         --card: #0f172a;
     }
-   
+    
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
         font-family: "Microsoft JhengHei", "Segoe UI", sans-serif;
@@ -19,7 +19,7 @@
         min-height: 100vh;
         padding: 10px;
     }
-   
+    
     .topbar {
         text-align: center;
         margin-bottom: 15px;
@@ -28,16 +28,17 @@
         border-radius: 12px;
         border: 1px solid #f59e0b33;
     }
-    .logo {
-        font-size: 22px;
-        font-weight: bold;
-        color: var(--primary);
+    .logo { 
+        font-size: 22px; 
+        font-weight: bold; 
+        color: var(--primary); 
     }
-    .sub {
-        font-size: 13px;
-        opacity: 0.75;
-        margin-top: 4px;
+    .sub { 
+        font-size: 13px; 
+        opacity: 0.75; 
+        margin-top: 4px; 
     }
+
     .panel {
         max-width: 620px;
         margin: 0 auto;
@@ -47,6 +48,7 @@
         overflow: hidden;
         box-shadow: 0 10px 40px rgba(0,0,0,0.7);
     }
+
     .buttons {
         padding: 15px;
         display: grid;
@@ -63,6 +65,7 @@
         transition: all 0.2s;
     }
     button:hover { transform: translateY(-2px); }
+
     .main-btn { background: #f59e0b; color: black; }
     .danger-btn { background: #b91c1c; color: white; }
 
@@ -78,6 +81,7 @@
         font-size: 15.5px;
         outline: none;
     }
+
     .ai-btn {
         width: 95%;
         margin: 0 auto 15px;
@@ -91,32 +95,10 @@
         font-weight: bold;
     }
 
-    /* 分享按鈕區域 - 新增 */
+    /* 分享按鈕區域 */
     .share-area {
         text-align: center;
-        padding: 15px;
-        background: #1e2937;
-    }
-    .share-buttons {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        flex-wrap: wrap;
-    }
-    .social-btn {
-        width: 52px;
-        height: 52px;
-        border: none;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    .social-btn:hover {
-        transform: scale(1.12);
+        padding: 10px 15px 15px;
     }
 
     #receipt {
@@ -128,22 +110,23 @@
         font-family: monospace;
         line-height: 1.6;
     }
-    .header {
-        text-align: center;
-        margin-bottom: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px dashed #f59e0b55;
+    .header { 
+        text-align: center; 
+        margin-bottom: 12px; 
+        padding-bottom: 12px; 
+        border-bottom: 1px dashed #f59e0b55; 
     }
-    .title {
-        font-size: 18px;
-        color: #f59e0b;
-        font-weight: bold;
+    .title { 
+        font-size: 18px; 
+        color: #f59e0b; 
+        font-weight: bold; 
     }
-    .warning {
-        font-size: 12px;
-        color: #ef4444;
-        margin-top: 6px;
+    .warning { 
+        font-size: 12px; 
+        color: #ef4444; 
+        margin-top: 6px; 
     }
+
     .info {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -151,17 +134,20 @@
         font-size: 14px;
         margin: 15px 0;
     }
+
     .divider {
         height: 1px;
         background: linear-gradient(to right, transparent, #f59e0b88, transparent);
         margin: 15px 0;
     }
+
     .content {
         min-height: 180px;
         font-size: 15.5px;
         white-space: pre-line;
         color: #e2e8f0;
     }
+
     .footer {
         text-align: center;
         font-size: 12px;
@@ -170,6 +156,7 @@
         line-height: 1.5;
     }
 
+    /* Modal */
     .modal{
         position: fixed;
         inset: 0;
@@ -235,35 +222,16 @@
         </button>
     </div>
 
-    <!-- 社群分享區域（已修改） -->
+    <!-- 社群分享區域 -->
     <div class="share-area">
-        <div class="share-buttons">
-            <!-- Facebook -->
-            <button onclick="shareToPlatform('facebook')" class="social-btn" style="background:#1877F2; color:white;">
-                f
-            </button>
-
-            <!-- Instagram -->
-            <button onclick="shareToPlatform('instagram')" class="social-btn" style="background: linear-gradient(135deg, #f56040, #c13584, #833ab4); color:white;">
-                📷
-            </button>
-
-            <!-- X -->
-            <button onclick="shareToPlatform('x')" class="social-btn" style="background:#000; color:white;">
-                𝕏
-            </button>
-
-            <!-- Threads -->
-            <button onclick="shareToPlatform('threads')" class="social-btn" style="background:#000; color:white;">
-                t
-            </button>
-
-            <!-- 下載截圖 -->
-            <button onclick="shareImage()" 
-                    style="background:#f59e0b; color:black; padding:0 24px; border-radius:12px; font-weight:bold;">
-                ⬇ 下載截圖
-            </button>
-        </div>
+        <button onclick="shareImage()" 
+                style="background:#1d9bf0; color:white; padding:11px 22px; border:none; border-radius:8px; margin:0 6px; font-size:15px;">
+            𝕏 分享到 X
+        </button>
+        <button onclick="copyShareText()" 
+                style="background:#333; color:white; padding:11px 22px; border:none; border-radius:8px; margin:0 6px; font-size:15px;">
+            📋 複製文字
+        </button>
     </div>
 
     <!-- 輸出區域 -->
@@ -333,41 +301,43 @@ function updateTime() {
 // ==================== 社群分享功能 ====================
 async function shareImage() {
     const receipt = document.getElementById('receipt');
-   
+    
     try {
         const canvas = await html2canvas(receipt, {
             scale: 2,
             backgroundColor: "#02050f",
             logging: false
         });
+
         const link = document.createElement('a');
         link.download = `民眾堂崩壞紀錄_${new Date().toISOString().slice(0,10)}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-        alert("✅ 截圖已下載！\n\n請將圖片上傳到你想發文的社群平台。");
+
+        alert("✅ 截圖已產生並下載！\n你可以直接將圖片上傳到 X、Facebook 或 Threads。");
+        
     } catch (err) {
         alert("截圖失敗，請稍後再試");
         console.error(err);
     }
 }
 
-function shareToPlatform(platform) {
-    shareImage();   // 點任何社群按鈕都先下載截圖
-    
-    let platformName = "";
-    if(platform === 'facebook') platformName = "Facebook";
-    else if(platform === 'instagram') platformName = "Instagram";
-    else if(platform === 'x') platformName = "X";
-    else if(platform === 'threads') platformName = "Threads";
+function copyShareText() {
+    const content = document.getElementById('result').innerText.trim() || "SYSTEM READY";
+    const textToCopy = `【民眾堂系統 vNEXT】\n\n${content}\n\n已崩壞 ${getCollapseDays()} 天\n#民眾堂 #MEMECORE #語意污染 #崩壞生成器`;
 
-    alert(`✅ 截圖已下載！\n\n請上傳到 ${platformName}`);
+    navigator.clipboard.writeText(textToCopy).then(() => {
+        alert("✅ 分享文字已複製到剪貼簿！\n可直接貼到社群平台");
+    }).catch(() => {
+        alert("複製失敗，請手動複製");
+    });
 }
 
 // ==================== 原有系統功能 ====================
 window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
     updateTime();
-    setInterval(updateTime, 30000); 
+    setInterval(updateTime, 30000);   // 每30秒更新一次時間
 };
 
 function enterSystem(ok){
@@ -385,6 +355,33 @@ function initSystem(){
         generate();
     }
 }
+
+<!-- ================= scripts ================= -->
+<script src="script.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+<script>
+
+window.onload = () => {
+    document.getElementById("introModal").style.display = "flex";
+};
+
+function enterSystem(ok){
+    document.getElementById("introModal").style.display = "none";
+
+    if(ok){
+        initSystem();
+    }else{
+        document.getElementById("result").innerHTML =
+        "SYSTEM OFFLINE";
+    }
+}
+
+function initSystem(){
+    updateClock?.();
+    generate?.();
+}
+
 </script>
 
 </body>
