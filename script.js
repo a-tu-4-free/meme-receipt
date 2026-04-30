@@ -30,20 +30,26 @@ let gameState = {
 
 // ==================== INIT ====================
 function loadMemes() {
-    fetch("memes.json", { cache: "no-store" })
+    fetch("./memes.json?ts=" + Date.now())
         .then(r => {
-            if (!r.ok) throw new Error("memes.json not found");
+            if (!r.ok) {
+                throw new Error("HTTP " + r.status);
+            }
             return r.json();
         })
         .then(d => {
             memes = d;
             memesReady = true;
+
+            console.log("✅ memes.json 載入成功");
             generate();
         })
         .catch(err => {
-            console.error(err);
+            console.error("❌ memes.json error:", err);
+
             document.getElementById("receiptContainer").innerHTML =
-                "SYSTEM FAILURE: memes.json missing";
+                "SYSTEM FAILURE: memes.json missing<br>" +
+                "path=" + location.pathname;
         });
 }
 
