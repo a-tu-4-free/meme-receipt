@@ -30,7 +30,10 @@ let gameState = {
 
 // ==================== INIT ====================
 function loadMemes() {
-    fetch("./memes.json?ts=" + Date.now())
+
+    const url = "https://raw.githubusercontent.com/a-tu-4-free/meme-receipt/main/memes.json";
+
+    fetch(url + "?ts=" + Date.now())
         .then(r => {
             if (!r.ok) {
                 throw new Error("HTTP " + r.status);
@@ -41,7 +44,8 @@ function loadMemes() {
             memes = d;
             memesReady = true;
 
-            console.log("✅ memes.json 載入成功");
+            console.log("✅ memes.json 載入成功 (RAW)");
+
             generate();
         })
         .catch(err => {
@@ -49,7 +53,7 @@ function loadMemes() {
 
             document.getElementById("receiptContainer").innerHTML =
                 "SYSTEM FAILURE: memes.json missing<br>" +
-                "path=" + location.pathname;
+                "URL=" + url;
         });
 }
 
