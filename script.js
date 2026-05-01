@@ -1,4 +1,4 @@
-// ==================== MEME CORE v3 FULL - 修改版 ====================
+// ==================== MEME CORE v3 FULL - 修正版 ====================
 import {
     rand,
     genMoney,
@@ -28,7 +28,7 @@ let gameState = {
     modeLock: null
 };
 
-// ==================== 堂口高層名單（已按照你的要求調整） ====================
+// ==================== 堂口高層名單 ====================
 const highLevelNames = [
     "蟑螂小姊姊",
     "白賊阿北",
@@ -83,11 +83,7 @@ function loadMemes() {
             document.getElementById("receiptContainer").innerHTML = `
                 <div style="color:#f87171; padding:20px; text-align:center;">
                     SYSTEM FAILURE: 無法載入 memes.json<br><br>
-                    請確認以下事項：<br>
-                    1. memes.json 是否已上傳到 GitHub<br>
-                    2. 檔案名稱完全正確（大小寫一致）<br>
-                    3. Repository 是否設為 Public<br><br>
-                    錯誤：${err.message}
+                    請確認 memes.json 是否正確上傳
                 </div>`;
         });
 }
@@ -126,10 +122,9 @@ function createReceipt(input = "", isKo = false, isHuang = false) {
     }
 
     const money = genMoney();
-    const highSalaryNum = Math.floor(1200000 + Math.random() * 4500000);
-    const actualSalaryNum = Math.floor(highSalaryNum * (0.18 + Math.random() * 0.35));
-
-    const highSalaryDisplay = getRandomHighLevelName();   // 使用新名單
+    const actualSalaryNum = Math.floor(800000 + Math.random() * 3000000);
+    
+    const highSalaryDisplay = getRandomHighLevelName();   // ← 關鍵：取得高層名稱
 
     const donate = parseInt(money.replace(/,/g, '')) || 0;
 
@@ -151,12 +146,12 @@ function createReceipt(input = "", isKo = false, isHuang = false) {
     return {
         content: parts.filter(Boolean).join("<br><br>"),
         money: money,
-        highSalary: highSalaryDisplay,        // 顯示堂口高層綽號
+        highSalary: highSalaryDisplay,        // ← 必須確保這裡有值
         actualSalary: actualSalaryNum.toLocaleString('zh-TW'),
         comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
-        level: genLevel(rand),
+        level: genLevel(gameState),           // ← 修正：傳入 gameState 而不是 rand
         isKo: isKo,
         isHuang: isHuang
     };
@@ -166,6 +161,7 @@ function createReceipt(input = "", isKo = false, isHuang = false) {
 function render() {
     const container = document.getElementById("receiptContainer");
     const template = document.getElementById("receiptTemplate");
+    
     container.innerHTML = "";
     container.classList.remove("double");
 
@@ -173,7 +169,6 @@ function render() {
         const clone = template.content.cloneNode(true);
         const receiptDiv = clone.querySelector(".receipt");
 
-        // 加入風格 class
         if (r.isKo) receiptDiv.classList.add("ko");
         if (r.isHuang) receiptDiv.classList.add("huang");
 
@@ -181,13 +176,13 @@ function render() {
         clone.querySelector(".rmoney").innerText = r.money || "0";
         clone.querySelector(".rid").innerText = r.id || "SYS-000000";
         clone.querySelector(".rtime").innerText = r.time || "—";
-        clone.querySelector(".rhighsalary").innerText = r.highSalary || "—";
+        
+        // === 關鍵修正點 ===
+        clone.querySelector(".rhighsalary").innerText = r.highSalary || "堂口高層";
         clone.querySelector(".ractual").innerText = r.actualSalary || "—";
 
         const comparisonDiv = clone.querySelector(".comparison");
-        if (comparisonDiv) {
-            comparisonDiv.innerHTML = r.comparison || "";
-        }
+        if (comparisonDiv) comparisonDiv.innerHTML = r.comparison || "";
 
         receiptDiv.addEventListener("click", () => {
             alert("系統已記錄此筆異常現金流\n雙標引擎運作中...");
@@ -209,11 +204,6 @@ function updateHUD() {
     if (levelEl) levelEl.innerText = "LV" + gameState.level;
     if (chaosEl) chaosEl.innerText = gameState.chaos;
     if (stabEl) stabEl.innerText = gameState.stability + "%";
-
-    document.body.style.filter = "";
-    if (gameState.chaos > 70) document.body.style.filter = "hue-rotate(120deg) saturate(1.4)";
-    if (gameState.stability < 40) document.body.style.filter = "contrast(1.3) brightness(1.1)";
-    if (gameState.stability < 15) document.body.style.animation = "shake 0.15s infinite";
 }
 
 // ==================== MAIN FUNCTIONS ====================
@@ -231,26 +221,21 @@ window.generate = function () {
 
 window.spam = () => generate();
 
-// 雙太陽模式
 window.spamBlack = function () {
     if (!memesReady) return;
-
     gameState.chaos = Math.min(99, gameState.chaos + 15);
     gameState.stability = Math.max(5, gameState.stability - 12);
 
     currentReceipts = [
-        createReceipt("", true, false),   // 阿北系
-        createReceipt("", false, true)    // 戰神系
+        createReceipt("", true, false),
+        createReceipt("", false, true)
     ];
 
-    const container = document.getElementById("receiptContainer");
-    container.classList.add("double");
-
+    document.getElementById("receiptContainer").classList.add("double");
     render();
     renderCommentUI("☠ 雙太陽模式啟動<br>阿北冷靜黑話 vs 戰神正義咆哮");
 };
 
-// 錢再多一點（等級上限99）
 window.upgradeMode = function () {
     if (gameState.level >= 99) {
         renderCommentUI("⚠️ 已達到最高等級 LV99，系統即將完全崩壞");
@@ -266,7 +251,7 @@ window.upgradeMode = function () {
     } else {
         currentReceipts = currentReceipts.map(r => ({
             ...r,
-            content: r.content + `<br><br><span class="angry">🔥 LV${gameState.level} 崩壞加成啟動！現金流量暴增！</span>`,
+            content: r.content + `<br><br><span class="angry">🔥 LV${gameState.level} 崩壞加成啟動！</span>`,
             money: (parseInt(r.money.replace(/,/g, "")) * (1.8 + Math.random() * 1.2)).toLocaleString('zh-TW')
         }));
     }
@@ -282,14 +267,10 @@ window.upgradeMode = function () {
 
 window.buildMemeFromInput = function () {
     const input = document.getElementById("userInput")?.value.trim();
-    if (!input) {
-        alert("請輸入內容！");
-        return;
-    }
-
+    if (!input) return alert("請輸入內容！");
+    
     gameState.chaos = Math.min(99, gameState.chaos + 12);
     gameState.stability = Math.max(5, gameState.stability - 8);
-
     currentReceipts = [createReceipt(input)];
     render();
 };
@@ -302,16 +283,16 @@ window.download = function () {
             a.download = `民眾堂收據_${Date.now()}.png`;
             a.href = canvas.toDataURL("image/png");
             a.click();
-        })
-        .catch(() => alert("截圖失敗"));
+        });
 };
 
+// 其他分享函式保持不變
 window.shareToFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`);
 window.shareToX = () => window.open(`https://twitter.com/intent/tweet?text=民眾堂%20MEME%20CORE&url=${encodeURIComponent(location.href)}`);
 window.shareToThreads = () => alert("已複製連結，請手動貼到 Threads");
 window.shareToIG = () => alert("請先下載收據圖片後上傳 IG");
 
-// ==================== CLOCK ====================
+// ==================== CLOCK & MODAL ====================
 const startDate = new Date("2024-08-29T00:00:00");
 function updateClock() {
     const now = new Date();
@@ -322,14 +303,12 @@ function updateClock() {
     diff %= 3600;
     const m = Math.floor(diff / 60);
     const s = diff % 60;
-
     document.querySelectorAll(".rclock").forEach(el => {
         el.innerText = `${d}天 ${h}時 ${m}分 ${s}秒`;
     });
 }
 setInterval(updateClock, 1000);
 
-// ==================== MODAL ====================
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("introModal");
     if (modal) modal.style.display = "flex";
@@ -337,15 +316,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.enterSystem = function (ok) {
     document.getElementById("introModal").style.display = "none";
-    if (ok) {
-        loadMemes();
-    } else {
-        document.getElementById("receiptContainer").innerHTML = `
-            <div style="color:#f87171; text-align:center; padding:40px;">
-                你已被系統列入黑名單<br><br>
-                雙標引擎已記錄你的拒絕行為
-            </div>`;
-    }
+    if (ok) loadMemes();
+    else document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
 };
 
-console.log("🔥 MEME CORE v3 - 堂口高層名單更新完成 LOADED");
+console.log("🔥 MEME CORE v3 - 高層名稱修正版 LOADED");
