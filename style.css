@@ -124,7 +124,9 @@ body::before {
   align-items: flex-start;
   justify-content: center;
   gap: 28px;
-  flex-wrap: wrap;
+  flex-wrap: wrap; /* 確保在更小的屏幕上可以換行 */
+  margin: 0 auto;
+  padding: 20px 0;
 }
 
 /* =========================

@@ -242,22 +242,9 @@ MEME CORE 正在啟動：
 <script type="module" src="script.js"></script>
 
 <script>
-// 全域變數
+// 全域變數（與 script.js 協同運作）
 let currentLevel = 1;
 const maxLevel = 99;
-
-const highLevelNames = [
-    "蟑螂小姊姊", "阿北轉手哥", "白襪會計師", "小牛文宣", "珊珊基金會",
-    "壁如姐的包", "虹安竹北幫", "國昌咆哮組", "文哲葉克膜", "智菡直播間",
-    "黃珊珊幽靈帳", "高虹安快遞", "蔡壁如顧問", "林珍珍的錢", "柯P睡眠醫學中心",
-    "黃國昌正義聯盟", "民眾黨洗錢小組", "阿北的幽靈員工", "智菡的千萬顧問費",
-    "小牛的消失帳戶", "珊珊的特別費", "壁如的海外帳", "國昌的憤怒基金"
-];
-
-// 隨機生成高層名稱
-function getRandomHighLevelName() {
-    return highLevelNames[Math.floor(Math.random() * highLevelNames.length)];
-}
 
 // 更新 HUD
 function updateHUD() {
@@ -266,7 +253,7 @@ function updateHUD() {
     document.getElementById("hudStability").textContent = `${Math.max(5, 100 - currentLevel * 9)}%`;
 }
 
-// 產生單張收據
+// 產生單張收據（修正千分位問題）
 function createReceipt(isKo = false, isHuang = false) {
     const template = document.getElementById("receiptTemplate");
     const receipt = template.content.cloneNode(true).querySelector(".receipt");
@@ -278,6 +265,7 @@ function createReceipt(isKo = false, isHuang = false) {
     const money = Math.floor(888888 + Math.random() * 8888888);
     const actual = Math.floor(money * (0.12 + Math.random() * 0.25));
 
+    // === 關鍵修正：確保所有數字都有千分位 ===
     receipt.querySelector(".rid").textContent = rid;
     receipt.querySelector(".rtime").textContent = rtime;
     receipt.querySelector(".rmoney").textContent = money.toLocaleString('zh-TW');
@@ -297,78 +285,68 @@ function createReceipt(isKo = false, isHuang = false) {
     return receipt;
 }
 
-// 隨機撈錢（單張）
+// 隨機生成高層名稱（與 script.js 同步）
+const highLevelNames = [
+    "蟑螂小姊姊", "白賊阿北", "咆嘯戰神", "白襪會計師", "B如姐的包",
+    "秘書長直播間", "幽靈帳主管", "特別費處理組", "竹北快遞哥",
+    "麻醉帳戶長", "AKMORE主任", "海外轉手王", "消失的錢包",
+    "顧問費小組", "餐費做帳黨工", "募款機關槍", "阿北轉手小弟",
+    "賺四代網軍", "澎風安快線", "很負責任的文忠", "系統洗錢組"
+];
+
+function getRandomHighLevelName() {
+    return highLevelNames[Math.floor(Math.random() * highLevelNames.length)];
+}
+
+// ==================== 主要功能 ====================
 function generate() {
     const container = document.getElementById("receiptContainer");
     container.innerHTML = "";
     container.classList.remove("double");
-
     const receipt = createReceipt();
     container.appendChild(receipt);
-    
     document.getElementById("systemComment").innerHTML = "🎲 系統已成功撈取一筆政治現金";
 }
 
-// 堂口洗錢（單張加強版）
 function spam() {
-    const container = document.getElementById("receiptContainer");
-    container.innerHTML = "";
-    container.classList.remove("double");
-
-    const receipt = createReceipt();
-    container.appendChild(receipt);
-    
-    document.getElementById("systemComment").innerHTML = "⚡ 堂口洗錢模式啟動，現金流已成功模糊化";
+    generate();
 }
 
-// 雙太陽模式（重點修改）
 function spamBlack() {
     const container = document.getElementById("receiptContainer");
     container.innerHTML = "";
     container.classList.add("double");
-
     const koReceipt = createReceipt(true, false);
     const huangReceipt = createReceipt(false, true);
-
     container.appendChild(koReceipt);
     container.appendChild(huangReceipt);
-
-    document.getElementById("systemComment").innerHTML = "☠ 雙太陽模式啟動<br>柯文哲風格 & 黄國昌風格 同時運作";
+    document.getElementById("systemComment").innerHTML = "☠ 雙太陽模式啟動<br>阿北失言黑話 vs 戰神正義咆哮";
 }
 
-// 錢再多一點（升級系統）
 function upgradeMode() {
     if (currentLevel < maxLevel) {
         currentLevel++;
         updateHUD();
-        
+       
         const chaos = Math.min(99, currentLevel * 8);
         const stability = Math.max(5, 100 - currentLevel * 9);
-        
+       
         let comment = `🔥 等級提升至 LV${currentLevel}！<br>`;
         comment += `混亂值：${chaos} | 穩定度：${stability}%`;
-
         if (currentLevel > 30) comment += "<br><span class='angry'>系統即將失控...</span>";
         if (currentLevel > 60) comment += "<br><span class='warning-text'>警告：現實扭曲指數嚴重超標</span>";
         if (currentLevel > 90) comment += "<br><span class='angry'>MEME CORE 已完全崩壞</span>";
 
         document.getElementById("systemComment").innerHTML = comment;
 
-        // 自動產生一張高級收據
         const container = document.getElementById("receiptContainer");
         container.innerHTML = "";
         container.classList.remove("double");
-
         const receipt = createReceipt();
         container.appendChild(receipt);
     } else {
         document.getElementById("systemComment").innerHTML = "⚠️ 已達到最高等級 LV99，系統即將完全失控";
     }
-}
-
-// 其他功能（占位，後續 script.js 會覆蓋或補完）
-function download() {
-    alert("已截圖並儲存證據至本地（模擬）");
 }
 
 function buildMemeFromInput() {
@@ -380,12 +358,14 @@ function buildMemeFromInput() {
     const container = document.getElementById("receiptContainer");
     container.innerHTML = "";
     container.classList.remove("double");
-
     const receipt = createReceipt();
     receipt.querySelector(".result").innerHTML = `<strong>雙標解析結果：</strong><br>${input}<br><br>系統判定：這是標準操作，沒問題。`;
     container.appendChild(receipt);
-    
     document.getElementById("systemComment").textContent = "🤖 雙標解析系統已完成分析";
+}
+
+function download() {
+    alert("已截圖並儲存證據至本地（模擬）");
 }
 
 function shareToFB() { alert("已模擬分享至 Facebook"); }
@@ -397,7 +377,7 @@ function enterSystem(enter) {
     document.getElementById("introModal").style.display = "none";
     if (enter) {
         document.getElementById("systemComment").innerHTML = "MEME CORE 已成功啟動，歡迎來到雙標世界";
-        generate(); // 預設產生一張
+        generate();
     } else {
         document.getElementById("systemComment").innerHTML = "你已被系統列入黑名單";
     }
