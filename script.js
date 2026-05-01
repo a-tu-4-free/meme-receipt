@@ -1,4 +1,4 @@
-// ==================== MEME CORE v3 FULL ====================
+// ==================== MEME CORE v3 FULL - 修改版 ====================
 import {
     rand,
     genMoney,
@@ -8,7 +8,6 @@ import {
     genComment,
     fillTemplate,
     chaosMath,
-    genHighSalary,
     genThanksMessage,
     genAngryMessage
 } from "./generator.js";
@@ -29,21 +28,58 @@ let gameState = {
     modeLock: null
 };
 
+// ==================== 堂口高層名單（已按照你的要求調整） ====================
+const highLevelNames = [
+    "蟑螂小姊姊",
+    "阿北",
+    "戰神",
+    "澎風安",
+    "白襪會計師",
+    "基金會",
+    "壁如姐的包",
+    "智菡直播間",
+    "幽靈帳主管",
+    "特別費處理組",
+    "竹北快遞哥",
+    "麻醉帳戶長",
+    "葉克膜主任",
+    "正義咆哮機",
+    "海外轉手王",
+    "消失的錢包",
+    "顧問費小組",
+    "直播間金主",
+    "黨部幽靈員工",
+    "募款機關槍",
+    "阿北轉手小弟",
+    "戰神憤怒帳",
+    "澎風安快線",
+    "壁如海外基金",
+    "珊珊特別戶",
+    "核心成員甲",
+    "系統洗錢組",
+    "雙標執行長",
+    "現金流守護者",
+    "語意污染師"
+];
+
+// 隨機取得堂口高層名稱
+function getRandomHighLevelName() {
+    return highLevelNames[Math.floor(Math.random() * highLevelNames.length)];
+}
+
 // ==================== INIT ====================
 function loadMemes() {
     const url = "memes.json";
     fetch(url + "?ts=" + Date.now())
         .then(r => {
-            if (!r.ok) {
-                throw new Error("HTTP " + r.status);
-            }
+            if (!r.ok) throw new Error("HTTP " + r.status);
             return r.json();
         })
         .then(d => {
             memes = d;
             memesReady = true;
             console.log("✅ memes.json 載入成功！");
-            generate();           // 第一次自動生成一張
+            generate();
         })
         .catch(err => {
             console.error("❌ memes.json 載入失敗:", err);
@@ -60,19 +96,14 @@ function loadMemes() {
 }
 
 // ==================== CORE ====================
-function createReceipt(input = "") {
-    const modePool = [
-        "NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"
-    ];
-
+function createReceipt(input = "", isKo = false, isHuang = false) {
+    const modePool = ["NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"];
     let mode = rand(modePool);
-
     if (gameState.chaos > 80) mode = "GLITCH";
     if (gameState.stability < 40) mode = "SYSTEM";
     if (gameState.modeLock) mode = gameState.modeLock;
 
     let parts = [];
-
     if (mode === "NORMAL") {
         parts = [
             fillTemplate(rand(memes.openings)),
@@ -80,20 +111,11 @@ function createReceipt(input = "") {
             fillTemplate(rand(memes.endings))
         ];
     } else if (mode === "SYSTEM") {
-        parts = [
-            "【SYSTEM MODE ACTIVE】",
-            fillTemplate(rand(memes.system_weird))
-        ];
+        parts = ["【SYSTEM MODE ACTIVE】", fillTemplate(rand(memes.system_weird))];
     } else if (mode === "GLITCH") {
-        parts = [
-            "▓▒░ SYSTEM CORRUPTION ░▒▓",
-            fillTemplate(rand(memes.glitch))
-        ];
+        parts = ["▓▒░ SYSTEM CORRUPTION ░▒▓", fillTemplate(rand(memes.glitch))];
     } else if (mode === "POLITICAL_OVERFLOW") {
-        parts = [
-            fillTemplate(rand(memes.politics_glitch)),
-            "SYSTEM OVERRIDE ACTIVE"
-        ];
+        parts = [fillTemplate(rand(memes.politics_glitch)), "SYSTEM OVERRIDE ACTIVE"];
     } else {
         parts = [
             fillTemplate(rand(memes.usages)),
@@ -106,18 +128,15 @@ function createReceipt(input = "") {
         parts.unshift(`【INPUT】${input}`);
     }
 
-    // ==================== 金額邏輯 ====================
     const money = genMoney();
-    const highSalaryNum = genHighSalary();
-    const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
+    const highSalaryNum = Math.floor(1200000 + Math.random() * 4500000);
+    const actualSalaryNum = Math.floor(highSalaryNum * (0.18 + Math.random() * 0.35));
 
-    const highSalary = highSalaryNum.toLocaleString();
-    const actualSalary = actualSalaryNum.toLocaleString();
+    const highSalaryDisplay = getRandomHighLevelName();   // 使用新名單
 
-    // 比較邏輯
     const donate = parseInt(money.replace(/,/g, '')) || 0;
-    let comparisonHTML = "";
 
+    let comparisonHTML = "";
     if (donate >= actualSalaryNum) {
         comparisonHTML = `
             <div class="thanks">✅ 民眾堂對您的奉獻深表感謝！</div>
@@ -135,12 +154,14 @@ function createReceipt(input = "") {
     return {
         content: parts.filter(Boolean).join("<br><br>"),
         money: money,
-        highSalary: highSalary,
-        actualSalary: actualSalary,
+        highSalary: highSalaryDisplay,        // 顯示堂口高層綽號
+        actualSalary: actualSalaryNum.toLocaleString('zh-TW'),
         comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
-        level: genLevel(rand)
+        level: genLevel(rand),
+        isKo: isKo,
+        isHuang: isHuang
     };
 }
 
@@ -149,16 +170,20 @@ function render() {
     const container = document.getElementById("receiptContainer");
     const template = document.getElementById("receiptTemplate");
     container.innerHTML = "";
+    container.classList.remove("double");
 
     currentReceipts.forEach(r => {
         const clone = template.content.cloneNode(true);
+        const receiptDiv = clone.querySelector(".receipt");
+
+        // 加入風格 class
+        if (r.isKo) receiptDiv.classList.add("ko");
+        if (r.isHuang) receiptDiv.classList.add("huang");
 
         clone.querySelector(".result").innerHTML = r.content || "";
         clone.querySelector(".rmoney").innerText = r.money || "0";
         clone.querySelector(".rid").innerText = r.id || "SYS-000000";
         clone.querySelector(".rtime").innerText = r.time || "—";
-
-        // 新增欄位填入
         clone.querySelector(".rhighsalary").innerText = r.highSalary || "—";
         clone.querySelector(".ractual").innerText = r.actualSalary || "—";
 
@@ -167,10 +192,14 @@ function render() {
             comparisonDiv.innerHTML = r.comparison || "";
         }
 
+        receiptDiv.addEventListener("click", () => {
+            alert("系統已記錄此筆異常現金流\n雙標引擎運作中...");
+        });
+
         container.appendChild(clone);
     });
 
-    renderCommentUI(genComment());
+    renderCommentUI(genComment(gameState));
     updateHUD();
 }
 
@@ -185,83 +214,105 @@ function updateHUD() {
     if (stabEl) stabEl.innerText = gameState.stability + "%";
 
     document.body.style.filter = "";
-    if (gameState.chaos > 60) document.body.style.filter = "hue-rotate(90deg)";
-    if (gameState.stability < 50) document.body.style.filter = "contrast(1.2)";
-    if (gameState.stability < 20) document.body.style.animation = "shake 0.2s infinite";
+    if (gameState.chaos > 70) document.body.style.filter = "hue-rotate(120deg) saturate(1.4)";
+    if (gameState.stability < 40) document.body.style.filter = "contrast(1.3) brightness(1.1)";
+    if (gameState.stability < 15) document.body.style.animation = "shake 0.15s infinite";
 }
 
-// ==================== MAIN ====================
-// 修改重點：每次只產生 1 張收據
+// ==================== MAIN FUNCTIONS ====================
+
 window.generate = function () {
     if (!memesReady) return;
-
     gameState.clicks++;
-    gameState.chaos += 5;
-    gameState.stability -= 2;
-    if (gameState.clicks > 10) gameState.level = 2;
+    gameState.chaos = Math.min(99, gameState.chaos + 6);
+    gameState.stability = Math.max(5, gameState.stability - 3);
+    if (gameState.clicks > 8 && gameState.level < 99) gameState.level++;
 
-    currentReceipts = [createReceipt()];   // 只產生 1 張
+    currentReceipts = [createReceipt("")];
+    render();
+};
+
+window.spam = () => generate();
+
+// 雙太陽模式
+window.spamBlack = function () {
+    if (!memesReady) return;
+
+    gameState.chaos = Math.min(99, gameState.chaos + 15);
+    gameState.stability = Math.max(5, gameState.stability - 12);
+
+    currentReceipts = [
+        createReceipt("", true, false),   // 阿北系
+        createReceipt("", false, true)    // 戰神系
+    ];
+
+    const container = document.getElementById("receiptContainer");
+    container.classList.add("double");
+
+    render();
+    renderCommentUI("☠ 雙太陽模式啟動<br>阿北冷靜黑話 vs 戰神正義咆哮");
+};
+
+// 錢再多一點（等級上限99）
+window.upgradeMode = function () {
+    if (gameState.level >= 99) {
+        renderCommentUI("⚠️ 已達到最高等級 LV99，系統即將完全崩壞");
+        return;
+    }
+
+    gameState.level = Math.min(99, gameState.level + 1);
+    gameState.chaos = Math.min(99, gameState.chaos + 18);
+    gameState.stability = Math.max(5, gameState.stability - 15);
+
+    if (currentReceipts.length === 0) {
+        currentReceipts = [createReceipt("")];
+    } else {
+        currentReceipts = currentReceipts.map(r => ({
+            ...r,
+            content: r.content + `<br><br><span class="angry">🔥 LV${gameState.level} 崩壞加成啟動！現金流量暴增！</span>`,
+            money: (parseInt(r.money.replace(/,/g, "")) * (1.8 + Math.random() * 1.2)).toLocaleString('zh-TW')
+        }));
+    }
+
+    let msg = `🔥 等級提升至 LV${gameState.level}！`;
+    if (gameState.level > 40) msg += "<br>系統開始出現嚴重語意污染...";
+    if (gameState.level > 70) msg += "<br><span class='warning-text'>現實扭曲指數嚴重超標！</span>";
+    if (gameState.level > 90) msg += "<br><span class='angry'>MEME CORE 已接近完全失控</span>";
+
+    renderCommentUI(msg);
     render();
 };
 
 window.buildMemeFromInput = function () {
     const input = document.getElementById("userInput")?.value.trim();
     if (!input) {
-        document.getElementById("receiptContainer").innerHTML = "SYSTEM: INPUT REQUIRED";
+        alert("請輸入內容！");
         return;
     }
 
-    gameState.clicks++;
-    gameState.chaos += 10;
-    gameState.stability -= 5;
+    gameState.chaos = Math.min(99, gameState.chaos + 12);
+    gameState.stability = Math.max(5, gameState.stability - 8);
 
-    currentReceipts = [createReceipt(input)];   // 只產生 1 張
+    currentReceipts = [createReceipt(input)];
     render();
 };
 
-// ==================== UPGRADE ====================
-window.upgradeMode = function () {
-    if (!currentReceipts.length) return;
-
-    gameState.chaos += 50;
-    gameState.stability -= 30;
-    gameState.level++;
-    gameState.modeLock = "GLITCH";
-
-    currentReceipts = currentReceipts.map(r => ({
-        ...r,
-        content: r.content + "<br><br>🔥【系統已失控】",
-        money: (parseInt(r.money.replace(/,/g, "")) * 10).toLocaleString(),
-        highSalary: (parseInt(r.highSalary.replace(/,/g, "")) * 8).toLocaleString(),
-        actualSalary: (parseInt(r.actualSalary.replace(/,/g, "")) * 8).toLocaleString(),
-        level: "💀 失控等級"
-    }));
-
-    renderCommentUI("🔥 系統判定：已進入崩壞模式");
-    render();
-};
-
-// ==================== OLD ====================
-window.spam = () => generate();
-window.spamBlack = () => generate();
-
-// ==================== DOWNLOAD ====================
 window.download = function () {
     const el = document.getElementById("receiptContainer");
-    html2canvas(el, { scale: 2, backgroundColor: "#fff" })
+    html2canvas(el, { scale: 2, backgroundColor: "#ffffff" })
         .then(canvas => {
             const a = document.createElement("a");
-            a.download = `MEMECORE_${Date.now()}.png`;
+            a.download = `民眾堂收據_${Date.now()}.png`;
             a.href = canvas.toDataURL("image/png");
             a.click();
-        });
+        })
+        .catch(() => alert("截圖失敗"));
 };
 
-// ==================== SHARE ====================
-window.shareToFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
-window.shareToX = () => window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
-window.shareToThreads = () => alert("已複製請貼上 Threads");
-window.shareToIG = () => alert("請下載圖片上傳 IG");
+window.shareToFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}`);
+window.shareToX = () => window.open(`https://twitter.com/intent/tweet?text=民眾堂%20MEME%20CORE&url=${encodeURIComponent(location.href)}`);
+window.shareToThreads = () => alert("已複製連結，請手動貼到 Threads");
+window.shareToIG = () => alert("請先下載收據圖片後上傳 IG");
 
 // ==================== CLOCK ====================
 const startDate = new Date("2024-08-29T00:00:00");
@@ -289,8 +340,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.enterSystem = function (ok) {
     document.getElementById("introModal").style.display = "none";
-    if (ok) loadMemes();
-    else document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
+    if (ok) {
+        loadMemes();
+    } else {
+        document.getElementById("receiptContainer").innerHTML = `
+            <div style="color:#f87171; text-align:center; padding:40px;">
+                你已被系統列入黑名單<br><br>
+                雙標引擎已記錄你的拒絕行為
+            </div>`;
+    }
 };
 
-console.log("🔥 MEME CORE v3 LOADED (STATE SYSTEM ACTIVE)");
+console.log("🔥 MEME CORE v3 - 堂口高層名單更新完成 LOADED");

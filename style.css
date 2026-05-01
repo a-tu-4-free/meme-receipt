@@ -70,7 +70,7 @@ body::before {
 
 /* ================= PANEL ================= */
 .panel {
-    max-width: 680px;
+    max-width: 720px;
     margin: 20px auto;
     width: 100%;
     position: relative;
@@ -90,13 +90,17 @@ body::before {
   background: linear-gradient(145deg, #f59e0b, #b45309);
   color: #0b1220;
   border: none;
-  padding: 12px 14px;
-  font-size: 14px;
+  padding: 13px 14px;
+  font-size: 14.5px;
   font-weight: 800;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 6px 0 #0b1220, 0 0 10px rgba(245,158,11,0.2);
-  transition: all 0.12s ease;
+  box-shadow: 0 6px 0 #0b1220, 0 0 10px rgba(245,158,11,0.25);
+  transition: all 0.15s ease;
+}
+.buttons button:active {
+  transform: translateY(3px);
+  box-shadow: 0 3px 0 #0b1220;
 }
 
 /* =========================
@@ -104,18 +108,27 @@ body::before {
 ========================= */
 #receiptContainer {
   width: 100%;
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  align-items: center;        /* 置中 */
-  gap: 30px;
-  padding: 20px 0;
-  min-height: 500px;
+  align-items: center;
+  gap: 35px;
+  padding: 25px 0;
+  min-height: 520px;
+}
+
+/* 雙太陽模式 - 並排顯示 */
+#receiptContainer.double {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
 }
 
 /* =========================
-   RECEIPT CARD（單張重點強化）
+   RECEIPT CARD
 ========================= */
 .receipt {
   width: 100%;
@@ -123,11 +136,39 @@ body::before {
   background: rgba(255,255,255,0.97);
   color: #0f172a;
   padding: 34px 30px;
-  border-radius: 18px;
-  box-shadow: 0 30px 80px rgba(0,0,0,0.7),
-              inset 0 0 0 1px rgba(245, 158, 11, 0.2);
+  border-radius: 20px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.72),
+              inset 0 0 0 1px rgba(245, 158, 11, 0.25);
   overflow: hidden;
   position: relative;
+  transition: all 0.25s ease;
+}
+
+.receipt:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 35px 90px rgba(0,0,0,0.78);
+}
+
+/* 柯文哲風格（阿北系） - 冷靜綠調 */
+.receipt.ko {
+  border: 4px solid #15803d;
+}
+.receipt.ko .title {
+  color: #15803d;
+}
+.receipt.ko .header .warning {
+  color: #166534;
+}
+
+/* 黃國昌風格（戰神系） - 激昂紅調 */
+.receipt.huang {
+  border: 4px solid #b91c1c;
+}
+.receipt.huang .title {
+  color: #b91c1c;
+}
+.receipt.huang .header .warning {
+  color: #991b1b;
 }
 
 /* =========================
@@ -135,18 +176,17 @@ body::before {
 ========================= */
 .header {
   text-align: center;
-  margin-bottom: 24px;
+  margin-bottom: 26px;
 }
 .header .title {
-  font-size: 19px;
+  font-size: 20px;
   font-weight: bold;
-  color: #1e2937;
-  letter-spacing: 1.5px;
+  letter-spacing: 1.8px;
 }
 .header .warning {
-  font-size: 13.5px;
-  color: #b45309;
-  margin-top: 6px;
+  font-size: 13.8px;
+  margin-top: 8px;
+  font-weight: 600;
 }
 
 /* =========================
@@ -154,52 +194,53 @@ body::before {
 ========================= */
 .info {
   background: #f8fafc;
-  padding: 16px 18px;
-  border-radius: 12px;
-  margin: 20px 0;
+  padding: 18px 20px;
+  border-radius: 14px;
+  margin: 22px 0;
   border: 1px solid #e2e8f0;
 }
 .info div {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
+  padding: 11px 0;
   border-bottom: 1px dashed #cbd5e1;
-  font-size: 15.8px;
+  font-size: 16px;
 }
 .info div:last-child {
   border-bottom: none;
 }
 
-/* 高層薪水特別強調 */
+/* 高層名稱特別強調 */
 .high-salary {
   color: #c2410c;
   font-weight: 700;
+  font-size: 1.05em;
 }
 
 /* =========================
    COMPARISON 區塊
 ========================= */
 .comparison {
-  margin: 22px 0;
-  padding: 18px 20px;
-  border-radius: 12px;
+  margin: 24px 0;
+  padding: 20px 22px;
+  border-radius: 14px;
   background: #fefce8;
   border: 1px solid #fde047;
-  min-height: 90px;
-  font-size: 15.5px;
-  line-height: 1.75;
+  min-height: 100px;
+  font-size: 15.8px;
+  line-height: 1.8;
 }
 
 /* =========================
    CONTENT
 ========================= */
 .content {
-  margin: 24px 0;
-  font-size: 16.2px;
-  line-height: 1.9;
+  margin: 26px 0;
+  font-size: 16.4px;
+  line-height: 1.95;
   color: #1e2937;
-  min-height: 200px;
+  min-height: 210px;
 }
 
 /* =========================
@@ -207,10 +248,10 @@ body::before {
 ========================= */
 .footer {
   text-align: center;
-  font-size: 13.8px;
+  font-size: 14px;
   color: #64748b;
-  margin-top: 26px;
-  line-height: 1.65;
+  margin-top: 30px;
+  line-height: 1.7;
 }
 
 /* =========================
@@ -219,29 +260,38 @@ body::before {
 .divider {
   height: 1px;
   background: linear-gradient(to right, transparent, #cbd5e1, transparent);
-  margin: 20px 0;
+  margin: 22px 0;
 }
 
 /* =========================
-   MOBILE FIX
+   MOBILE OPTIMIZATION
 ========================= */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .buttons button {
     flex: 1 1 100%;
   }
+  
   .receipt {
-    padding: 24px 20px;
+    padding: 26px 22px;
+    max-width: 100%;
   }
+  
+  #receiptContainer.double {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
   .info {
-    padding: 14px 16px;
+    padding: 16px 18px;
   }
+  
   #receiptContainer {
-    padding: 10px 0;
+    padding: 15px 0;
   }
 }
 
 /* =========================
-   額外視覺強化
+   文字樣式強化
 ========================= */
 .angry {
   color: #b91c1c;
@@ -254,4 +304,9 @@ body::before {
 .warning-text {
   color: #b45309;
   font-weight: 600;
+}
+
+/* 額外互動效果 */
+.receipt:active {
+  transform: scale(0.98);
 }
