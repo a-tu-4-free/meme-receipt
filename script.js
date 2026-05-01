@@ -8,9 +8,9 @@ import {
     genComment,
     fillTemplate,
     chaosMath,
-    genHighSalary,        // ← 新增
-    genThanksMessage,     // ← 新增
-    genAngryMessage       // ← 新增
+    genHighSalary,
+    genThanksMessage,
+    genAngryMessage
 } from "./generator.js";
 
 import {
@@ -43,7 +43,7 @@ function loadMemes() {
             memes = d;
             memesReady = true;
             console.log("✅ memes.json 載入成功！");
-            generate();
+            generate();           // 第一次自動生成一張
         })
         .catch(err => {
             console.error("❌ memes.json 載入失敗:", err);
@@ -107,8 +107,8 @@ function createReceipt(input = "") {
     }
 
     // ==================== 金額邏輯 ====================
-    const money = genMoney();                    
-    const highSalaryNum = genHighSalary();       
+    const money = genMoney();
+    const highSalaryNum = genHighSalary();
     const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
 
     const highSalary = highSalaryNum.toLocaleString();
@@ -153,17 +153,19 @@ function render() {
     currentReceipts.forEach(r => {
         const clone = template.content.cloneNode(true);
 
-        clone.querySelector(".result").innerHTML = r.content;
-        clone.querySelector(".rmoney").innerText = r.money;
-        clone.querySelector(".rid").innerText = r.id;
-        clone.querySelector(".rtime").innerText = r.time;
-        
-        // 新增欄位
+        clone.querySelector(".result").innerHTML = r.content || "";
+        clone.querySelector(".rmoney").innerText = r.money || "0";
+        clone.querySelector(".rid").innerText = r.id || "SYS-000000";
+        clone.querySelector(".rtime").innerText = r.time || "—";
+
+        // 新增欄位填入
         clone.querySelector(".rhighsalary").innerText = r.highSalary || "—";
         clone.querySelector(".ractual").innerText = r.actualSalary || "—";
 
         const comparisonDiv = clone.querySelector(".comparison");
-        if (comparisonDiv) comparisonDiv.innerHTML = r.comparison || "";
+        if (comparisonDiv) {
+            comparisonDiv.innerHTML = r.comparison || "";
+        }
 
         container.appendChild(clone);
     });
@@ -189,17 +191,16 @@ function updateHUD() {
 }
 
 // ==================== MAIN ====================
+// 修改重點：每次只產生 1 張收據
 window.generate = function () {
     if (!memesReady) return;
+
     gameState.clicks++;
     gameState.chaos += 5;
     gameState.stability -= 2;
     if (gameState.clicks > 10) gameState.level = 2;
 
-    currentReceipts = [];
-    for (let i = 0; i < 3; i++) {
-        currentReceipts.push(createReceipt());
-    }
+    currentReceipts = [createReceipt()];   // 只產生 1 張
     render();
 };
 
@@ -214,10 +215,7 @@ window.buildMemeFromInput = function () {
     gameState.chaos += 10;
     gameState.stability -= 5;
 
-    currentReceipts = [];
-    for (let i = 0; i < 3; i++) {
-        currentReceipts.push(createReceipt(input));
-    }
+    currentReceipts = [createReceipt(input)];   // 只產生 1 張
     render();
 };
 

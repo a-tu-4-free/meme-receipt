@@ -70,7 +70,7 @@ body::before {
 
 /* ================= PANEL ================= */
 .panel {
-    max-width: 650px;
+    max-width: 680px;
     margin: 20px auto;
     width: 100%;
     position: relative;
@@ -100,28 +100,32 @@ body::before {
 }
 
 /* =========================
-   RECEIPT CONTAINER
+   RECEIPT CONTAINER（重點修改）
 ========================= */
 #receiptContainer {
   width: 100%;
-  max-width: 650px;
+  max-width: 680px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;        /* 置中 */
+  gap: 30px;
+  padding: 20px 0;
+  min-height: 500px;
 }
 
 /* =========================
-   RECEIPT CARD
+   RECEIPT CARD（單張重點強化）
 ========================= */
 .receipt {
   width: 100%;
+  max-width: 620px;
   background: rgba(255,255,255,0.97);
   color: #0f172a;
-  padding: 28px;
-  border-radius: 16px;
-  box-shadow: 0 25px 80px rgba(0,0,0,0.6),
-              inset 0 0 0 1px rgba(0,0,0,0.08);
+  padding: 34px 30px;
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7),
+              inset 0 0 0 1px rgba(245, 158, 11, 0.2);
   overflow: hidden;
   position: relative;
 }
@@ -131,40 +135,38 @@ body::before {
 ========================= */
 .header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .header .title {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: bold;
   color: #1e2937;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 .header .warning {
-  font-size: 13px;
+  font-size: 13.5px;
   color: #b45309;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 
 /* =========================
-   INFO 區塊（重點修改）
+   INFO 區塊
 ========================= */
 .info {
   background: #f8fafc;
-  padding: 14px 16px;
-  border-radius: 10px;
-  margin: 16px 0;
+  padding: 16px 18px;
+  border-radius: 12px;
+  margin: 20px 0;
   border: 1px solid #e2e8f0;
 }
-
 .info div {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 9px 0;
+  padding: 10px 0;
   border-bottom: 1px dashed #cbd5e1;
-  font-size: 15.5px;
+  font-size: 15.8px;
 }
-
 .info div:last-child {
   border-bottom: none;
 }
@@ -176,28 +178,28 @@ body::before {
 }
 
 /* =========================
-   COMPARISON 區塊（新增重點）
+   COMPARISON 區塊
 ========================= */
 .comparison {
-  margin: 18px 0;
-  padding: 16px;
-  border-radius: 10px;
+  margin: 22px 0;
+  padding: 18px 20px;
+  border-radius: 12px;
   background: #fefce8;
   border: 1px solid #fde047;
-  min-height: 80px;
+  min-height: 90px;
   font-size: 15.5px;
-  line-height: 1.7;
+  line-height: 1.75;
 }
 
 /* =========================
    CONTENT
 ========================= */
 .content {
-  margin: 20px 0;
-  font-size: 16px;
-  line-height: 1.85;
+  margin: 24px 0;
+  font-size: 16.2px;
+  line-height: 1.9;
   color: #1e2937;
-  min-height: 180px;
+  min-height: 200px;
 }
 
 /* =========================
@@ -205,10 +207,10 @@ body::before {
 ========================= */
 .footer {
   text-align: center;
-  font-size: 13.5px;
+  font-size: 13.8px;
   color: #64748b;
-  margin-top: 20px;
-  line-height: 1.6;
+  margin-top: 26px;
+  line-height: 1.65;
 }
 
 /* =========================
@@ -217,7 +219,7 @@ body::before {
 .divider {
   height: 1px;
   background: linear-gradient(to right, transparent, #cbd5e1, transparent);
-  margin: 18px 0;
+  margin: 20px 0;
 }
 
 /* =========================
@@ -228,10 +230,13 @@ body::before {
     flex: 1 1 100%;
   }
   .receipt {
-    padding: 20px 18px;
+    padding: 24px 20px;
   }
   .info {
-    padding: 12px 14px;
+    padding: 14px 16px;
+  }
+  #receiptContainer {
+    padding: 10px 0;
   }
 }
 
@@ -242,12 +247,10 @@ body::before {
   color: #b91c1c;
   font-weight: bold;
 }
-
 .thanks {
   color: #15803d;
   font-weight: bold;
 }
-
 .warning-text {
   color: #b45309;
   font-weight: 600;

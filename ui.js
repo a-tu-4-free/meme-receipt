@@ -1,74 +1,74 @@
-// ==================== ui.js v3 (堂口高層薪水版) ====================
+// ==================== ui.js v4 (單張收據優化版) ====================
 
 let lastClickedReceipt = null;
 
-// ==================== 收據渲染（強化互動版） ====================
+// ==================== 收據渲染（單張版本） ====================
 export function renderReceiptsUI(container, template, list) {
     container.innerHTML = "";
 
-    list.forEach((r, index) => {
-        const clone = template.content.cloneNode(true);
-        const el = clone.querySelector(".receipt");
+    // 因為現在只顯示一張，所以取第一筆資料
+    const r = list[0];
+    if (!r) return;
 
-        // ==================== 基本資料填入 ====================
-        const resultEl = clone.querySelector(".result");
-        const moneyEl = clone.querySelector(".rmoney");
-        const idEl = clone.querySelector(".rid");
-        const timeEl = clone.querySelector(".rtime");
-        const highSalaryEl = clone.querySelector(".rhighsalary");
-        const actualSalaryEl = clone.querySelector(".ractual");
-        const comparisonEl = clone.querySelector(".comparison");
+    const clone = template.content.cloneNode(true);
+    const el = clone.querySelector(".receipt");
 
-        // 填入資料
-        resultEl.innerHTML = r.content || "";
-        moneyEl.innerText = r.money || "0";
-        idEl.innerText = r.id || "SYS-000000";
-        timeEl.innerText = r.time || "—";
+    // ==================== 基本資料填入 ====================
+    const resultEl = clone.querySelector(".result");
+    const moneyEl = clone.querySelector(".rmoney");
+    const idEl = clone.querySelector(".rid");
+    const timeEl = clone.querySelector(".rtime");
+    const highSalaryEl = clone.querySelector(".rhighsalary");
+    const actualSalaryEl = clone.querySelector(".ractual");
+    const comparisonEl = clone.querySelector(".comparison");
 
-        // 新增欄位
-        if (highSalaryEl) highSalaryEl.innerText = r.highSalary || "—";
-        if (actualSalaryEl) actualSalaryEl.innerText = r.actualSalary || "—";
-        if (comparisonEl) comparisonEl.innerHTML = r.comparison || "";
+    // 填入資料
+    resultEl.innerHTML = r.content || "";
+    moneyEl.innerText = r.money || "0";
+    idEl.innerText = r.id || "SYS-000000";
+    timeEl.innerText = r.time || "—";
 
-        // ==================== 出場動畫（逐張延遲） ====================
-        el.style.opacity = "0";
-        el.style.transform = "translateY(20px) scale(0.98)";
+    if (highSalaryEl) highSalaryEl.innerText = r.highSalary || "—";
+    if (actualSalaryEl) actualSalaryEl.innerText = r.actualSalary || "—";
+    if (comparisonEl) comparisonEl.innerHTML = r.comparison || "";
+
+    // ==================== 出場動畫（單張版本） ====================
+    el.style.opacity = "0";
+    el.style.transform = "translateY(30px) scale(0.95)";
+
+    setTimeout(() => {
+        el.style.transition = "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)";
+        el.style.opacity = "1";
+        el.style.transform = "translateY(0) scale(1)";
+    }, 50);
+
+    // ==================== 點擊互動 ====================
+    el.addEventListener("click", () => {
+        // 重複點擊時增加旋轉效果
+        if (lastClickedReceipt === el) {
+            el.style.transform = "scale(1.03) rotate(-2deg)";
+        } else {
+            el.style.transform = "scale(1.05)";
+        }
 
         setTimeout(() => {
-            el.style.transition = "all 0.4s ease";
-            el.style.opacity = "1";
-            el.style.transform = "translateY(0) scale(1)";
-        }, index * 120);
+            el.style.transform = "scale(1)";
+        }, 180);
 
-        // ==================== 點擊互動（重點） ====================
-        el.addEventListener("click", () => {
-            // 重複點擊效果
-            if (lastClickedReceipt === el) {
-                el.style.transform = "scale(1.02) rotate(-1deg)";
-            } else {
-                el.style.transform = "scale(1.03)";
-            }
+        lastClickedReceipt = el;
 
+        // 隨機 glitch 效果
+        if (Math.random() > 0.65) {
+            el.style.filter = "contrast(2.2) hue-rotate(200deg) saturate(1.3)";
             setTimeout(() => {
-                el.style.transform = "scale(1)";
-            }, 150);
+                el.style.filter = "none";
+            }, 220);
+        }
 
-            lastClickedReceipt = el;
-
-            // 💀 隨機 glitch flicker 效果
-            if (Math.random() > 0.7) {
-                el.style.filter = "contrast(2) hue-rotate(180deg)";
-                setTimeout(() => {
-                    el.style.filter = "none";
-                }, 200);
-            }
-
-            // 可在此擴充更多點擊後的反應
-            console.log(`📄 收據點擊：${r.id}`);
-        });
-
-        container.appendChild(clone);
+        console.log(`📄 收據點擊：${r.id}`);
     });
+
+    container.appendChild(clone);
 }
 
 // ==================== 系統吐槽（動畫版） ====================
@@ -76,19 +76,19 @@ export function renderCommentUI(text) {
     const el = document.getElementById("systemComment");
     if (!el) return;
 
-    // 如果內容一樣 → 觸發抖動
+    // 如果內容一樣 → 觸發左右抖動
     if (el.innerText === text) {
-        el.style.transform = "translateX(4px)";
-        setTimeout(() => el.style.transform = "translateX(-4px)", 80);
-        setTimeout(() => el.style.transform = "translateX(0)", 160);
+        el.style.transform = "translateX(6px)";
+        setTimeout(() => el.style.transform = "translateX(-6px)", 80);
+        setTimeout(() => el.style.transform = "translateX(0)", 180);
         return;
     }
 
-    // 更新文字 + fade effect
+    // 更新文字 + 淡入效果
     el.style.opacity = "0";
     setTimeout(() => {
         el.innerText = text;
-        el.style.transition = "0.3s ease";
+        el.style.transition = "opacity 0.35s ease";
         el.style.opacity = "1";
-    }, 120);
+    }, 100);
 }
