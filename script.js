@@ -1,5 +1,4 @@
 // ==================== MEME CORE v3 FULL ====================
-
 import {
     rand,
     genMoney,
@@ -19,7 +18,6 @@ import {
 let memes = null;
 let memesReady = false;
 let currentReceipts = [];
-
 let gameState = {
     chaos: 0,
     stability: 100,
@@ -30,9 +28,7 @@ let gameState = {
 
 // ==================== INIT ====================
 function loadMemes() {
-    // 所有檔案在同一層 → 使用相對路徑（最穩定）
     const url = "memes.json";
-
     fetch(url + "?ts=" + Date.now())
         .then(r => {
             if (!r.ok) {
@@ -44,7 +40,7 @@ function loadMemes() {
             memes = d;
             memesReady = true;
             console.log("✅ memes.json 載入成功！");
-            generate();        // 第一次自動生成
+            generate(); // 第一次自動生成
         })
         .catch(err => {
             console.error("❌ memes.json 載入失敗:", err);
@@ -62,7 +58,6 @@ function loadMemes() {
 
 // ==================== CORE ====================
 function createReceipt(input = "") {
-
     const modePool = [
         "NORMAL",
         "SYSTEM",
@@ -113,12 +108,41 @@ function createReceipt(input = "") {
         parts.unshift(`【INPUT】${input}`);
     }
 
+    // 新增：堂口高層薪水與高層實領
+    const money = genMoney();                    // 奉獻金額
+    const highSalary = genMoney(80000, 350000);  // 高層薪水範圍（建議你之後在 generator.js 調整）
+    const actualSalary = Math.floor(highSalary * (0.6 + Math.random() * 0.35)); // 實領約60%~95%
+
+    // 比較結果與文字
+    let comparisonHTML = "";
+    const donate = parseInt(money.replace(/,/g, ''));
+
+    if (donate >= actualSalary) {
+        // 感謝模式
+        comparisonHTML = `
+            <div class="thanks">✅ 民眾堂表示感謝！</div>
+            <div style="color:#86efac; margin-top:6px;">
+                「您的奉獻將化為堂口未來的重要基石，感謝您的支持！」
+            </div>`;
+    } else {
+        // 生氣模式
+        comparisonHTML = `
+            <div class="angry">⚠️ 堂口高層相當不滿！</div>
+            <div class="warning-text" style="margin-top:8px;">
+                「奉獻金額明顯不足，堂口運作將受到嚴重影響！」<br>
+                「請立即增加奉獻金額，否則後果自行負責。」
+            </div>`;
+    }
+
     return {
         content: parts.filter(Boolean).join("<br><br>"),
-        money: genMoney(),
+        money: money,
+        highSalary: highSalary.toLocaleString(),
+        actualSalary: actualSalary.toLocaleString(),
+        comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
-        level: genLevel(rand)
+        level: genLevel(rand)   // 暫時保留，之後可改成其他
     };
 }
 
@@ -126,7 +150,6 @@ function createReceipt(input = "") {
 function render() {
     const container = document.getElementById("receiptContainer");
     const template = document.getElementById("receiptTemplate");
-
     container.innerHTML = "";
 
     currentReceipts.forEach(r => {
@@ -136,13 +159,21 @@ function render() {
         clone.querySelector(".rmoney").innerText = r.money;
         clone.querySelector(".rid").innerText = r.id;
         clone.querySelector(".rtime").innerText = r.time;
-        clone.querySelector(".rlevel").innerText = r.level;
+        
+        // 新增欄位填入
+        clone.querySelector(".rhighsalary").innerText = r.highSalary;
+        clone.querySelector(".ractual").innerText = r.actualSalary;
+
+        // 填入比較訊息
+        const comparisonDiv = clone.querySelector(".comparison");
+        if (comparisonDiv) {
+            comparisonDiv.innerHTML = r.comparison;
+        }
 
         container.appendChild(clone);
     });
 
     renderCommentUI(genComment());
-
     updateHUD();
 }
 
@@ -158,15 +189,12 @@ function updateHUD() {
 
     // 🔥 視覺崩壞效果
     document.body.style.filter = "";
-
     if (gameState.chaos > 60) {
         document.body.style.filter = "hue-rotate(90deg)";
     }
-
     if (gameState.stability < 50) {
         document.body.style.filter = "contrast(1.2)";
     }
-
     if (gameState.stability < 20) {
         document.body.style.animation = "shake 0.2s infinite";
     }
@@ -185,20 +213,16 @@ window.generate = function () {
     }
 
     currentReceipts = [];
-
     for (let i = 0; i < 3; i++) {
         currentReceipts.push(createReceipt());
     }
-
     render();
 };
 
 window.buildMemeFromInput = function () {
     const input = document.getElementById("userInput")?.value.trim();
-
     if (!input) {
-        document.getElementById("receiptContainer").innerHTML =
-            "SYSTEM: INPUT REQUIRED";
+        document.getElementById("receiptContainer").innerHTML = "SYSTEM: INPUT REQUIRED";
         return;
     }
 
@@ -207,33 +231,31 @@ window.buildMemeFromInput = function () {
     gameState.stability -= 5;
 
     currentReceipts = [];
-
     for (let i = 0; i < 3; i++) {
         currentReceipts.push(createReceipt(input));
     }
-
     render();
 };
 
-// ==================== UPGRADE (核心爆炸點) ====================
+// ==================== UPGRADE ====================
 window.upgradeMode = function () {
     if (!currentReceipts.length) return;
 
     gameState.chaos += 50;
     gameState.stability -= 30;
     gameState.level++;
-
     gameState.modeLock = "GLITCH";
 
     currentReceipts = currentReceipts.map(r => ({
         ...r,
         content: r.content + "<br><br>🔥【系統已失控】",
         money: (parseInt(r.money.replace(/,/g, "")) * 10).toLocaleString(),
+        highSalary: (parseInt(r.highSalary.replace(/,/g, "")) * 8).toLocaleString(),
+        actualSalary: (parseInt(r.actualSalary.replace(/,/g, "")) * 8).toLocaleString(),
         level: "💀 失控等級"
     }));
 
     renderCommentUI("🔥 系統判定：已進入崩壞模式");
-
     render();
 };
 
@@ -244,7 +266,6 @@ window.spamBlack = () => generate();
 // ==================== DOWNLOAD ====================
 window.download = function () {
     const el = document.getElementById("receiptContainer");
-
     html2canvas(el, { scale: 2, backgroundColor: "#fff" })
         .then(canvas => {
             const a = document.createElement("a");
@@ -270,13 +291,10 @@ const startDate = new Date("2024-08-29T00:00:00");
 function updateClock() {
     const now = new Date();
     let diff = Math.floor((now - startDate) / 1000);
-
     const d = Math.floor(diff / 86400);
     diff %= 86400;
-
     const h = Math.floor(diff / 3600);
     diff %= 3600;
-
     const m = Math.floor(diff / 60);
     const s = diff % 60;
 
@@ -284,7 +302,6 @@ function updateClock() {
         el.innerText = `${d}天 ${h}時 ${m}分 ${s}秒`;
     });
 }
-
 setInterval(updateClock, 1000);
 
 // ==================== MODAL ====================
@@ -295,12 +312,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.enterSystem = function (ok) {
     document.getElementById("introModal").style.display = "none";
-
     if (ok) {
         loadMemes();
     } else {
-        document.getElementById("receiptContainer").innerHTML =
-            "SYSTEM OFFLINE";
+        document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
     }
 };
 

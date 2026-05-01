@@ -1,36 +1,36 @@
-// ==================== ui.js v2 (INTERACTION UPGRADE) ====================
+// ==================== ui.js v3 (堂口高層薪水版) ====================
 
 let lastClickedReceipt = null;
 
 // ==================== 收據渲染（強化互動版） ====================
 export function renderReceiptsUI(container, template, list) {
-
     container.innerHTML = "";
 
     list.forEach((r, index) => {
-
         const clone = template.content.cloneNode(true);
-
         const el = clone.querySelector(".receipt");
 
+        // ==================== 基本資料填入 ====================
         const resultEl = clone.querySelector(".result");
         const moneyEl = clone.querySelector(".rmoney");
         const idEl = clone.querySelector(".rid");
         const timeEl = clone.querySelector(".rtime");
-        const levelEl = clone.querySelector(".rlevel");
+        const highSalaryEl = clone.querySelector(".rhighsalary");
+        const actualSalaryEl = clone.querySelector(".ractual");
+        const comparisonEl = clone.querySelector(".comparison");
 
-        // ====================
-        // 基本資料填入
-        // ====================
-        resultEl.innerHTML = r.content;
-        moneyEl.innerText = r.money;
-        idEl.innerText = r.id;
-        timeEl.innerText = r.time;
-        levelEl.innerText = r.level;
+        // 填入資料
+        resultEl.innerHTML = r.content || "";
+        moneyEl.innerText = r.money || "0";
+        idEl.innerText = r.id || "SYS-000000";
+        timeEl.innerText = r.time || "—";
 
-        // ====================
-        // 出場動畫（逐張延遲）
-        // ====================
+        // 新增欄位
+        if (highSalaryEl) highSalaryEl.innerText = r.highSalary || "—";
+        if (actualSalaryEl) actualSalaryEl.innerText = r.actualSalary || "—";
+        if (comparisonEl) comparisonEl.innerHTML = r.comparison || "";
+
+        // ==================== 出場動畫（逐張延遲） ====================
         el.style.opacity = "0";
         el.style.transform = "translateY(20px) scale(0.98)";
 
@@ -40,11 +40,8 @@ export function renderReceiptsUI(container, template, list) {
             el.style.transform = "translateY(0) scale(1)";
         }, index * 120);
 
-        // ====================
-        // 點擊互動（重點）
-        // ====================
+        // ==================== 點擊互動（重點） ====================
         el.addEventListener("click", () => {
-
             // 重複點擊效果
             if (lastClickedReceipt === el) {
                 el.style.transform = "scale(1.02) rotate(-1deg)";
@@ -58,13 +55,16 @@ export function renderReceiptsUI(container, template, list) {
 
             lastClickedReceipt = el;
 
-            // 💀 隨機 glitch flicker
+            // 💀 隨機 glitch flicker 效果
             if (Math.random() > 0.7) {
                 el.style.filter = "contrast(2) hue-rotate(180deg)";
                 setTimeout(() => {
                     el.style.filter = "none";
                 }, 200);
             }
+
+            // 可在此擴充更多點擊後的反應
+            console.log(`📄 收據點擊：${r.id}`);
         });
 
         container.appendChild(clone);
@@ -73,9 +73,7 @@ export function renderReceiptsUI(container, template, list) {
 
 // ==================== 系統吐槽（動畫版） ====================
 export function renderCommentUI(text) {
-
     const el = document.getElementById("systemComment");
-
     if (!el) return;
 
     // 如果內容一樣 → 觸發抖動
@@ -88,7 +86,6 @@ export function renderCommentUI(text) {
 
     // 更新文字 + fade effect
     el.style.opacity = "0";
-
     setTimeout(() => {
         el.innerText = text;
         el.style.transition = "0.3s ease";

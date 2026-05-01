@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>民眾堂系統 vNEXT // MEME CORE</title>
 <link rel="stylesheet" href="style.css">
-
 <style>
 /* ===== modal ===== */
 .modal{
@@ -18,7 +17,6 @@
     z-index: 99999;
     padding: 20px;
 }
-
 .modal-box{
     width: min(520px, 95%);
     background: #0f172a;
@@ -28,27 +26,23 @@
     padding: 20px;
     box-shadow: 0 0 30px rgba(0,0,0,0.6);
 }
-
 .modal-title{
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
     color: #f59e0b;
 }
-
 .modal-content{
     font-size: 14px;
     line-height: 1.7;
     white-space: pre-line;
     opacity: 0.9;
 }
-
 .modal-buttons{
     margin-top: 15px;
     display: flex;
     gap: 10px;
 }
-
 .modal-buttons button{
     flex: 1;
     padding: 10px;
@@ -57,12 +51,10 @@
     font-weight: bold;
     border-radius: 8px;
 }
-
 .modal-buttons button:first-child{
     background: #f59e0b;
     color: black;
 }
-
 .modal-buttons button:last-child{
     background: #1f2937;
     color: white;
@@ -74,10 +66,26 @@
     flex-direction: column;
     gap: 20px;
 }
+
+/* 新增：高層薪水與比較樣式 */
+.high-salary {
+    color: #f59e0b;
+    font-weight: bold;
+}
+.thanks {
+    color: #4ade80;
+    font-weight: bold;
+}
+.angry {
+    color: #f87171;
+    font-weight: bold;
+}
+.warning-text {
+    color: #fb923c;
+    font-size: 14px;
+}
 </style>
-
 </head>
-
 <body>
 
 <!-- ================= TOP ================= -->
@@ -87,7 +95,6 @@
 </div>
 
 <div class="panel">
-
     <!-- ================= 操作 ================= -->
     <div class="buttons">
         <button onclick="generate()">🎲 隨機撈錢</button>
@@ -99,36 +106,13 @@
 
     <!-- ================= INPUT ================= -->
     <div style="margin-top:15px; text-align:center;">
-
         <input id="userInput"
                placeholder="輸入內容（例如：系統正在查帳 / 我懷疑異常 / 政策出現錯誤）"
-               style="
-                    width: 95%;
-                    padding: 14px;
-                    border: 2px solid #1e2937;
-                    border-radius: 10px;
-                    font-size: 15px;
-                    outline: none;
-                    background: #0b1220;
-                    color: white;
-               ">
-
+               style="width: 95%; padding: 14px; border: 2px solid #1e2937; border-radius: 10px; font-size: 15px; outline: none; background: #0b1220; color: white;">
         <button onclick="buildMemeFromInput()"
-                style="
-                    margin-top:10px;
-                    width:95%;
-                    background: linear-gradient(135deg,#111827,#1f2937);
-                    color:#fbbf24;
-                    border:none;
-                    padding:14px;
-                    font-size:16px;
-                    border-radius:10px;
-                    font-weight:bold;
-                    cursor:pointer;
-                ">
+                style="margin-top:10px; width:95%; background: linear-gradient(135deg,#111827,#1f2937); color:#fbbf24; border:none; padding:14px; font-size:16px; border-radius:10px; font-weight:bold; cursor:pointer;">
             🤖 雙標解析系統
         </button>
-
     </div>
 
     <!-- ================= SHARE ================= -->
@@ -138,95 +122,67 @@
         <button onclick="shareToThreads()" class="social-btn">t</button>
         <button onclick="shareToIG()" class="social-btn">📷</button>
     </div>
-	
-	<div id="playerHUD" style="
-		margin:15px;
-		padding:10px;
-		background:#0f172a;
-		border:1px solid #334155;
-		border-radius:10px;
-		color:#fbbf24;
-		font-size:13px;
-		text-align:center;
-	">
-		等級：<span id="hudLevel">LV1</span> |
-		混亂值：<span id="hudChaos">0</span> |
-		系統穩定度：<span id="hudStability">100%</span>
-	</div>
 
-    <!-- ================= 系統吐槽 ================= -->
-    <div id="systemComment" style="
-        margin:15px;
-        font-size:16px;
-        color:#fbbf24;
-        text-align:center;
-    ">
+    <div id="playerHUD" style="margin:15px; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fbbf24; font-size:13px; text-align:center;">
+        等級：<span id="hudLevel">LV1</span> |
+        混亂值：<span id="hudChaos">0</span> |
+        系統穩定度：<span id="hudStability">100%</span>
     </div>
 
+    <!-- ================= 系統吐槽 ================= -->
+    <div id="systemComment" style="margin:15px; font-size:16px; color:#fbbf24; text-align:center;"></div>
+
     <!-- ================= OUTPUT（多收據） ================= -->
-	<div id="receiptContainer"></div>
-
-	<div style="text-align:center;margin-top:10px;color:#64748b;font-size:12px;">
-		點擊「收據」可以觸發系統反應
-	</div>
-
+    <div id="receiptContainer"></div>
+    
+    <div style="text-align:center;margin-top:10px;color:#64748b;font-size:12px;">
+        點擊「收據」可以觸發系統反應
+    </div>
 </div>
 
 <!-- ================= TEMPLATE（隱藏模板） ================= -->
 <template id="receiptTemplate">
     <div class="receipt">
-
         <div class="header">
             <div class="title">SYSTEM OUTPUT TERMINAL</div>
             <div class="warning">MEME ENGINE ACTIVE • REALITY DISTORTION ENABLED</div>
         </div>
-
         <div class="info">
             <div>收據編號：<span class="rid"></span></div>
             <div>收款時間：<span class="rtime"></span></div>
-            <div>對開收據：NT$ <span class="rmoney"></span></div>
-            <div>人頭等級：<span class="rlevel"></span></div>
+            <div>奉獻金額：NT$ <span class="rmoney"></span></div>
+            <div>堂口高層薪水：<span class="rhighsalary high-salary"></span></div>
+            <div>高層實領：NT$ <span class="ractual"></span></div>
             <div>查帳逾時：<span class="rclock"></span></div>
         </div>
-
         <div class="divider"></div>
-
         <div class="content result"></div>
-
+        <div class="comparison"></div>     <!-- 新增：感謝或生氣訊息顯示區 -->
         <div class="divider"></div>
-
         <div class="footer">
             MEME CORE SYSTEM<br>
             「你看到的現金，不是給阿北」<br>
             「阿北只是轉手」
         </div>
-
     </div>
 </template>
 
 <!-- ================= BOOT MODAL ================= -->
 <div id="introModal" class="modal">
   <div class="modal-box">
-
     <div class="modal-title">SYSTEM BOOT SEQUENCE</div>
-
     <div class="modal-content">
 偵測到非正常語意流
-
 MEME CORE 正在啟動：
-
 - 會計師顧問系統
 - 律師訴訟系統
 - 2026民眾堂募款計劃
-
 是否進入雙標系統？
     </div>
-
     <div class="modal-buttons">
       <button onclick="enterSystem(true)">進入系統</button>
       <button onclick="enterSystem(false)">拒絕進入（系統會記住你）</button>
     </div>
-
   </div>
 </div>
 
@@ -239,6 +195,5 @@ window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
 };
 </script>
-
 </body>
 </html>
