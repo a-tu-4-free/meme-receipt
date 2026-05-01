@@ -30,8 +30,8 @@ let gameState = {
 
 // ==================== INIT ====================
 function loadMemes() {
-
-    const url = "https://raw.githubusercontent.com/a-tu-4-free/meme-receipt/main/memes.json";
+    // 所有檔案在同一層 → 使用相對路徑（最穩定）
+    const url = "memes.json";
 
     fetch(url + "?ts=" + Date.now())
         .then(r => {
@@ -43,17 +43,20 @@ function loadMemes() {
         .then(d => {
             memes = d;
             memesReady = true;
-
-            console.log("✅ memes.json 載入成功 (RAW)");
-
-            generate();
+            console.log("✅ memes.json 載入成功！");
+            generate();        // 第一次自動生成
         })
         .catch(err => {
-            console.error("❌ memes.json error:", err);
-
-            document.getElementById("receiptContainer").innerHTML =
-                "SYSTEM FAILURE: memes.json missing<br>" +
-                "URL=" + url;
+            console.error("❌ memes.json 載入失敗:", err);
+            document.getElementById("receiptContainer").innerHTML = `
+                <div style="color:#f87171; padding:20px; text-align:center;">
+                    SYSTEM FAILURE: 無法載入 memes.json<br><br>
+                    請確認以下事項：<br>
+                    1. memes.json 是否已上傳到 GitHub<br>
+                    2. 檔案名稱完全正確（大小寫一致）<br>
+                    3. Repository 是否設為 Public<br><br>
+                    錯誤：${err.message}
+                </div>`;
         });
 }
 

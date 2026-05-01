@@ -44,9 +44,41 @@ body::before {
 }
 
 /* =========================
-   LAYOUT LAYER FIX
+   LAYOUT LAYER
 ========================= */
-.topbar,
+/* ================= TOPBAR ================= */
+.topbar {
+    background: linear-gradient(135deg, #1e2937, #0f172a);
+    padding: 18px 15px;
+    text-align: center;
+    border-bottom: 3px solid #f59e0b;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.topbar .logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #fbbf24;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+    margin-bottom: 6px;
+    letter-spacing: 2px;
+}
+
+.topbar .sub {
+    font-size: 15px;
+    color: #94a3b8;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+/* 讓整個 panel 也更容易置中 */
+.panel {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
 .panel,
 #receiptContainer {
   position: relative;
