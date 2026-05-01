@@ -60,81 +60,29 @@
     color: white;
 }
 
-/* ==================== 重點修改 ==================== */
-/* 收據容器 */
+/* 新增：多收據排列 */
 #receiptContainer{
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 30px;
-    min-height: 400px;
-    padding: 20px 0;
+    gap: 20px;
 }
 
-/* 雙太陽模式：並排顯示 */
-#receiptContainer.double {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 25px;
-    flex-wrap: wrap;
-}
-
-.receipt {
-    width: 100%;
-    max-width: 520px;
-    background: rgba(255,255,255,0.97);
-    color: #0f172a;
-    padding: 32px 28px;
-    border-radius: 18px;
-    box-shadow: 0 25px 70px rgba(0,0,0,0.65),
-                inset 0 0 0 1px rgba(245, 158, 11, 0.15);
-    margin: 0 auto;
-    transition: transform 0.2s;
-}
-
-.receipt:hover {
-    transform: translateY(-8px);
-}
-
-/* 柯文哲風格 */
-.receipt.ko {
-    border: 3px solid #15803d;
-}
-.receipt.ko .title { color: #15803d; }
-
-/* 黃國昌風格 */
-.receipt.huang {
-    border: 3px solid #b91c1c;
-}
-.receipt.huang .title { color: #b91c1c; }
-
-/* 高層薪水與文字樣式 */
+/* 新增：高層薪水與比較樣式 */
 .high-salary {
-    color: #c2410c;
+    color: #f59e0b;
     font-weight: bold;
-    font-size: 1.08em;
 }
 .thanks {
-    color: #15803d;
+    color: #4ade80;
     font-weight: bold;
 }
 .angry {
-    color: #b91c1c;
+    color: #f87171;
     font-weight: bold;
 }
 .warning-text {
-    color: #b45309;
-    font-size: 15px;
-}
-
-/* 比較區塊 */
-.comparison {
-    margin: 22px 0;
-    padding: 18px;
-    border-radius: 12px;
-    background: #fefce8;
-    border: 1px solid #fde047;
+    color: #fb923c;
+    font-size: 14px;
 }
 </style>
 </head>
@@ -184,15 +132,15 @@
     <!-- ================= 系統吐槽 ================= -->
     <div id="systemComment" style="margin:15px; font-size:16px; color:#fbbf24; text-align:center;"></div>
 
-    <!-- ================= OUTPUT ================= -->
+    <!-- ================= OUTPUT（多收據） ================= -->
     <div id="receiptContainer"></div>
-  
-    <div style="text-align:center;margin-top:15px;color:#64748b;font-size:13px;">
-        點擊收據可以觸發系統反應
+    
+    <div style="text-align:center;margin-top:10px;color:#64748b;font-size:12px;">
+        點擊「收據」可以觸發系統反應
     </div>
 </div>
 
-<!-- ================= TEMPLATE ================= -->
+<!-- ================= TEMPLATE（隱藏模板） ================= -->
 <template id="receiptTemplate">
     <div class="receipt">
         <div class="header">
@@ -203,13 +151,13 @@
             <div>收據編號：<span class="rid"></span></div>
             <div>收款時間：<span class="rtime"></span></div>
             <div>奉獻金額：NT$ <span class="rmoney"></span></div>
-            <div>堂口高層：<span class="rhighsalary high-salary"></span></div>
+            <div>堂口高層薪水：<span class="rhighsalary high-salary"></span></div>
             <div>高層實領：NT$ <span class="ractual"></span></div>
             <div>查帳逾時：<span class="rclock"></span></div>
         </div>
         <div class="divider"></div>
         <div class="content result"></div>
-        <div class="comparison"></div>
+        <div class="comparison"></div>     <!-- 新增：感謝或生氣訊息顯示區 -->
         <div class="divider"></div>
         <div class="footer">
             MEME CORE SYSTEM<br>
@@ -238,157 +186,14 @@ MEME CORE 正在啟動：
   </div>
 </div>
 
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<!-- ================= scripts ================= -->
 <script type="module" src="script.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <script>
-// 全域變數（與 script.js 協同運作）
-let currentLevel = 1;
-const maxLevel = 99;
-
-// 更新 HUD
-function updateHUD() {
-    document.getElementById("hudLevel").textContent = `LV${currentLevel}`;
-    document.getElementById("hudChaos").textContent = `${Math.min(99, currentLevel * 8)}`;
-    document.getElementById("hudStability").textContent = `${Math.max(5, 100 - currentLevel * 9)}%`;
-}
-
-// 產生單張收據（修正千分位問題）
-function createReceipt(isKo = false, isHuang = false) {
-    const template = document.getElementById("receiptTemplate");
-    const receipt = template.content.cloneNode(true).querySelector(".receipt");
-
-    const rid = "M" + String(Math.floor(100000 + Math.random() * 900000));
-    const now = new Date();
-    const rtime = now.toLocaleString('zh-TW', { hour12: false });
-
-    const money = Math.floor(888888 + Math.random() * 8888888);
-    const actual = Math.floor(money * (0.12 + Math.random() * 0.25));
-
-    // === 關鍵修正：確保所有數字都有千分位 ===
-    receipt.querySelector(".rid").textContent = rid;
-    receipt.querySelector(".rtime").textContent = rtime;
-    receipt.querySelector(".rmoney").textContent = money.toLocaleString('zh-TW');
-    receipt.querySelector(".rhighsalary").textContent = getRandomHighLevelName();
-    receipt.querySelector(".ractual").textContent = actual.toLocaleString('zh-TW');
-    receipt.querySelector(".rclock").textContent = `${Math.floor(3 + Math.random() * 27)} 小時`;
-
-    // 根據風格加入 class
-    if (isKo) receipt.classList.add("ko");
-    if (isHuang) receipt.classList.add("huang");
-
-    // 點擊事件
-    receipt.addEventListener("click", () => {
-        alert("系統偵測到現金流異常！\n\n雙標引擎已記錄此操作。");
-    });
-
-    return receipt;
-}
-
-// 隨機生成高層名稱（與 script.js 同步）
-const highLevelNames = [
-    "蟑螂小姊姊", "白賊阿北", "咆嘯戰神", "白襪會計師", "B如姐的包",
-    "秘書長直播間", "幽靈帳主管", "特別費處理組", "竹北快遞哥",
-    "麻醉帳戶長", "AKMORE主任", "海外轉手王", "消失的錢包",
-    "顧問費小組", "餐費做帳黨工", "募款機關槍", "阿北轉手小弟",
-    "賺四代網軍", "澎風安快線", "很負責任的文忠", "系統洗錢組"
-];
-
-function getRandomHighLevelName() {
-    return highLevelNames[Math.floor(Math.random() * highLevelNames.length)];
-}
-
-// ==================== 主要功能 ====================
-function generate() {
-    const container = document.getElementById("receiptContainer");
-    container.innerHTML = "";
-    container.classList.remove("double");
-    const receipt = createReceipt();
-    container.appendChild(receipt);
-    document.getElementById("systemComment").innerHTML = "🎲 系統已成功撈取一筆政治現金";
-}
-
-function spam() {
-    generate();
-}
-
-function spamBlack() {
-    const container = document.getElementById("receiptContainer");
-    container.innerHTML = "";
-    container.classList.add("double");
-    const koReceipt = createReceipt(true, false);
-    const huangReceipt = createReceipt(false, true);
-    container.appendChild(koReceipt);
-    container.appendChild(huangReceipt);
-    document.getElementById("systemComment").innerHTML = "☠ 雙太陽模式啟動<br>阿北失言黑話 vs 戰神正義咆哮";
-}
-
-function upgradeMode() {
-    if (currentLevel < maxLevel) {
-        currentLevel++;
-        updateHUD();
-       
-        const chaos = Math.min(99, currentLevel * 8);
-        const stability = Math.max(5, 100 - currentLevel * 9);
-       
-        let comment = `🔥 等級提升至 LV${currentLevel}！<br>`;
-        comment += `混亂值：${chaos} | 穩定度：${stability}%`;
-        if (currentLevel > 30) comment += "<br><span class='angry'>系統即將失控...</span>";
-        if (currentLevel > 60) comment += "<br><span class='warning-text'>警告：現實扭曲指數嚴重超標</span>";
-        if (currentLevel > 90) comment += "<br><span class='angry'>MEME CORE 已完全崩壞</span>";
-
-        document.getElementById("systemComment").innerHTML = comment;
-
-        const container = document.getElementById("receiptContainer");
-        container.innerHTML = "";
-        container.classList.remove("double");
-        const receipt = createReceipt();
-        container.appendChild(receipt);
-    } else {
-        document.getElementById("systemComment").innerHTML = "⚠️ 已達到最高等級 LV99，系統即將完全失控";
-    }
-}
-
-function buildMemeFromInput() {
-    const input = document.getElementById("userInput").value.trim();
-    if (!input) {
-        alert("請輸入內容");
-        return;
-    }
-    const container = document.getElementById("receiptContainer");
-    container.innerHTML = "";
-    container.classList.remove("double");
-    const receipt = createReceipt();
-    receipt.querySelector(".result").innerHTML = `<strong>雙標解析結果：</strong><br>${input}<br><br>系統判定：這是標準操作，沒問題。`;
-    container.appendChild(receipt);
-    document.getElementById("systemComment").textContent = "🤖 雙標解析系統已完成分析";
-}
-
-function download() {
-    alert("已截圖並儲存證據至本地（模擬）");
-}
-
-function shareToFB() { alert("已模擬分享至 Facebook"); }
-function shareToX() { alert("已模擬分享至 X"); }
-function shareToThreads() { alert("已模擬分享至 Threads"); }
-function shareToIG() { alert("已模擬分享至 Instagram"); }
-
-function enterSystem(enter) {
-    document.getElementById("introModal").style.display = "none";
-    if (enter) {
-        document.getElementById("systemComment").innerHTML = "MEME CORE 已成功啟動，歡迎來到雙標世界";
-        generate();
-    } else {
-        document.getElementById("systemComment").innerHTML = "你已被系統列入黑名單";
-    }
-}
-
-// 初始化
 window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
-    updateHUD();
 };
 </script>
-
 </body>
 </html>
