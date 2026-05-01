@@ -7,7 +7,10 @@ import {
     genLevel,
     genComment,
     fillTemplate,
-    chaosMath
+    chaosMath,
+    genHighSalary,        // ← 新增
+    genThanksMessage,     // ← 新增
+    genAngryMessage       // ← 新增
 } from "./generator.js";
 
 import {
@@ -40,7 +43,7 @@ function loadMemes() {
             memes = d;
             memesReady = true;
             console.log("✅ memes.json 載入成功！");
-            generate(); // 第一次自動生成
+            generate();
         })
         .catch(err => {
             console.error("❌ memes.json 載入失敗:", err);
@@ -59,16 +62,11 @@ function loadMemes() {
 // ==================== CORE ====================
 function createReceipt(input = "") {
     const modePool = [
-        "NORMAL",
-        "SYSTEM",
-        "GLITCH",
-        "POLITICAL_OVERFLOW",
-        "CHAOS"
+        "NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"
     ];
 
     let mode = rand(modePool);
 
-    // 🔥 系統鎖模式（進化機制）
     if (gameState.chaos > 80) mode = "GLITCH";
     if (gameState.stability < 40) mode = "SYSTEM";
     if (gameState.modeLock) mode = gameState.modeLock;
@@ -108,41 +106,41 @@ function createReceipt(input = "") {
         parts.unshift(`【INPUT】${input}`);
     }
 
-    // 新增：堂口高層薪水與高層實領
-    const money = genMoney();                    // 奉獻金額
-    const highSalary = genMoney(80000, 350000);  // 高層薪水範圍（建議你之後在 generator.js 調整）
-    const actualSalary = Math.floor(highSalary * (0.6 + Math.random() * 0.35)); // 實領約60%~95%
+    // ==================== 金額邏輯 ====================
+    const money = genMoney();                    
+    const highSalaryNum = genHighSalary();       
+    const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
 
-    // 比較結果與文字
+    const highSalary = highSalaryNum.toLocaleString();
+    const actualSalary = actualSalaryNum.toLocaleString();
+
+    // 比較邏輯
+    const donate = parseInt(money.replace(/,/g, '')) || 0;
     let comparisonHTML = "";
-    const donate = parseInt(money.replace(/,/g, ''));
 
-    if (donate >= actualSalary) {
-        // 感謝模式
+    if (donate >= actualSalaryNum) {
         comparisonHTML = `
-            <div class="thanks">✅ 民眾堂表示感謝！</div>
-            <div style="color:#86efac; margin-top:6px;">
-                「您的奉獻將化為堂口未來的重要基石，感謝您的支持！」
+            <div class="thanks">✅ 民眾堂對您的奉獻深表感謝！</div>
+            <div style="color:#4ade80; margin-top:6px; font-size:15px;">
+                ${genThanksMessage()}
             </div>`;
     } else {
-        // 生氣模式
         comparisonHTML = `
             <div class="angry">⚠️ 堂口高層相當不滿！</div>
-            <div class="warning-text" style="margin-top:8px;">
-                「奉獻金額明顯不足，堂口運作將受到嚴重影響！」<br>
-                「請立即增加奉獻金額，否則後果自行負責。」
+            <div class="warning-text" style="margin-top:8px; font-size:15px;">
+                ${genAngryMessage()}
             </div>`;
     }
 
     return {
         content: parts.filter(Boolean).join("<br><br>"),
         money: money,
-        highSalary: highSalary.toLocaleString(),
-        actualSalary: actualSalary.toLocaleString(),
+        highSalary: highSalary,
+        actualSalary: actualSalary,
         comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
-        level: genLevel(rand)   // 暫時保留，之後可改成其他
+        level: genLevel(rand)
     };
 }
 
@@ -160,15 +158,12 @@ function render() {
         clone.querySelector(".rid").innerText = r.id;
         clone.querySelector(".rtime").innerText = r.time;
         
-        // 新增欄位填入
-        clone.querySelector(".rhighsalary").innerText = r.highSalary;
-        clone.querySelector(".ractual").innerText = r.actualSalary;
+        // 新增欄位
+        clone.querySelector(".rhighsalary").innerText = r.highSalary || "—";
+        clone.querySelector(".ractual").innerText = r.actualSalary || "—";
 
-        // 填入比較訊息
         const comparisonDiv = clone.querySelector(".comparison");
-        if (comparisonDiv) {
-            comparisonDiv.innerHTML = r.comparison;
-        }
+        if (comparisonDiv) comparisonDiv.innerHTML = r.comparison || "";
 
         container.appendChild(clone);
     });
@@ -187,30 +182,19 @@ function updateHUD() {
     if (chaosEl) chaosEl.innerText = gameState.chaos;
     if (stabEl) stabEl.innerText = gameState.stability + "%";
 
-    // 🔥 視覺崩壞效果
     document.body.style.filter = "";
-    if (gameState.chaos > 60) {
-        document.body.style.filter = "hue-rotate(90deg)";
-    }
-    if (gameState.stability < 50) {
-        document.body.style.filter = "contrast(1.2)";
-    }
-    if (gameState.stability < 20) {
-        document.body.style.animation = "shake 0.2s infinite";
-    }
+    if (gameState.chaos > 60) document.body.style.filter = "hue-rotate(90deg)";
+    if (gameState.stability < 50) document.body.style.filter = "contrast(1.2)";
+    if (gameState.stability < 20) document.body.style.animation = "shake 0.2s infinite";
 }
 
 // ==================== MAIN ====================
 window.generate = function () {
     if (!memesReady) return;
-
     gameState.clicks++;
     gameState.chaos += 5;
     gameState.stability -= 2;
-
-    if (gameState.clicks > 10) {
-        gameState.level = 2;
-    }
+    if (gameState.clicks > 10) gameState.level = 2;
 
     currentReceipts = [];
     for (let i = 0; i < 3; i++) {
@@ -276,18 +260,13 @@ window.download = function () {
 };
 
 // ==================== SHARE ====================
-window.shareToFB = () =>
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
-
-window.shareToX = () =>
-    window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
-
+window.shareToFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
+window.shareToX = () => window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
 window.shareToThreads = () => alert("已複製請貼上 Threads");
 window.shareToIG = () => alert("請下載圖片上傳 IG");
 
 // ==================== CLOCK ====================
 const startDate = new Date("2024-08-29T00:00:00");
-
 function updateClock() {
     const now = new Date();
     let diff = Math.floor((now - startDate) / 1000);
@@ -312,11 +291,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
 window.enterSystem = function (ok) {
     document.getElementById("introModal").style.display = "none";
-    if (ok) {
-        loadMemes();
-    } else {
-        document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
-    }
+    if (ok) loadMemes();
+    else document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
 };
 
 console.log("🔥 MEME CORE v3 LOADED (STATE SYSTEM ACTIVE)");
