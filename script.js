@@ -12,7 +12,7 @@ import {
     genHighSalary,
     genThanksMessage,
     genAngryMessage,
-    genTangkouName      // ← 正確引入
+    genTangkouName
 } from "./generator.js";
 
 import {
@@ -89,14 +89,13 @@ function createReceipt(type = "random", input = "") {
         ? genRandomMoney() 
         : genTangkouMoney();
 
-    // 等級加成
+    // 等級加成（最高10級，每次 +5%）
     const levelMultiplier = 1 + (Math.min(gameState.level, 10) * 0.05);
     moneyNum = Math.floor(moneyNum * levelMultiplier);
     const money = moneyNum.toLocaleString();
 
     const highSalaryNum = genHighSalary();
     const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
-
     const actualSalary = actualSalaryNum.toLocaleString();
 
     // 比較邏輯
@@ -119,14 +118,14 @@ function createReceipt(type = "random", input = "") {
         type: type,
         content: parts.filter(Boolean).join("<br><br>"),
         money: money,
-        highSalary: type === "tangkou" 
-            ? `堂口高層 ${genTangkouName()}` 
+        highSalary: type === "tangkou"
+            ? `堂口高層 ${genTangkouName()}`
             : highSalaryNum.toLocaleString(),
         actualSalary: actualSalary,
         comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
-        level: genLevel(gameState)   // ← 修正
+        level: genLevel(gameState)
     };
 }
 
@@ -227,8 +226,8 @@ window.upgradeMode = function () {
         ...r,
         content: r.content + "<br><br>🔥【系統已失控】",
         money: (parseInt(r.money.replace(/,/g, "")) * 10).toLocaleString(),
-        highSalary: r.type === "tangkou" 
-            ? `堂口高層 ${genTangkouName()}` 
+        highSalary: r.type === "tangkou"
+            ? `堂口高層 ${genTangkouName()}`
             : (parseInt(r.highSalary.replace(/,/g, "")) * 8 || 0).toLocaleString(),
         actualSalary: (parseInt(r.actualSalary.replace(/,/g, "")) * 8).toLocaleString(),
         level: "💀 失控等級"
@@ -284,7 +283,7 @@ document.addEventListener("DOMContentLoaded", () => {
 window.enterSystem = function (ok) {
     const modal = document.getElementById("introModal");
     if (modal) modal.style.display = "none";
-    
+
     if (ok) {
         loadMemes();
     } else {

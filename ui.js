@@ -4,11 +4,11 @@ let lastClickedReceipt = null;
 // ==================== 收據渲染（強化互動版） ====================
 export function renderReceiptsUI(container, template, list) {
     container.innerHTML = "";
-    
+   
     list.forEach((r, index) => {
         const clone = template.content.cloneNode(true);
         const el = clone.querySelector(".receipt");
-        
+       
         // ==================== 根據類型加入樣式 ====================
         if (r.type === "tangkou") {
             el.classList.add("tangkou");
@@ -28,16 +28,16 @@ export function renderReceiptsUI(container, template, list) {
         moneyEl.innerText = r.money || "0";
         idEl.innerText = r.id || "SYS-000000";
         timeEl.innerText = r.time || "—";
-        
+       
         // 堂口高層（已由 script.js 處理成人名格式）
         if (highSalaryEl) {
             highSalaryEl.innerText = r.highSalary || "—";
         }
-        
+       
         if (actualSalaryEl) {
             actualSalaryEl.innerText = r.actualSalary || "—";
         }
-        
+       
         if (comparisonEl) {
             comparisonEl.innerHTML = r.comparison || "";
         }
@@ -45,7 +45,7 @@ export function renderReceiptsUI(container, template, list) {
         // ==================== 出場動畫（逐張延遲） ====================
         el.style.opacity = "0";
         el.style.transform = "translateY(20px) scale(0.98)";
-        
+       
         setTimeout(() => {
             el.style.transition = "all 0.4s ease";
             el.style.opacity = "1";
@@ -60,7 +60,7 @@ export function renderReceiptsUI(container, template, list) {
             } else {
                 el.style.transform = "scale(1.03)";
             }
-            
+           
             setTimeout(() => {
                 el.style.transform = "scale(1)";
             }, 150);

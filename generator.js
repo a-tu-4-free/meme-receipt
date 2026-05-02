@@ -5,7 +5,7 @@ export function rand(arr) {
         : "【SYSTEM LOADING】";
 }
 
-// ==================== 金額生成（重點修改） ====================
+// ==================== 金額生成 ====================
 // 隨機模式：50 ~ 1000 元
 export function genRandomMoney() {
     return Math.floor(Math.random() * 951) + 50; // 50 ~ 1000
@@ -36,7 +36,7 @@ export function genTime() {
     });
 }
 
-// ==================== 堂口高層 ====================
+// ==================== 堂口高層薪水 ====================
 export function genHighSalary() {
     // 高層薪水範圍：8萬 ~ 45萬
     return Math.floor(Math.random() * (450000 - 80000 + 1) + 80000);
@@ -69,7 +69,11 @@ export function genTangkouName() {
         "國台拌三三談談專家",
         "小沈安排的人頭",
         "堂口御用剪輯師",
-        "民眾堂帳房"
+        "民眾堂帳房",
+        "白賊阿北的影子",
+        "立法戰狼",
+        "空心菜",
+        "吉他戰神"
     ];
     return rand(names);
 }
@@ -100,7 +104,7 @@ export function genLevel(state = {}) {
     return Math.random() > 0.8 ? rand(rare) : rand(normal);
 }
 
-// ==================== 感謝詞庫（奉獻金額 ≥ 高層實領） ====================
+// ==================== 感謝詞庫 ====================
 export function genThanksMessage() {
     const thanks = [
         "✅ 民眾堂對您的奉獻深表感謝！",
@@ -117,12 +121,14 @@ export function genThanksMessage() {
         "感謝您讓堂口又多了一位優質金主！",
         "這筆錢會化作無數小草，替您衝鋒陷陣。",
         "堂口已將您的名字刻在別人的胸口上。",
-        "阿北在睡夢中都為您點了讚！"
+        "阿北在睡夢中都為您點了讚！",
+        "這筆奉獻讓堂口高層眉開眼笑。",
+        "您的名字已被列入堂口VIP名單。"
     ];
     return rand(thanks);
 }
 
-// ==================== 生氣警語詞庫（奉獻金額 < 高層實領） ====================
+// ==================== 生氣警語詞庫 ====================
 export function genAngryMessage() {
     const angry = [
         "⚠️ 堂口高層相當不滿！奉獻金額嚴重不足！",
@@ -141,7 +147,9 @@ export function genAngryMessage() {
         "這種金額只夠買一包小草，堂口不需要！",
         "阿北：我寧願去睡覺也不想看這種奉獻。",
         "堂口帳房：這筆錢我都不好意思入帳。",
-        "警告！再不加碼將取消您的金主資格。"
+        "警告！再不加碼將取消您的金主資格。",
+        "這奉獻連小草都看不起。",
+        "堂口高層已氣到拍桌。"
     ];
     return rand(angry);
 }
@@ -177,7 +185,8 @@ export function genComment() {
         "這筆錢只夠買一包衛生紙",
         "堂口已將此筆奉獻評為「笑話等級」",
         "偵測到低配金主，正在自動鄙視",
-        "系統：你確定這不是在酸民眾堂？"
+        "系統：你確定這不是在酸民眾堂？",
+        "這筆奉獻連阿北的助理都看不下去。"
     ];
     return rand(comments);
 }
@@ -211,14 +220,13 @@ export function chaosMath() {
 
 // ==================== 完整收據生成（保留供未來使用） ====================
 export function generateReceipt(memes, input = "", state = {}) {
-    // 此函式目前 script.js 未使用，保留原樣
     const chaos = state.chaos || 0;
     const stability = state.stability || 100;
     let modePool = ["NORMAL", "SYSTEM", "GLITCH", "CHAOS"];
     if (chaos > 60) modePool.push("GLITCH");
     if (chaos > 85) modePool = ["GLITCH", "CHAOS", "SYSTEM"];
     if (stability < 40) modePool = ["SYSTEM", "GLITCH"];
-    
+   
     const mode = rand(modePool);
     let parts = [];
 
