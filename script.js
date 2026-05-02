@@ -59,13 +59,11 @@ function loadMemes() {
 function createReceipt(type = "random", input = "") {
     const modePool = ["NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"];
     let mode = rand(modePool);
-
     if (gameState.chaos > 80) mode = "GLITCH";
     if (gameState.stability < 40) mode = "SYSTEM";
     if (gameState.modeLock) mode = gameState.modeLock;
 
     let parts = [];
-
     if (mode === "NORMAL") {
         parts = [
             fillTemplate(rand(memes.openings)),
@@ -85,18 +83,15 @@ function createReceipt(type = "random", input = "") {
     if (input) parts.unshift(`【INPUT】${input}`);
 
     // ==================== 金額邏輯 ====================
-    let moneyNum = type === "random" 
-        ? genRandomMoney() 
-        : genTangkouMoney();
-
-    // 等級加成（最高10級，每次 +5%）
+    let moneyNum = type === "random" ? genRandomMoney() : genTangkouMoney();
     const levelMultiplier = 1 + (Math.min(gameState.level, 10) * 0.05);
     moneyNum = Math.floor(moneyNum * levelMultiplier);
-    const money = moneyNum.toLocaleString();
 
-    const highSalaryNum = genHighSalary();
+    const highSalaryNum = genHighSalary();        // 高層薪水（備用）
     const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
-    const actualSalary = actualSalaryNum.toLocaleString();
+
+    // ==================== 關鍵修正：堂口高層永遠顯示人名 ====================
+    const tangkouName = genTangkouName();
 
     // 比較邏輯
     let comparisonHTML = "";
@@ -117,11 +112,9 @@ function createReceipt(type = "random", input = "") {
     return {
         type: type,
         content: parts.filter(Boolean).join("<br><br>"),
-        money: money,
-        highSalary: type === "tangkou"
-            ? `堂口高層 ${genTangkouName()}`
-            : highSalaryNum.toLocaleString(),
-        actualSalary: actualSalary,
+        money: moneyNum.toLocaleString(),
+        highSalary: `${tangkouName}`,                    // ← 改這裡！永遠顯示人名
+        actualSalary: actualSalaryNum.toLocaleString(),
         comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
