@@ -1,14 +1,18 @@
-// ==================== ui.js v3 (堂口高層薪水版) ====================
-
+// ==================== ui.js v3 (堂口高層版 - 雙太陽模式) ====================
 let lastClickedReceipt = null;
 
 // ==================== 收據渲染（強化互動版） ====================
 export function renderReceiptsUI(container, template, list) {
     container.innerHTML = "";
-
+    
     list.forEach((r, index) => {
         const clone = template.content.cloneNode(true);
         const el = clone.querySelector(".receipt");
+        
+        // ==================== 根據類型加入樣式 ====================
+        if (r.type === "tangkou") {
+            el.classList.add("tangkou");
+        }
 
         // ==================== 基本資料填入 ====================
         const resultEl = clone.querySelector(".result");
@@ -24,23 +28,31 @@ export function renderReceiptsUI(container, template, list) {
         moneyEl.innerText = r.money || "0";
         idEl.innerText = r.id || "SYS-000000";
         timeEl.innerText = r.time || "—";
-
-        // 新增欄位
-        if (highSalaryEl) highSalaryEl.innerText = r.highSalary || "—";
-        if (actualSalaryEl) actualSalaryEl.innerText = r.actualSalary || "—";
-        if (comparisonEl) comparisonEl.innerHTML = r.comparison || "";
+        
+        // 堂口高層（已由 script.js 處理成人名格式）
+        if (highSalaryEl) {
+            highSalaryEl.innerText = r.highSalary || "—";
+        }
+        
+        if (actualSalaryEl) {
+            actualSalaryEl.innerText = r.actualSalary || "—";
+        }
+        
+        if (comparisonEl) {
+            comparisonEl.innerHTML = r.comparison || "";
+        }
 
         // ==================== 出場動畫（逐張延遲） ====================
         el.style.opacity = "0";
         el.style.transform = "translateY(20px) scale(0.98)";
-
+        
         setTimeout(() => {
             el.style.transition = "all 0.4s ease";
             el.style.opacity = "1";
             el.style.transform = "translateY(0) scale(1)";
         }, index * 120);
 
-        // ==================== 點擊互動（重點） ====================
+        // ==================== 點擊互動 ====================
         el.addEventListener("click", () => {
             // 重複點擊效果
             if (lastClickedReceipt === el) {
@@ -48,7 +60,7 @@ export function renderReceiptsUI(container, template, list) {
             } else {
                 el.style.transform = "scale(1.03)";
             }
-
+            
             setTimeout(() => {
                 el.style.transform = "scale(1)";
             }, 150);
@@ -56,15 +68,14 @@ export function renderReceiptsUI(container, template, list) {
             lastClickedReceipt = el;
 
             // 💀 隨機 glitch flicker 效果
-            if (Math.random() > 0.7) {
+            if (Math.random() > 0.65) {
                 el.style.filter = "contrast(2) hue-rotate(180deg)";
                 setTimeout(() => {
                     el.style.filter = "none";
-                }, 200);
+                }, 220);
             }
 
-            // 可在此擴充更多點擊後的反應
-            console.log(`📄 收據點擊：${r.id}`);
+            console.log(`📄 收據點擊：${r.id} (${r.type || 'random'})`);
         });
 
         container.appendChild(clone);

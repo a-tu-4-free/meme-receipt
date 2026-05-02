@@ -1,4 +1,4 @@
-// ==================== MEME CORE v3 FULL ====================
+// ==================== MEME CORE v3 DOUBLE SUN MODE ====================
 import {
     rand,
     genMoney,
@@ -8,9 +8,10 @@ import {
     genComment,
     fillTemplate,
     chaosMath,
-    genHighSalary,        // ← 新增
-    genThanksMessage,     // ← 新增
-    genAngryMessage       // ← 新增
+    genHighSalary,
+    genThanksMessage,
+    genAngryMessage
+	genTangkouName
 } from "./generator.js";
 
 import {
@@ -60,7 +61,7 @@ function loadMemes() {
 }
 
 // ==================== CORE ====================
-function createReceipt(input = "") {
+function createReceipt(type = "random", input = "") {
     const modePool = [
         "NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"
     ];
@@ -107,15 +108,27 @@ function createReceipt(input = "") {
     }
 
     // ==================== 金額邏輯 ====================
-    const money = genMoney();                    
-    const highSalaryNum = genHighSalary();       
+    let moneyNum;
+    if (type === "random") {
+        moneyNum = Math.floor(Math.random() * 951) + 50; // 50 ~ 1000
+    } else { // tangkou
+        moneyNum = Math.floor(Math.random() * 9000) + 1001; // 1001 ~ 10000
+    }
+
+    // 等級加成（最高10級，每次增加5%）
+    const levelMultiplier = 1 + (Math.min(gameState.level, 10) * 0.05);
+    moneyNum = Math.floor(moneyNum * levelMultiplier);
+
+    const money = moneyNum.toLocaleString();
+
+    const highSalaryNum = genHighSalary();
     const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
 
     const highSalary = highSalaryNum.toLocaleString();
     const actualSalary = actualSalaryNum.toLocaleString();
 
     // 比較邏輯
-    const donate = parseInt(money.replace(/,/g, '')) || 0;
+    const donate = moneyNum;
     let comparisonHTML = "";
 
     if (donate >= actualSalaryNum) {
@@ -133,9 +146,12 @@ function createReceipt(input = "") {
     }
 
     return {
+        type: type,
         content: parts.filter(Boolean).join("<br><br>"),
         money: money,
-        highSalary: highSalary,
+        highSalary: type === "tangkou" 
+			? `堂口高層 ${genTangkouName()}` 
+			: highSalary,
         actualSalary: actualSalary,
         comparison: comparisonHTML,
         id: genId(),
@@ -149,6 +165,10 @@ function render() {
     const container = document.getElementById("receiptContainer");
     const template = document.getElementById("receiptTemplate");
     container.innerHTML = "";
+    container.style.display = "flex";
+    container.style.gap = "24px";
+    container.style.justifyContent = "center";
+    container.style.flexWrap = "wrap";
 
     currentReceipts.forEach(r => {
         const clone = template.content.cloneNode(true);
@@ -158,12 +178,17 @@ function render() {
         clone.querySelector(".rid").innerText = r.id;
         clone.querySelector(".rtime").innerText = r.time;
         
-        // 新增欄位
         clone.querySelector(".rhighsalary").innerText = r.highSalary || "—";
         clone.querySelector(".ractual").innerText = r.actualSalary || "—";
 
         const comparisonDiv = clone.querySelector(".comparison");
         if (comparisonDiv) comparisonDiv.innerHTML = r.comparison || "";
+
+        // 堂口加一點視覺區別
+        if (r.type === "tangkou") {
+            const receiptEl = clone.querySelector(".receipt");
+            if (receiptEl) receiptEl.style.border = "2px solid #fbbf24";
+        }
 
         container.appendChild(clone);
     });
@@ -194,12 +219,12 @@ window.generate = function () {
     gameState.clicks++;
     gameState.chaos += 5;
     gameState.stability -= 2;
-    if (gameState.clicks > 10) gameState.level = 2;
+    if (gameState.clicks > 8) gameState.level = Math.min(gameState.level + 1, 10);
 
-    currentReceipts = [];
-    for (let i = 0; i < 3; i++) {
-        currentReceipts.push(createReceipt());
-    }
+    currentReceipts = [
+        createReceipt("random"),   // 左側 - 隨機
+        createReceipt("tangkou")   // 右側 - 堂口
+    ];
     render();
 };
 
@@ -214,10 +239,10 @@ window.buildMemeFromInput = function () {
     gameState.chaos += 10;
     gameState.stability -= 5;
 
-    currentReceipts = [];
-    for (let i = 0; i < 3; i++) {
-        currentReceipts.push(createReceipt(input));
-    }
+    currentReceipts = [
+        createReceipt("random", input),
+        createReceipt("tangkou", input)
+    ];
     render();
 };
 
@@ -227,14 +252,16 @@ window.upgradeMode = function () {
 
     gameState.chaos += 50;
     gameState.stability -= 30;
-    gameState.level++;
+    gameState.level = Math.min(gameState.level + 2, 10);
     gameState.modeLock = "GLITCH";
 
     currentReceipts = currentReceipts.map(r => ({
         ...r,
         content: r.content + "<br><br>🔥【系統已失控】",
         money: (parseInt(r.money.replace(/,/g, "")) * 10).toLocaleString(),
-        highSalary: (parseInt(r.highSalary.replace(/,/g, "")) * 8).toLocaleString(),
+        highSalary: r.type === "tangkou" 
+            ? `堂口高層 ${genTangkouName()}` 
+            : (parseInt(r.highSalary.replace(/,/g, "")) * 8).toLocaleString(),
         actualSalary: (parseInt(r.actualSalary.replace(/,/g, "")) * 8).toLocaleString(),
         level: "💀 失控等級"
     }));
@@ -295,4 +322,4 @@ window.enterSystem = function (ok) {
     else document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
 };
 
-console.log("🔥 MEME CORE v3 LOADED (STATE SYSTEM ACTIVE)");
+console.log("🔥 MEME CORE v3 DOUBLE SUN MODE LOADED（左右隨機+堂口模式）");

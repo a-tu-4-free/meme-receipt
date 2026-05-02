@@ -70,7 +70,7 @@ body::before {
 
 /* ================= PANEL ================= */
 .panel {
-    max-width: 650px;
+    max-width: 1200px;
     margin: 20px auto;
     width: 100%;
     position: relative;
@@ -84,6 +84,7 @@ body::before {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  justify-content: center;
 }
 .buttons button {
   flex: 1 1 45%;
@@ -100,22 +101,26 @@ body::before {
 }
 
 /* =========================
-   RECEIPT CONTAINER
+   RECEIPT CONTAINER - 雙太陽左右模式
 ========================= */
 #receiptContainer {
   width: 100%;
-  max-width: 650px;
-  margin: 0 auto;
+  max-width: 1200px;
+  margin: 30px auto;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
+  flex-direction: row;
+  gap: 28px;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 
 /* =========================
    RECEIPT CARD
 ========================= */
 .receipt {
-  width: 100%;
+  width: 380px;
+  max-width: 100%;
   background: rgba(255,255,255,0.97);
   color: #0f172a;
   padding: 28px;
@@ -124,6 +129,19 @@ body::before {
               inset 0 0 0 1px rgba(0,0,0,0.08);
   overflow: hidden;
   position: relative;
+  transition: all 0.3s ease;
+}
+
+.receipt:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 35px 90px rgba(0,0,0,0.65);
+}
+
+/* 堂口專用金色邊框（雙太陽模式視覺重點） */
+.receipt.tangkou {
+  border: 3px solid #fbbf24;
+  box-shadow: 0 25px 80px rgba(251, 191, 36, 0.35),
+              inset 0 0 0 1px rgba(0,0,0,0.08);
 }
 
 /* =========================
@@ -146,7 +164,7 @@ body::before {
 }
 
 /* =========================
-   INFO 區塊（重點修改）
+   INFO 區塊
 ========================= */
 .info {
   background: #f8fafc;
@@ -155,7 +173,6 @@ body::before {
   margin: 16px 0;
   border: 1px solid #e2e8f0;
 }
-
 .info div {
   display: flex;
   justify-content: space-between;
@@ -164,7 +181,6 @@ body::before {
   border-bottom: 1px dashed #cbd5e1;
   font-size: 15.5px;
 }
-
 .info div:last-child {
   border-bottom: none;
 }
@@ -176,7 +192,7 @@ body::before {
 }
 
 /* =========================
-   COMPARISON 區塊（新增重點）
+   COMPARISON 區塊
 ========================= */
 .comparison {
   margin: 18px 0;
@@ -221,14 +237,25 @@ body::before {
 }
 
 /* =========================
-   MOBILE FIX
+   MOBILE FIX（在手機上改成上下排列）
 ========================= */
+@media (max-width: 900px) {
+  #receiptContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+  .receipt {
+    width: 100%;
+    max-width: 420px;
+  }
+}
+
 @media (max-width: 600px) {
   .buttons button {
     flex: 1 1 100%;
   }
   .receipt {
-    padding: 20px 18px;
+    padding: 22px 18px;
   }
   .info {
     padding: 12px 14px;
@@ -242,12 +269,10 @@ body::before {
   color: #b91c1c;
   font-weight: bold;
 }
-
 .thanks {
   color: #15803d;
   font-weight: bold;
 }
-
 .warning-text {
   color: #b45309;
   font-weight: 600;
