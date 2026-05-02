@@ -81,18 +81,15 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.5);
     transition: all 0.3s;
 }
-
 .receipt:hover {
     transform: translateY(-4px);
     box-shadow: 0 15px 30px rgba(251, 191, 36, 0.2);
 }
-
 /* 堂口收據特殊邊框 */
 .receipt.tangkou {
     border-color: #fbbf24;
     box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
 }
-
 .high-salary {
     color: #f59e0b;
     font-weight: bold;
@@ -161,7 +158,7 @@
 
     <!-- ================= OUTPUT ================= -->
     <div id="receiptContainer"></div>
-   
+  
     <div style="text-align:center;margin-top:10px;color:#64748b;font-size:12px;">
         左側：隨機奉獻　｜　右側：堂口高層
     </div>
@@ -217,9 +214,38 @@ MEME CORE 正在啟動：
 <script type="module" src="script.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
+<!-- 全域函數暴露（解決 Modal 和分享按鈕無法點擊問題） -->
 <script>
 window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
+};
+
+// 強制暴露所有可能用到的全域函數
+window.enterSystem = function(ok) {
+    document.getElementById("introModal").style.display = "none";
+    if (ok) {
+        // 呼叫 script.js 中的 loadMemes
+        if (typeof loadMemes === "function") loadMemes();
+    } else {
+        document.getElementById("receiptContainer").innerHTML = `
+            <div style="color:#f87171; padding:40px; text-align:center; font-size:18px;">
+                SYSTEM OFFLINE<br><br>你拒絕了進入。
+            </div>`;
+    }
+};
+
+// 分享功能備援
+window.shareToFB = function() {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
+};
+window.shareToX = function() {
+    window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
+};
+window.shareToThreads = function() {
+    alert("已複製請貼上 Threads");
+};
+window.shareToIG = function() {
+    alert("請下載圖片上傳 IG");
 };
 </script>
 </body>
