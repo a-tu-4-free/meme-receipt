@@ -1,7 +1,8 @@
 // ==================== MEME CORE v3 DOUBLE SUN MODE ====================
 import {
     rand,
-    genMoney,
+    genRandomMoney,
+    genTangkouMoney,
     genId,
     genTime,
     genLevel,
@@ -10,8 +11,8 @@ import {
     chaosMath,
     genHighSalary,
     genThanksMessage,
-    genAngryMessage
-	genTangkouName
+    genAngryMessage,
+    genTangkouName      // ← 正確引入
 } from "./generator.js";
 
 import {
@@ -35,9 +36,7 @@ function loadMemes() {
     const url = "memes.json";
     fetch(url + "?ts=" + Date.now())
         .then(r => {
-            if (!r.ok) {
-                throw new Error("HTTP " + r.status);
-            }
+            if (!r.ok) throw new Error("HTTP " + r.status);
             return r.json();
         })
         .then(d => {
@@ -51,10 +50,6 @@ function loadMemes() {
             document.getElementById("receiptContainer").innerHTML = `
                 <div style="color:#f87171; padding:20px; text-align:center;">
                     SYSTEM FAILURE: 無法載入 memes.json<br><br>
-                    請確認以下事項：<br>
-                    1. memes.json 是否已上傳到 GitHub<br>
-                    2. 檔案名稱完全正確（大小寫一致）<br>
-                    3. Repository 是否設為 Public<br><br>
                     錯誤：${err.message}
                 </div>`;
         });
@@ -62,10 +57,7 @@ function loadMemes() {
 
 // ==================== CORE ====================
 function createReceipt(type = "random", input = "") {
-    const modePool = [
-        "NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"
-    ];
-
+    const modePool = ["NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"];
     let mode = rand(modePool);
 
     if (gameState.chaos > 80) mode = "GLITCH";
@@ -81,57 +73,35 @@ function createReceipt(type = "random", input = "") {
             fillTemplate(rand(memes.endings))
         ];
     } else if (mode === "SYSTEM") {
-        parts = [
-            "【SYSTEM MODE ACTIVE】",
-            fillTemplate(rand(memes.system_weird))
-        ];
+        parts = ["【SYSTEM MODE ACTIVE】", fillTemplate(rand(memes.system_weird))];
     } else if (mode === "GLITCH") {
-        parts = [
-            "▓▒░ SYSTEM CORRUPTION ░▒▓",
-            fillTemplate(rand(memes.glitch))
-        ];
+        parts = ["▓▒░ SYSTEM CORRUPTION ░▒▓", fillTemplate(rand(memes.glitch))];
     } else if (mode === "POLITICAL_OVERFLOW") {
-        parts = [
-            fillTemplate(rand(memes.politics_glitch)),
-            "SYSTEM OVERRIDE ACTIVE"
-        ];
+        parts = [fillTemplate(rand(memes.politics_glitch)), "SYSTEM OVERRIDE ACTIVE"];
     } else {
-        parts = [
-            fillTemplate(rand(memes.usages)),
-            fillTemplate(rand(memes.glitch)),
-            chaosMath()
-        ];
+        parts = [fillTemplate(rand(memes.usages)), fillTemplate(rand(memes.glitch)), chaosMath()];
     }
 
-    if (input) {
-        parts.unshift(`【INPUT】${input}`);
-    }
+    if (input) parts.unshift(`【INPUT】${input}`);
 
     // ==================== 金額邏輯 ====================
-    let moneyNum;
-    if (type === "random") {
-        moneyNum = Math.floor(Math.random() * 951) + 50; // 50 ~ 1000
-    } else { // tangkou
-        moneyNum = Math.floor(Math.random() * 9000) + 1001; // 1001 ~ 10000
-    }
+    let moneyNum = type === "random" 
+        ? genRandomMoney() 
+        : genTangkouMoney();
 
-    // 等級加成（最高10級，每次增加5%）
+    // 等級加成
     const levelMultiplier = 1 + (Math.min(gameState.level, 10) * 0.05);
     moneyNum = Math.floor(moneyNum * levelMultiplier);
-
     const money = moneyNum.toLocaleString();
 
     const highSalaryNum = genHighSalary();
     const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
 
-    const highSalary = highSalaryNum.toLocaleString();
     const actualSalary = actualSalaryNum.toLocaleString();
 
     // 比較邏輯
-    const donate = moneyNum;
     let comparisonHTML = "";
-
-    if (donate >= actualSalaryNum) {
+    if (moneyNum >= actualSalaryNum) {
         comparisonHTML = `
             <div class="thanks">✅ 民眾堂對您的奉獻深表感謝！</div>
             <div style="color:#4ade80; margin-top:6px; font-size:15px;">
@@ -150,13 +120,13 @@ function createReceipt(type = "random", input = "") {
         content: parts.filter(Boolean).join("<br><br>"),
         money: money,
         highSalary: type === "tangkou" 
-			? `堂口高層 ${genTangkouName()}` 
-			: highSalary,
+            ? `堂口高層 ${genTangkouName()}` 
+            : highSalaryNum.toLocaleString(),
         actualSalary: actualSalary,
         comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
-        level: genLevel(rand)
+        level: genLevel(gameState)   // ← 修正
     };
 }
 
@@ -172,22 +142,20 @@ function render() {
 
     currentReceipts.forEach(r => {
         const clone = template.content.cloneNode(true);
+        const receiptEl = clone.querySelector(".receipt");
 
         clone.querySelector(".result").innerHTML = r.content;
         clone.querySelector(".rmoney").innerText = r.money;
         clone.querySelector(".rid").innerText = r.id;
         clone.querySelector(".rtime").innerText = r.time;
-        
         clone.querySelector(".rhighsalary").innerText = r.highSalary || "—";
         clone.querySelector(".ractual").innerText = r.actualSalary || "—";
 
         const comparisonDiv = clone.querySelector(".comparison");
         if (comparisonDiv) comparisonDiv.innerHTML = r.comparison || "";
 
-        // 堂口加一點視覺區別
-        if (r.type === "tangkou") {
-            const receiptEl = clone.querySelector(".receipt");
-            if (receiptEl) receiptEl.style.border = "2px solid #fbbf24";
+        if (r.type === "tangkou" && receiptEl) {
+            receiptEl.classList.add("tangkou");
         }
 
         container.appendChild(clone);
@@ -222,8 +190,8 @@ window.generate = function () {
     if (gameState.clicks > 8) gameState.level = Math.min(gameState.level + 1, 10);
 
     currentReceipts = [
-        createReceipt("random"),   // 左側 - 隨機
-        createReceipt("tangkou")   // 右側 - 堂口
+        createReceipt("random"),
+        createReceipt("tangkou")
     ];
     render();
 };
@@ -261,7 +229,7 @@ window.upgradeMode = function () {
         money: (parseInt(r.money.replace(/,/g, "")) * 10).toLocaleString(),
         highSalary: r.type === "tangkou" 
             ? `堂口高層 ${genTangkouName()}` 
-            : (parseInt(r.highSalary.replace(/,/g, "")) * 8).toLocaleString(),
+            : (parseInt(r.highSalary.replace(/,/g, "")) * 8 || 0).toLocaleString(),
         actualSalary: (parseInt(r.actualSalary.replace(/,/g, "")) * 8).toLocaleString(),
         level: "💀 失控等級"
     }));
@@ -270,11 +238,10 @@ window.upgradeMode = function () {
     render();
 };
 
-// ==================== OLD ====================
+// ==================== OLD & DOWNLOAD & SHARE & CLOCK ====================
 window.spam = () => generate();
 window.spamBlack = () => generate();
 
-// ==================== DOWNLOAD ====================
 window.download = function () {
     const el = document.getElementById("receiptContainer");
     html2canvas(el, { scale: 2, backgroundColor: "#fff" })
@@ -286,13 +253,11 @@ window.download = function () {
         });
 };
 
-// ==================== SHARE ====================
 window.shareToFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
 window.shareToX = () => window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
 window.shareToThreads = () => alert("已複製請貼上 Threads");
 window.shareToIG = () => alert("請下載圖片上傳 IG");
 
-// ==================== CLOCK ====================
 const startDate = new Date("2024-08-29T00:00:00");
 function updateClock() {
     const now = new Date();
@@ -317,9 +282,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.enterSystem = function (ok) {
-    document.getElementById("introModal").style.display = "none";
-    if (ok) loadMemes();
-    else document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
+    const modal = document.getElementById("introModal");
+    if (modal) modal.style.display = "none";
+    
+    if (ok) {
+        loadMemes();
+    } else {
+        document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
+    }
 };
 
 console.log("🔥 MEME CORE v3 DOUBLE SUN MODE LOADED（左右隨機+堂口模式）");
