@@ -60,14 +60,62 @@
     color: white;
 }
 
-/* 新增：多收據排列 */
+/* ===== 收據容器 - 左右雙太陽模式 ===== */
 #receiptContainer{
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex-direction: row;
+    gap: 22px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 20px 0;
 }
 
-/* 新增：高層薪水與比較樣式 */
+/* 單張收據樣式 - 壓縮高度 */
+.receipt {
+    width: 375px;
+    max-width: 100%;
+    background: #0f172a;
+    border: 2px solid #334155;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    transition: all 0.3s;
+    height: fit-content;
+}
+.receipt:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 30px rgba(251, 191, 36, 0.2);
+}
+
+/* 堂口收據特殊邊框 */
+.receipt.tangkou {
+    border-color: #fbbf24;
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+}
+
+/* 按鈕 - 改窄 */
+.buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+}
+.buttons button {
+    flex: 1 1 28%;
+    min-width: 135px;
+    padding: 11px 12px;
+    font-size: 14px;
+}
+
+/* Footer 文字顏色修正 */
+.footer {
+    text-align: center;
+    font-size: 13.5px;
+    color: #e2e8f0;
+    margin-top: 16px;
+    line-height: 1.6;
+}
+
 .high-salary {
     color: #f59e0b;
     font-weight: bold;
@@ -87,21 +135,22 @@
 </style>
 </head>
 <body>
-
 <!-- ================= TOP ================= -->
 <div class="topbar">
     <div class="logo">2026KProfiteering.tw SYSTEM vNEXT</div>
-    <div class="sub">崩壞生成器 • 語意污染模式 • 非真實運算</div>
+    <div class="sub">崩壞生成器 • 語意污染模式 • 雙太陽堂口系統</div>
 </div>
 
 <div class="panel">
-    <!-- ================= 操作 ================= -->
+    <!-- ================= 操作按鈕 ================= -->
     <div class="buttons">
-        <button onclick="generate()">🎲 隨機撈錢</button>
-        <button onclick="spam()">⚡ 堂口洗錢</button>
-        <button onclick="spamBlack()">☠ 雙太陽模式</button>
+        <button onclick="generate()">🎲 隨機撈錢（左）</button>
+        <button onclick="generate()">☀ 堂口模式（右）</button>
+        <button onclick="generate()" style="background: linear-gradient(135deg, #ca8a04, #f59e0b); color: black; font-weight: bold;">
+            🔥 雙太陽模式
+        </button>
         <button onclick="download()">⬇ 留下證據</button>
-        <button onclick="upgradeMode()">🔥 錢再多一點</button>
+        <button onclick="upgradeMode()">💰 錢再多一點</button>
     </div>
 
     <!-- ================= INPUT ================= -->
@@ -123,6 +172,7 @@
         <button onclick="shareToIG()" class="social-btn">📷</button>
     </div>
 
+    <!-- ================= HUD ================= -->
     <div id="playerHUD" style="margin:15px; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fbbf24; font-size:13px; text-align:center;">
         等級：<span id="hudLevel">LV1</span> |
         混亂值：<span id="hudChaos">0</span> |
@@ -132,15 +182,15 @@
     <!-- ================= 系統吐槽 ================= -->
     <div id="systemComment" style="margin:15px; font-size:16px; color:#fbbf24; text-align:center;"></div>
 
-    <!-- ================= OUTPUT（多收據） ================= -->
+    <!-- ================= OUTPUT ================= -->
     <div id="receiptContainer"></div>
-    
+ 
     <div style="text-align:center;margin-top:10px;color:#64748b;font-size:12px;">
-        點擊「收據」可以觸發系統反應
+        左側：隨機奉獻　｜　右側：堂口高層
     </div>
 </div>
 
-<!-- ================= TEMPLATE（隱藏模板） ================= -->
+<!-- ================= TEMPLATE ================= -->
 <template id="receiptTemplate">
     <div class="receipt">
         <div class="header">
@@ -151,13 +201,13 @@
             <div>收據編號：<span class="rid"></span></div>
             <div>收款時間：<span class="rtime"></span></div>
             <div>奉獻金額：NT$ <span class="rmoney"></span></div>
-            <div>堂口高層薪水：<span class="rhighsalary high-salary"></span></div>
+            <div>堂口高層：<span class="rhighsalary high-salary"></span></div>
             <div>高層實領：NT$ <span class="ractual"></span></div>
             <div>查帳逾時：<span class="rclock"></span></div>
         </div>
         <div class="divider"></div>
         <div class="content result"></div>
-        <div class="comparison"></div>     <!-- 新增：感謝或生氣訊息顯示區 -->
+        <div class="comparison"></div>
         <div class="divider"></div>
         <div class="footer">
             MEME CORE SYSTEM<br>
@@ -177,7 +227,7 @@ MEME CORE 正在啟動：
 - 會計師顧問系統
 - 律師訴訟系統
 - 2026民眾堂募款計劃
-是否進入雙標系統？
+是否進入雙太陽堂口系統？
     </div>
     <div class="modal-buttons">
       <button onclick="enterSystem(true)">進入系統</button>
@@ -190,9 +240,35 @@ MEME CORE 正在啟動：
 <script type="module" src="script.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
+<!-- 全域函數暴露 -->
 <script>
 window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
+};
+
+window.enterSystem = function(ok) {
+    document.getElementById("introModal").style.display = "none";
+    if (ok) {
+        if (typeof loadMemes === "function") loadMemes();
+    } else {
+        document.getElementById("receiptContainer").innerHTML = `
+            <div style="color:#f87171; padding:40px; text-align:center; font-size:18px;">
+                SYSTEM OFFLINE<br><br>你拒絕了進入。
+            </div>`;
+    }
+};
+
+window.shareToFB = function() {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
+};
+window.shareToX = function() {
+    window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
+};
+window.shareToThreads = function() {
+    alert("已複製請貼上 Threads");
+};
+window.shareToIG = function() {
+    alert("請下載圖片上傳 IG");
 };
 </script>
 </body>

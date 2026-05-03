@@ -1,16 +1,18 @@
-// ==================== MEME CORE v3 FULL ====================
+// ==================== MEME CORE v3 DOUBLE SUN MODE ====================
 import {
     rand,
-    genMoney,
+    genRandomMoney,
+    genTangkouMoney,
     genId,
     genTime,
     genLevel,
     genComment,
     fillTemplate,
     chaosMath,
-    genHighSalary,        // ← 新增
-    genThanksMessage,     // ← 新增
-    genAngryMessage       // ← 新增
+    genHighSalary,
+    genThanksMessage,
+    genAngryMessage,
+    genTangkouName
 } from "./generator.js";
 
 import {
@@ -34,9 +36,7 @@ function loadMemes() {
     const url = "memes.json";
     fetch(url + "?ts=" + Date.now())
         .then(r => {
-            if (!r.ok) {
-                throw new Error("HTTP " + r.status);
-            }
+            if (!r.ok) throw new Error("HTTP " + r.status);
             return r.json();
         })
         .then(d => {
@@ -50,29 +50,20 @@ function loadMemes() {
             document.getElementById("receiptContainer").innerHTML = `
                 <div style="color:#f87171; padding:20px; text-align:center;">
                     SYSTEM FAILURE: 無法載入 memes.json<br><br>
-                    請確認以下事項：<br>
-                    1. memes.json 是否已上傳到 GitHub<br>
-                    2. 檔案名稱完全正確（大小寫一致）<br>
-                    3. Repository 是否設為 Public<br><br>
                     錯誤：${err.message}
                 </div>`;
         });
 }
 
 // ==================== CORE ====================
-function createReceipt(input = "") {
-    const modePool = [
-        "NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"
-    ];
-
+function createReceipt(type = "random", input = "") {
+    const modePool = ["NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"];
     let mode = rand(modePool);
-
     if (gameState.chaos > 80) mode = "GLITCH";
     if (gameState.stability < 40) mode = "SYSTEM";
     if (gameState.modeLock) mode = gameState.modeLock;
 
     let parts = [];
-
     if (mode === "NORMAL") {
         parts = [
             fillTemplate(rand(memes.openings)),
@@ -80,45 +71,31 @@ function createReceipt(input = "") {
             fillTemplate(rand(memes.endings))
         ];
     } else if (mode === "SYSTEM") {
-        parts = [
-            "【SYSTEM MODE ACTIVE】",
-            fillTemplate(rand(memes.system_weird))
-        ];
+        parts = ["【SYSTEM MODE ACTIVE】", fillTemplate(rand(memes.system_weird))];
     } else if (mode === "GLITCH") {
-        parts = [
-            "▓▒░ SYSTEM CORRUPTION ░▒▓",
-            fillTemplate(rand(memes.glitch))
-        ];
+        parts = ["▓▒░ SYSTEM CORRUPTION ░▒▓", fillTemplate(rand(memes.glitch))];
     } else if (mode === "POLITICAL_OVERFLOW") {
-        parts = [
-            fillTemplate(rand(memes.politics_glitch)),
-            "SYSTEM OVERRIDE ACTIVE"
-        ];
+        parts = [fillTemplate(rand(memes.politics_glitch)), "SYSTEM OVERRIDE ACTIVE"];
     } else {
-        parts = [
-            fillTemplate(rand(memes.usages)),
-            fillTemplate(rand(memes.glitch)),
-            chaosMath()
-        ];
+        parts = [fillTemplate(rand(memes.usages)), fillTemplate(rand(memes.glitch)), chaosMath()];
     }
 
-    if (input) {
-        parts.unshift(`【INPUT】${input}`);
-    }
+    if (input) parts.unshift(`【INPUT】${input}`);
 
     // ==================== 金額邏輯 ====================
-    const money = genMoney();                    
-    const highSalaryNum = genHighSalary();       
+    let moneyNum = type === "random" ? genRandomMoney() : genTangkouMoney();
+    const levelMultiplier = 1 + (Math.min(gameState.level, 10) * 0.05);
+    moneyNum = Math.floor(moneyNum * levelMultiplier);
+
+    const highSalaryNum = genHighSalary();        // 高層薪水（備用）
     const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
 
-    const highSalary = highSalaryNum.toLocaleString();
-    const actualSalary = actualSalaryNum.toLocaleString();
+    // ==================== 關鍵修正：堂口高層永遠顯示人名 ====================
+    const tangkouName = genTangkouName();
 
     // 比較邏輯
-    const donate = parseInt(money.replace(/,/g, '')) || 0;
     let comparisonHTML = "";
-
-    if (donate >= actualSalaryNum) {
+    if (moneyNum >= actualSalaryNum) {
         comparisonHTML = `
             <div class="thanks">✅ 民眾堂對您的奉獻深表感謝！</div>
             <div style="color:#4ade80; margin-top:6px; font-size:15px;">
@@ -133,14 +110,15 @@ function createReceipt(input = "") {
     }
 
     return {
+        type: type,
         content: parts.filter(Boolean).join("<br><br>"),
-        money: money,
-        highSalary: highSalary,
-        actualSalary: actualSalary,
+        money: moneyNum.toLocaleString(),
+        highSalary: `${tangkouName}`,                    // ← 改這裡！永遠顯示人名
+        actualSalary: actualSalaryNum.toLocaleString(),
         comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
-        level: genLevel(rand)
+        level: genLevel(gameState)
     };
 }
 
@@ -149,21 +127,28 @@ function render() {
     const container = document.getElementById("receiptContainer");
     const template = document.getElementById("receiptTemplate");
     container.innerHTML = "";
+    container.style.display = "flex";
+    container.style.gap = "24px";
+    container.style.justifyContent = "center";
+    container.style.flexWrap = "wrap";
 
     currentReceipts.forEach(r => {
         const clone = template.content.cloneNode(true);
+        const receiptEl = clone.querySelector(".receipt");
 
         clone.querySelector(".result").innerHTML = r.content;
         clone.querySelector(".rmoney").innerText = r.money;
         clone.querySelector(".rid").innerText = r.id;
         clone.querySelector(".rtime").innerText = r.time;
-        
-        // 新增欄位
         clone.querySelector(".rhighsalary").innerText = r.highSalary || "—";
         clone.querySelector(".ractual").innerText = r.actualSalary || "—";
 
         const comparisonDiv = clone.querySelector(".comparison");
         if (comparisonDiv) comparisonDiv.innerHTML = r.comparison || "";
+
+        if (r.type === "tangkou" && receiptEl) {
+            receiptEl.classList.add("tangkou");
+        }
 
         container.appendChild(clone);
     });
@@ -194,12 +179,12 @@ window.generate = function () {
     gameState.clicks++;
     gameState.chaos += 5;
     gameState.stability -= 2;
-    if (gameState.clicks > 10) gameState.level = 2;
+    if (gameState.clicks > 8) gameState.level = Math.min(gameState.level + 1, 10);
 
-    currentReceipts = [];
-    for (let i = 0; i < 3; i++) {
-        currentReceipts.push(createReceipt());
-    }
+    currentReceipts = [
+        createReceipt("random"),
+        createReceipt("tangkou")
+    ];
     render();
 };
 
@@ -214,10 +199,10 @@ window.buildMemeFromInput = function () {
     gameState.chaos += 10;
     gameState.stability -= 5;
 
-    currentReceipts = [];
-    for (let i = 0; i < 3; i++) {
-        currentReceipts.push(createReceipt(input));
-    }
+    currentReceipts = [
+        createReceipt("random", input),
+        createReceipt("tangkou", input)
+    ];
     render();
 };
 
@@ -227,14 +212,16 @@ window.upgradeMode = function () {
 
     gameState.chaos += 50;
     gameState.stability -= 30;
-    gameState.level++;
+    gameState.level = Math.min(gameState.level + 2, 10);
     gameState.modeLock = "GLITCH";
 
     currentReceipts = currentReceipts.map(r => ({
         ...r,
         content: r.content + "<br><br>🔥【系統已失控】",
         money: (parseInt(r.money.replace(/,/g, "")) * 10).toLocaleString(),
-        highSalary: (parseInt(r.highSalary.replace(/,/g, "")) * 8).toLocaleString(),
+        highSalary: r.type === "tangkou"
+            ? `堂口高層 ${genTangkouName()}`
+            : (parseInt(r.highSalary.replace(/,/g, "")) * 8 || 0).toLocaleString(),
         actualSalary: (parseInt(r.actualSalary.replace(/,/g, "")) * 8).toLocaleString(),
         level: "💀 失控等級"
     }));
@@ -243,11 +230,10 @@ window.upgradeMode = function () {
     render();
 };
 
-// ==================== OLD ====================
+// ==================== OLD & DOWNLOAD & SHARE & CLOCK ====================
 window.spam = () => generate();
 window.spamBlack = () => generate();
 
-// ==================== DOWNLOAD ====================
 window.download = function () {
     const el = document.getElementById("receiptContainer");
     html2canvas(el, { scale: 2, backgroundColor: "#fff" })
@@ -259,13 +245,11 @@ window.download = function () {
         });
 };
 
-// ==================== SHARE ====================
 window.shareToFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
 window.shareToX = () => window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
 window.shareToThreads = () => alert("已複製請貼上 Threads");
 window.shareToIG = () => alert("請下載圖片上傳 IG");
 
-// ==================== CLOCK ====================
 const startDate = new Date("2024-08-29T00:00:00");
 function updateClock() {
     const now = new Date();
@@ -290,9 +274,14 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.enterSystem = function (ok) {
-    document.getElementById("introModal").style.display = "none";
-    if (ok) loadMemes();
-    else document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
+    const modal = document.getElementById("introModal");
+    if (modal) modal.style.display = "none";
+
+    if (ok) {
+        loadMemes();
+    } else {
+        document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
+    }
 };
 
-console.log("🔥 MEME CORE v3 LOADED (STATE SYSTEM ACTIVE)");
+console.log("🔥 MEME CORE v3 DOUBLE SUN MODE LOADED（左右隨機+堂口模式）");
