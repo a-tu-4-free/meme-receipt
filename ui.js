@@ -1,105 +1,173 @@
-// ==================== ui.js v3 (堂口高層版 - 雙太陽模式) ====================
-let lastClickedReceipt = null;
+// ==================== MEME CORE UI ENGINE ====================
 
-// ==================== 收據渲染（強化互動版） ====================
+// ==================== EFFECT CACHE ====================
+let activeReceipt = null;
+
+/**
+ * =========================
+ * 📄 RENDER RECEIPTS
+ * =========================
+ */
 export function renderReceiptsUI(container, template, list) {
     container.innerHTML = "";
-   
+
     list.forEach((r, index) => {
-        const clone = template.content.cloneNode(true);
-        const el = clone.querySelector(".receipt");
-       
-        // ==================== 根據類型加入樣式 ====================
+        const node = template.content.cloneNode(true);
+        const el = node.querySelector(".receipt");
+
+        // ================= TYPE STYLE =================
         if (r.type === "tangkou") {
             el.classList.add("tangkou");
         }
 
-        // ==================== 基本資料填入 ====================
-        const resultEl = clone.querySelector(".result");
-        const moneyEl = clone.querySelector(".rmoney");
-        const idEl = clone.querySelector(".rid");
-        const timeEl = clone.querySelector(".rtime");
-        const highSalaryEl = clone.querySelector(".rhighsalary");
-        const actualSalaryEl = clone.querySelector(".ractual");
-        const comparisonEl = clone.querySelector(".comparison");
+        // ================= DATA BIND =================
+        bindText(node, ".result", r.content);
+        bindText(node, ".rmoney", r.money);
+        bindText(node, ".rid", r.id);
+        bindText(node, ".rtime", r.time);
+        bindText(node, ".rhighsalary", r.highSalary);
+        bindText(node, ".ractual", r.actualSalary);
 
-        // 填入資料
-        resultEl.innerHTML = r.content || "";
-        moneyEl.innerText = r.money || "0";
-        idEl.innerText = r.id || "SYS-000000";
-        timeEl.innerText = r.time || "—";
-       
-        // 堂口高層（已由 script.js 處理成人名格式）
-        if (highSalaryEl) {
-            highSalaryEl.innerText = r.highSalary || "—";
-        }
-       
-        if (actualSalaryEl) {
-            actualSalaryEl.innerText = r.actualSalary || "—";
-        }
-       
-        if (comparisonEl) {
-            comparisonEl.innerHTML = r.comparison || "";
-        }
+        const comp = node.querySelector(".comparison");
+        if (comp) comp.innerHTML = r.comparison || "";
 
-        // ==================== 出場動畫（逐張延遲） ====================
-        el.style.opacity = "0";
-        el.style.transform = "translateY(20px) scale(0.98)";
-       
-        setTimeout(() => {
-            el.style.transition = "all 0.4s ease";
-            el.style.opacity = "1";
-            el.style.transform = "translateY(0) scale(1)";
-        }, index * 120);
+        // ================= ENTRY ANIMATION =================
+        setEntryAnimation(el, index);
 
-        // ==================== 點擊互動 ====================
-        el.addEventListener("click", () => {
-            // 重複點擊效果
-            if (lastClickedReceipt === el) {
-                el.style.transform = "scale(1.02) rotate(-1deg)";
-            } else {
-                el.style.transform = "scale(1.03)";
-            }
-           
-            setTimeout(() => {
-                el.style.transform = "scale(1)";
-            }, 150);
+        // ================= INTERACTION =================
+        attachReceiptInteraction(el, r);
 
-            lastClickedReceipt = el;
-
-            // 💀 隨機 glitch flicker 效果
-            if (Math.random() > 0.65) {
-                el.style.filter = "contrast(2) hue-rotate(180deg)";
-                setTimeout(() => {
-                    el.style.filter = "none";
-                }, 220);
-            }
-
-            console.log(`📄 收據點擊：${r.id} (${r.type || 'random'})`);
-        });
-
-        container.appendChild(clone);
+        container.appendChild(node);
     });
 }
 
-// ==================== 系統吐槽（動畫版） ====================
+/**
+ * =========================
+ * 🔗 bind helper
+ * =========================
+ */
+function bindText(root, selector, value) {
+    const el = root.querySelector(selector);
+    if (el) el.innerText = value ?? "—";
+}
+
+/**
+ * =========================
+ * 🎬 ENTRY ANIMATION SYSTEM
+ * =========================
+ */
+function setEntryAnimation(el, index) {
+    el.style.opacity = "0";
+    el.style.transform = "translateY(18px) scale(0.98)";
+
+    setTimeout(() => {
+        el.style.transition = "0.35s ease";
+        el.style.opacity = "1";
+        el.style.transform = "translateY(0) scale(1)";
+    }, index * 100);
+}
+
+/**
+ * =========================
+ * 🧠 RECEIPT INTERACTION ENGINE
+ * =========================
+ */
+function attachReceiptInteraction(el, data) {
+    let clickLock = false;
+
+    el.addEventListener("click", () => {
+        if (clickLock) return;
+        clickLock = true;
+
+        // base scale effect
+        el.style.transform = "scale(1.03)";
+
+        setTimeout(() => {
+            el.style.transform = "scale(1)";
+            clickLock = false;
+        }, 150);
+
+        // repeat click accent
+        if (activeReceipt === el) {
+            el.style.transform = "scale(1.05) rotate(-1deg)";
+        }
+
+        activeReceipt = el;
+
+        // ================= glitch chance =================
+        triggerGlitch(el);
+
+        console.log(`📄 receipt clicked: ${data.id}`);
+    });
+
+    // hover micro effect
+    el.addEventListener("mouseenter", () => {
+        el.style.transition = "0.2s";
+        el.style.transform = "translateY(-3px)";
+    });
+
+    el.addEventListener("mouseleave", () => {
+        el.style.transform = "translateY(0)";
+    });
+}
+
+/**
+ * =========================
+ * 💀 GLITCH ENGINE
+ * =========================
+ */
+function triggerGlitch(el) {
+    const r = Math.random();
+
+    if (r > 0.65) {
+        el.style.filter = "contrast(2) hue-rotate(160deg)";
+
+        setTimeout(() => {
+            el.style.filter = "none";
+        }, 180);
+    }
+
+    if (r > 0.85) {
+        el.style.transform = "translateX(3px)";
+        setTimeout(() => el.style.transform = "translateX(-3px)", 50);
+        setTimeout(() => el.style.transform = "translateX(0)", 100);
+    }
+}
+
+/**
+ * =========================
+ * 💬 COMMENT SYSTEM
+ * =========================
+ */
 export function renderCommentUI(text) {
     const el = document.getElementById("systemComment");
     if (!el) return;
 
-    // 如果內容一樣 → 觸發抖動
+    // same text → shake instead of replace
     if (el.innerText === text) {
-        el.style.transform = "translateX(4px)";
-        setTimeout(() => el.style.transform = "translateX(-4px)", 80);
-        setTimeout(() => el.style.transform = "translateX(0)", 160);
+        shake(el);
         return;
     }
 
-    // 更新文字 + fade effect
+    // fade update
     el.style.opacity = "0";
+
     setTimeout(() => {
         el.innerText = text;
-        el.style.transition = "0.3s ease";
+        el.style.transition = "0.25s ease";
         el.style.opacity = "1";
-    }, 120);
+    }, 100);
+}
+
+/**
+ * =========================
+ * 📳 SHAKE EFFECT
+ * =========================
+ */
+function shake(el) {
+    el.style.transform = "translateX(4px)";
+
+    setTimeout(() => el.style.transform = "translateX(-4px)", 60);
+    setTimeout(() => el.style.transform = "translateX(2px)", 120);
+    setTimeout(() => el.style.transform = "translateX(0)", 180);
 }

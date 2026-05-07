@@ -4,272 +4,151 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>民眾堂系統 vNEXT // MEME CORE</title>
+
 <link rel="stylesheet" href="style.css">
-<style>
-/* ===== modal ===== */
-.modal{
-    position: fixed;
-    inset: 0;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0,0,0,0.75);
-    z-index: 99999;
-    padding: 20px;
-}
-.modal-box{
-    width: min(520px, 95%);
-    background: #0f172a;
-    color: white;
-    border: 2px solid #f59e0b;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 0 30px rgba(0,0,0,0.6);
-}
-.modal-title{
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #f59e0b;
-}
-.modal-content{
-    font-size: 14px;
-    line-height: 1.7;
-    white-space: pre-line;
-    opacity: 0.9;
-}
-.modal-buttons{
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-}
-.modal-buttons button{
-    flex: 1;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 8px;
-}
-.modal-buttons button:first-child{
-    background: #f59e0b;
-    color: black;
-}
-.modal-buttons button:last-child{
-    background: #1f2937;
-    color: white;
-}
 
-/* ===== 收據容器 - 左右雙太陽模式 ===== */
-#receiptContainer{
-    display: flex;
-    flex-direction: row;
-    gap: 22px;
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 20px 0;
-}
-
-/* 單張收據樣式 - 壓縮高度 */
-.receipt {
-    width: 375px;
-    max-width: 100%;
-    background: #0f172a;
-    border: 2px solid #334155;
-    border-radius: 12px;
-    padding: 18px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-    transition: all 0.3s;
-    height: fit-content;
-}
-.receipt:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 15px 30px rgba(251, 191, 36, 0.2);
-}
-
-/* 堂口收據特殊邊框 */
-.receipt.tangkou {
-    border-color: #fbbf24;
-    box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
-}
-
-/* 按鈕 - 改窄 */
-.buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-}
-.buttons button {
-    flex: 1 1 28%;
-    min-width: 135px;
-    padding: 11px 12px;
-    font-size: 14px;
-}
-
-/* Footer 文字顏色修正 */
-.footer {
-    text-align: center;
-    font-size: 13.5px;
-    color: #e2e8f0;
-    margin-top: 16px;
-    line-height: 1.6;
-}
-
-.high-salary {
-    color: #f59e0b;
-    font-weight: bold;
-}
-.thanks {
-    color: #4ade80;
-    font-weight: bold;
-}
-.angry {
-    color: #f87171;
-    font-weight: bold;
-}
-.warning-text {
-    color: #fb923c;
-    font-size: 14px;
-}
-</style>
 </head>
+
 <body>
-<!-- ================= TOP ================= -->
-<div class="topbar">
-    <div class="logo">2026KProfiteering.tw SYSTEM vNEXT</div>
-    <div class="sub">崩壞生成器 • 語意污染模式 • 雙太陽堂口系統</div>
-</div>
 
+<!-- TOP -->
 <div class="panel">
-    <!-- ================= 操作按鈕 ================= -->
-    <div class="buttons">
-        <button onclick="generate()">🎲 隨機撈錢（左）</button>
-        <button onclick="generate()">☀ 堂口模式（右）</button>
-        <button onclick="generate()" style="background: linear-gradient(135deg, #ca8a04, #f59e0b); color: black; font-weight: bold;">
-            🔥 雙太陽模式
-        </button>
-        <button onclick="download()">⬇ 留下證據</button>
-        <button onclick="upgradeMode()">💰 錢再多一點</button>
-    </div>
 
-    <!-- ================= INPUT ================= -->
-    <div style="margin-top:15px; text-align:center;">
-        <input id="userInput"
-               placeholder="輸入內容（例如：系統正在查帳 / 我懷疑異常 / 政策出現錯誤）"
-               style="width: 95%; padding: 14px; border: 2px solid #1e2937; border-radius: 10px; font-size: 15px; outline: none; background: #0b1220; color: white;">
-        <button onclick="buildMemeFromInput()"
-                style="margin-top:10px; width:95%; background: linear-gradient(135deg,#111827,#1f2937); color:#fbbf24; border:none; padding:14px; font-size:16px; border-radius:10px; font-weight:bold; cursor:pointer;">
-            🤖 雙標解析系統
-        </button>
-    </div>
+<!-- ================= BUTTONS ================= -->
+<div class="buttons">
 
-    <!-- ================= SHARE ================= -->
-    <div class="share-buttons">
-        <button onclick="shareToFB()" class="social-btn">f</button>
-        <button onclick="shareToX()" class="social-btn">𝕏</button>
-        <button onclick="shareToThreads()" class="social-btn">t</button>
-        <button onclick="shareToIG()" class="social-btn">📷</button>
-    </div>
+    <button onclick="setMode('random')">🎲 隨機撈錢</button>
+    <button onclick="setMode('tangkou')">☀ 堂口模式</button>
 
-    <!-- ================= HUD ================= -->
-    <div id="playerHUD" style="margin:15px; padding:10px; background:#0f172a; border:1px solid #334155; border-radius:10px; color:#fbbf24; font-size:13px; text-align:center;">
-        等級：<span id="hudLevel">LV1</span> |
-        混亂值：<span id="hudChaos">0</span> |
-        系統穩定度：<span id="hudStability">100%</span>
-    </div>
+    <button onclick="toggleDoubleSun()" id="doubleSunBtn">
+        🌞 雙太陽 OFF
+    </button>
 
-    <!-- ================= 系統吐槽 ================= -->
-    <div id="systemComment" style="margin:15px; font-size:16px; color:#fbbf24; text-align:center;"></div>
+    <button onclick="upgrade()">💰 錢再多一點</button>
 
-    <!-- ================= OUTPUT ================= -->
-    <div id="receiptContainer"></div>
- 
-    <div style="text-align:center;margin-top:10px;color:#64748b;font-size:12px;">
-        左側：隨機奉獻　｜　右側：堂口高層
-    </div>
+    <button onclick="openEvidence()">📦 留下證據</button>
 </div>
 
-<!-- ================= TEMPLATE ================= -->
+<!-- HUD -->
+<div id="hud">
+模式：<span id="mode">-</span> |
+Lv：<span id="level">0</span> |
+混亂值：<span id="chaos">0</span>
+</div>
+
+<!-- SYSTEM TEXT -->
+<div id="systemComment"></div>
+
+<!-- OUTPUT -->
+<div id="receiptContainer"></div>
+
+</div>
+
+<!-- TEMPLATE -->
 <template id="receiptTemplate">
-    <div class="receipt">
-        <div class="header">
-            <div class="title">SYSTEM OUTPUT TERMINAL</div>
-            <div class="warning">MEME ENGINE ACTIVE • REALITY DISTORTION ENABLED</div>
-        </div>
-        <div class="info">
-            <div>收據編號：<span class="rid"></span></div>
-            <div>收款時間：<span class="rtime"></span></div>
-            <div>奉獻金額：NT$ <span class="rmoney"></span></div>
-            <div>堂口高層：<span class="rhighsalary high-salary"></span></div>
-            <div>高層實領：NT$ <span class="ractual"></span></div>
-            <div>查帳逾時：<span class="rclock"></span></div>
-        </div>
-        <div class="divider"></div>
-        <div class="content result"></div>
-        <div class="comparison"></div>
-        <div class="divider"></div>
-        <div class="footer">
-            MEME CORE SYSTEM<br>
-            「你看到的現金，不是給阿北」<br>
-            「阿北只是轉手」
-        </div>
+<div class="receipt">
+
+    <div>MEME CORE SYSTEM</div>
+    <hr>
+
+    <div>收據格式：<span class="rid"></span></div>
+    <div>捐款時間：<span class="rtime"></span></div>
+
+    <div>捐款金額：NT$ <span class="rmoney"></span></div>
+    <div>高層代表：<span class="rhigh"></span></div>
+    <div>高層薪水：NT$ <span class="ractual"></span></div>
+
+    <hr>
+
+    <div class="result"></div>
+
+    <div class="footer" id="footerText">
+        MEME CORE SYSTEM
     </div>
+
+</div>
 </template>
 
-<!-- ================= BOOT MODAL ================= -->
+<!-- MODAL -->
 <div id="introModal" class="modal">
   <div class="modal-box">
-    <div class="modal-title">SYSTEM BOOT SEQUENCE</div>
+    <div class="modal-title">SYSTEM BOOT</div>
     <div class="modal-content">
-偵測到非正常語意流
-MEME CORE 正在啟動：
-- 會計師顧問系統
-- 律師訴訟系統
-- 2026民眾堂募款計劃
-是否進入雙太陽堂口系統？
+MEME CORE 啟動
+是否進入堂口雙標收據系統？
     </div>
     <div class="modal-buttons">
-      <button onclick="enterSystem(true)">進入系統</button>
-      <button onclick="enterSystem(false)">拒絕進入（系統會記住你）</button>
+      <button onclick="enter(true)">想奉獻，則進入</button>
+      <button onclick="enter(false)">想不開，則離開</button>
     </div>
   </div>
 </div>
 
-<!-- ================= scripts ================= -->
+<!-- evidence modal -->
+<div id="evidenceModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title">留下證據，可以避免被阿北牽拖</div>
+    <div class="modal-content">
+選擇操作：
+    </div>
+    <div class="modal-buttons">
+      <button onclick="sharePack()">複製連結+圖片分享給你的小草朋友</button>
+      <button onclick="downloadShot()">下載截圖，可避免特偵組對你問A答B</button>
+      <button onclick="closeEvidence()">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- scripts -->
 <script type="module" src="script.js"></script>
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
-<!-- 全域函數暴露 -->
 <script>
 window.onload = () => {
     document.getElementById("introModal").style.display = "flex";
 };
 
-window.enterSystem = function(ok) {
+window.enter = (ok) => {
     document.getElementById("introModal").style.display = "none";
-    if (ok) {
-        if (typeof loadMemes === "function") loadMemes();
-    } else {
-        document.getElementById("receiptContainer").innerHTML = `
-            <div style="color:#f87171; padding:40px; text-align:center; font-size:18px;">
-                SYSTEM OFFLINE<br><br>你拒絕了進入。
-            </div>`;
+};
+
+window.setMode = (m) => {
+    window.gameMode = m;
+    document.getElementById("mode").innerText = m;
+};
+
+window.upgrade = () => {
+    if (!window.level) window.level = 0;
+    window.level++;
+    document.getElementById("level").innerText = window.level;
+
+    if (window.level >= 10) {
+        document.body.innerHTML = "<h1 style='color:red;text-align:center;padding:50px'>SYSTEM LOCKED</h1>";
     }
 };
 
-window.shareToFB = function() {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
+window.openEvidence = () => {
+    document.getElementById("evidenceModal").style.display = "flex";
 };
-window.shareToX = function() {
-    window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
+
+window.closeEvidence = () => {
+    document.getElementById("evidenceModal").style.display = "none";
 };
-window.shareToThreads = function() {
-    alert("已複製請貼上 Threads");
+
+window.downloadShot = () => {
+    html2canvas(document.querySelector(".receipt")).then(canvas => {
+        let a = document.createElement("a");
+        a.href = canvas.toDataURL();
+        a.download = "meme.png";
+        a.click();
+    });
 };
-window.shareToIG = function() {
-    alert("請下載圖片上傳 IG");
+
+window.sharePack = async () => {
+    await navigator.clipboard.writeText(location.href);
+    alert("已複製連結");
 };
 </script>
+
 </body>
 </html>

@@ -1,4 +1,4 @@
-// ==================== MEME CORE v3 DOUBLE SUN MODE ====================
+// ==================== MEME CORE ENGINE (FIXED VERSION) ====================
 import {
     rand,
     genRandomMoney,
@@ -12,276 +12,194 @@ import {
     genHighSalary,
     genThanksMessage,
     genAngryMessage,
-    genTangkouName
+    genTangkouName,
+    genFooter
 } from "./generator.js";
-
-import {
-    renderCommentUI
-} from "./ui.js";
-
+import { renderCommentUI } from "./ui.js";
+// ==================== SAFE RNG ====================
+function randRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 // ==================== STATE ====================
 let memes = null;
 let memesReady = false;
-let currentReceipts = [];
+let currentReceipt = null;
 let gameState = {
+    mode: "random",
     chaos: 0,
     stability: 100,
     level: 1,
-    clicks: 0,
-    modeLock: null
+    doubleSun: false,
+    jackpotUsed: false,
+    lock: false
 };
-
-// ==================== INIT ====================
+// ==================== LOAD MEMES ====================
 function loadMemes() {
-    const url = "memes.json";
-    fetch(url + "?ts=" + Date.now())
-        .then(r => {
-            if (!r.ok) throw new Error("HTTP " + r.status);
-            return r.json();
-        })
+    fetch("memes.json?ts=" + Date.now())
+        .then(r => r.json())
         .then(d => {
             memes = d;
             memesReady = true;
-            console.log("✅ memes.json 載入成功！");
+            console.log("memes loaded");
             generate();
         })
         .catch(err => {
-            console.error("❌ memes.json 載入失敗:", err);
-            document.getElementById("receiptContainer").innerHTML = `
-                <div style="color:#f87171; padding:20px; text-align:center;">
-                    SYSTEM FAILURE: 無法載入 memes.json<br><br>
-                    錯誤：${err.message}
-                </div>`;
+            console.error("memes load fail", err);
         });
 }
-
-// ==================== CORE ====================
-function createReceipt(type = "random", input = "") {
-    const modePool = ["NORMAL", "SYSTEM", "GLITCH", "POLITICAL_OVERFLOW", "CHAOS"];
-    let mode = rand(modePool);
-    if (gameState.chaos > 80) mode = "GLITCH";
-    if (gameState.stability < 40) mode = "SYSTEM";
-    if (gameState.modeLock) mode = gameState.modeLock;
-
-    let parts = [];
-    if (mode === "NORMAL") {
-        parts = [
-            fillTemplate(rand(memes.openings)),
-            fillTemplate(rand(memes.usages)),
-            fillTemplate(rand(memes.endings))
-        ];
-    } else if (mode === "SYSTEM") {
-        parts = ["【SYSTEM MODE ACTIVE】", fillTemplate(rand(memes.system_weird))];
-    } else if (mode === "GLITCH") {
-        parts = ["▓▒░ SYSTEM CORRUPTION ░▒▓", fillTemplate(rand(memes.glitch))];
-    } else if (mode === "POLITICAL_OVERFLOW") {
-        parts = [fillTemplate(rand(memes.politics_glitch)), "SYSTEM OVERRIDE ACTIVE"];
-    } else {
-        parts = [fillTemplate(rand(memes.usages)), fillTemplate(rand(memes.glitch)), chaosMath()];
+// ==================== CHAOS SYSTEM ====================
+function addChaos(mode) {
+    let gain = 0;
+    if (mode === "random") {
+        const r = Math.random();
+        if (r < 0.7) gain = randRange(1, 5);
+        else if (r < 0.9) gain = randRange(6, 20);
+        else if (r < 0.98) gain = randRange(21, 50);
+        else gain = randRange(51, 100);
     }
-
-    if (input) parts.unshift(`【INPUT】${input}`);
-
-    // ==================== 金額邏輯 ====================
-    let moneyNum = type === "random" ? genRandomMoney() : genTangkouMoney();
-    const levelMultiplier = 1 + (Math.min(gameState.level, 10) * 0.05);
-    moneyNum = Math.floor(moneyNum * levelMultiplier);
-
-    const highSalaryNum = genHighSalary();        // 高層薪水（備用）
-    const actualSalaryNum = Math.floor(highSalaryNum * (0.65 + Math.random() * 0.3));
-
-    // ==================== 關鍵修正：堂口高層永遠顯示人名 ====================
-    const tangkouName = genTangkouName();
-
-    // 比較邏輯
-    let comparisonHTML = "";
-    if (moneyNum >= actualSalaryNum) {
-        comparisonHTML = `
-            <div class="thanks">✅ 民眾堂對您的奉獻深表感謝！</div>
-            <div style="color:#4ade80; margin-top:6px; font-size:15px;">
-                ${genThanksMessage()}
-            </div>`;
-    } else {
-        comparisonHTML = `
-            <div class="angry">⚠️ 堂口高層相當不滿！</div>
-            <div class="warning-text" style="margin-top:8px; font-size:15px;">
-                ${genAngryMessage()}
-            </div>`;
+    if (mode === "tangkou") {
+        const r = Math.random();
+        if (r < 0.6) gain = randRange(10, 50);
+        else if (r < 0.85) gain = randRange(50, 200);
+        else if (r < 0.95) gain = randRange(200, 1000);
+        else gain = randRange(1000, 5000);
     }
-
+    gameState.chaos += gain;
+    gameState.stability -= Math.floor(gain / 25);
+    if (gameState.stability < 0) gameState.stability = 0;
+    return gain;
+}
+// ==================== JACKPOT ====================
+function checkJackpot() {
+    if (gameState.jackpotUsed) return 0;
+    const r = Math.random();
+    if (gameState.mode === "random" && r < 0.001) {
+        gameState.jackpotUsed = true;
+        return randRange(100000, 900000);
+    }
+    if (gameState.mode === "tangkou" && r < 0.001) {
+        gameState.jackpotUsed = true;
+        return randRange(1000000, 9000000);
+    }
+    if (gameState.level >= 5 && r < 0.0005) {
+        gameState.jackpotUsed = true;
+        return randRange(10000000, 99000000);
+    }
+    return 0;
+}
+// ==================== RECEIPT ====================
+function createReceipt(input = "") {
+    if (!memes) return { content: "SYSTEM LOADING" };
+    let baseMoney =
+        gameState.mode === "random"
+            ? genRandomMoney()
+            : genTangkouMoney();
+    let levelBonus =
+        gameState.level *
+        (gameState.mode === "random" ? 50 : 5000);
+    let chaosGain = addChaos(gameState.mode);
+    let jackpot = checkJackpot();
+    let money = baseMoney + levelBonus + chaosGain * 10 + jackpot;
+    // ================= content =================
+    let content = [];
+    content.push(fillTemplate(rand(memes.openings || [])));
+    content.push(fillTemplate(rand(memes.usages || [])));
+    if (gameState.doubleSun) {
+        content.push("【咆哮戰神】 " + fillTemplate(rand(memes.huang || [])));
+        content.push("【白賊阿北】 " + fillTemplate(rand(memes.ko || [])));
+    } else {
+        content.push(fillTemplate(rand(memes.usages || [])));
+    }
+    content.push(fillTemplate(rand(memes.endings || [])));
+    if (input) content.unshift("【INPUT】" + input);
+    // ================= salary =================
+    const highSalary = genTangkouName();
+    const actualSalary = Math.floor(money * (0.6 + Math.random() * 0.3));
+    const comparison =
+        money >= actualSalary
+            ? `✅ 感謝奉獻<br>${genThanksMessage()}`
+            : `⚠️ 高層不滿<br>${genAngryMessage()}`;
     return {
-        type: type,
-        content: parts.filter(Boolean).join("<br><br>"),
-        money: moneyNum.toLocaleString(),
-        highSalary: `${tangkouName}`,                    // ← 改這裡！永遠顯示人名
-        actualSalary: actualSalaryNum.toLocaleString(),
-        comparison: comparisonHTML,
         id: genId(),
         time: genTime(),
-        level: genLevel(gameState)
+        money: money,
+        moneyDisplay: money.toLocaleString(),
+        highSalary,
+        actualSalary,
+        actualSalaryDisplay: actualSalary.toLocaleString(),
+        content: content.join("<br><br>"),
+        comparison,
+        footer: genFooter()
     };
 }
-
 // ==================== RENDER ====================
 function render() {
     const container = document.getElementById("receiptContainer");
     const template = document.getElementById("receiptTemplate");
+    if (!container || !template) return;
     container.innerHTML = "";
-    container.style.display = "flex";
-    container.style.gap = "24px";
-    container.style.justifyContent = "center";
-    container.style.flexWrap = "wrap";
-
-    currentReceipts.forEach(r => {
-        const clone = template.content.cloneNode(true);
-        const receiptEl = clone.querySelector(".receipt");
-
-        clone.querySelector(".result").innerHTML = r.content;
-        clone.querySelector(".rmoney").innerText = r.money;
-        clone.querySelector(".rid").innerText = r.id;
-        clone.querySelector(".rtime").innerText = r.time;
-        clone.querySelector(".rhighsalary").innerText = r.highSalary || "—";
-        clone.querySelector(".ractual").innerText = r.actualSalary || "—";
-
-        const comparisonDiv = clone.querySelector(".comparison");
-        if (comparisonDiv) comparisonDiv.innerHTML = r.comparison || "";
-
-        if (r.type === "tangkou" && receiptEl) {
-            receiptEl.classList.add("tangkou");
-        }
-
-        container.appendChild(clone);
-    });
-
-    renderCommentUI(genComment());
+    const r = createReceipt();
+    const node = template.content.cloneNode(true);
+    node.querySelector(".rid").innerText = r.id;
+    node.querySelector(".rtime").innerText = r.time;
+    node.querySelector(".rmoney").innerText = r.moneyDisplay;
+    node.querySelector(".rhigh").innerText = r.highSalary;
+    node.querySelector(".ractual").innerText = r.actualSalaryDisplay;
+    node.querySelector(".result").innerHTML = r.content;
+    const footer = node.querySelector(".footer");
+    if (footer) footer.innerHTML = r.footer;
+    container.appendChild(node);
     updateHUD();
+    renderCommentUI(genComment(gameState.chaos));
 }
-
 // ==================== HUD ====================
 function updateHUD() {
-    const levelEl = document.getElementById("hudLevel");
-    const chaosEl = document.getElementById("hudChaos");
-    const stabEl = document.getElementById("hudStability");
-
-    if (levelEl) levelEl.innerText = "LV" + gameState.level;
-    if (chaosEl) chaosEl.innerText = gameState.chaos;
-    if (stabEl) stabEl.innerText = gameState.stability + "%";
-
-    document.body.style.filter = "";
-    if (gameState.chaos > 60) document.body.style.filter = "hue-rotate(90deg)";
-    if (gameState.stability < 50) document.body.style.filter = "contrast(1.2)";
-    if (gameState.stability < 20) document.body.style.animation = "shake 0.2s infinite";
+    const safeSet = (id, v) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = v;
+    };
+    safeSet("mode", gameState.mode);
+    safeSet("level", gameState.level);
+    safeSet("chaos", gameState.chaos);
 }
-
-// ==================== MAIN ====================
+// ==================== ACTIONS ====================
 window.generate = function () {
-    if (!memesReady) return;
-    gameState.clicks++;
-    gameState.chaos += 5;
-    gameState.stability -= 2;
-    if (gameState.clicks > 8) gameState.level = Math.min(gameState.level + 1, 10);
-
-    currentReceipts = [
-        createReceipt("random"),
-        createReceipt("tangkou")
-    ];
+    if (!memesReady || gameState.lock) return;
     render();
 };
-
+window.setMode = function (m) {
+    gameState.mode = m;
+};
+window.toggleDoubleSun = function () {
+    gameState.doubleSun = !gameState.doubleSun;
+    const btn = document.getElementById("doubleSunBtn");
+    if (btn) {
+        btn.innerText =
+            gameState.doubleSun
+                ? "🌞 雙太陽 ON"
+                : "🌞 雙太陽 OFF";
+    }
+    render();
+};
+window.upgrade = function () {
+    gameState.level++;
+    if (gameState.level >= 10) {
+        gameState.lock = true;
+        document.body.innerHTML =
+            "<h1 style='color:red;text-align:center;padding:50px'>SYSTEM LOCKED</h1>";
+    }
+    render();
+};
 window.buildMemeFromInput = function () {
-    const input = document.getElementById("userInput")?.value.trim();
-    if (!input) {
-        document.getElementById("receiptContainer").innerHTML = "SYSTEM: INPUT REQUIRED";
-        return;
-    }
-
-    gameState.clicks++;
-    gameState.chaos += 10;
-    gameState.stability -= 5;
-
-    currentReceipts = [
-        createReceipt("random", input),
-        createReceipt("tangkou", input)
-    ];
     render();
 };
-
-// ==================== UPGRADE ====================
-window.upgradeMode = function () {
-    if (!currentReceipts.length) return;
-
-    gameState.chaos += 50;
-    gameState.stability -= 30;
-    gameState.level = Math.min(gameState.level + 2, 10);
-    gameState.modeLock = "GLITCH";
-
-    currentReceipts = currentReceipts.map(r => ({
-        ...r,
-        content: r.content + "<br><br>🔥【系統已失控】",
-        money: (parseInt(r.money.replace(/,/g, "")) * 10).toLocaleString(),
-        highSalary: r.type === "tangkou"
-            ? `堂口高層 ${genTangkouName()}`
-            : (parseInt(r.highSalary.replace(/,/g, "")) * 8 || 0).toLocaleString(),
-        actualSalary: (parseInt(r.actualSalary.replace(/,/g, "")) * 8).toLocaleString(),
-        level: "💀 失控等級"
-    }));
-
-    renderCommentUI("🔥 系統判定：已進入崩壞模式");
-    render();
+// ==================== INIT ====================
+window.enter = function (ok) {
+    document.getElementById("introModal").style.display = "none";
+    if (ok) loadMemes();
 };
-
-// ==================== OLD & DOWNLOAD & SHARE & CLOCK ====================
-window.spam = () => generate();
-window.spamBlack = () => generate();
-
-window.download = function () {
-    const el = document.getElementById("receiptContainer");
-    html2canvas(el, { scale: 2, backgroundColor: "#fff" })
-        .then(canvas => {
-            const a = document.createElement("a");
-            a.download = `MEMECORE_${Date.now()}.png`;
-            a.href = canvas.toDataURL("image/png");
-            a.click();
-        });
-};
-
-window.shareToFB = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${location.href}`);
-window.shareToX = () => window.open(`https://twitter.com/intent/tweet?text=MEME CORE&url=${location.href}`);
-window.shareToThreads = () => alert("已複製請貼上 Threads");
-window.shareToIG = () => alert("請下載圖片上傳 IG");
-
-const startDate = new Date("2024-08-29T00:00:00");
-function updateClock() {
-    const now = new Date();
-    let diff = Math.floor((now - startDate) / 1000);
-    const d = Math.floor(diff / 86400);
-    diff %= 86400;
-    const h = Math.floor(diff / 3600);
-    diff %= 3600;
-    const m = Math.floor(diff / 60);
-    const s = diff % 60;
-
-    document.querySelectorAll(".rclock").forEach(el => {
-        el.innerText = `${d}天 ${h}時 ${m}分 ${s}秒`;
-    });
-}
-setInterval(updateClock, 1000);
-
-// ==================== MODAL ====================
 document.addEventListener("DOMContentLoaded", () => {
-    const modal = document.getElementById("introModal");
-    if (modal) modal.style.display = "flex";
+    const m = document.getElementById("introModal");
+    if (m) m.style.display = "flex";
 });
-
-window.enterSystem = function (ok) {
-    const modal = document.getElementById("introModal");
-    if (modal) modal.style.display = "none";
-
-    if (ok) {
-        loadMemes();
-    } else {
-        document.getElementById("receiptContainer").innerHTML = "SYSTEM OFFLINE";
-    }
-};
-
-console.log("🔥 MEME CORE v3 DOUBLE SUN MODE LOADED（左右隨機+堂口模式）");
+console.log("MEME CORE ENGINE FIXED ✔");
