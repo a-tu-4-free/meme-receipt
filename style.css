@@ -1,395 +1,370 @@
 /* =========================
    BASE RESET
 ========================= */
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  overflow-x: hidden;
+  width: 100%; height: 100%;
+  overflow: hidden; /* 桌機不捲動 */
   font-family: "Microsoft JhengHei", "Segoe UI", Arial, sans-serif;
   background: radial-gradient(circle at top, #0b1220, #020617);
   color: #e5e7eb;
 }
 
-/* =========================
-   BODY BASE
-========================= */
 body {
-  min-height: 100vh;
-  padding: 14px 10px;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
-/* =========================
-   BACKGROUND EFFECT
-========================= */
 body::before {
   content: "";
-  position: fixed;
-  inset: 0;
+  position: fixed; inset: 0;
   background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,0.03),
-      rgba(255,255,255,0.03) 1px,
-      transparent 1px,
-      transparent 3px
-    ),
-    radial-gradient(circle at center, rgba(255,255,255,0.03), transparent 70%);
-  pointer-events: none;
-  z-index: 0;
-  mix-blend-mode: overlay;
-  opacity: 0.6;
+    repeating-linear-gradient(0deg,rgba(255,255,255,0.03),rgba(255,255,255,0.03) 1px,transparent 1px,transparent 3px),
+    radial-gradient(circle at center,rgba(255,255,255,0.03),transparent 70%);
+  pointer-events: none; z-index: 0;
+  mix-blend-mode: overlay; opacity: 0.6;
 }
 
 /* =========================
-   PANEL
+   PANEL — 填滿視窗，flex列
 ========================= */
 .panel {
-  max-width: 1250px;
-  margin: 15px auto;
-  width: 100%;
-  position: relative;
-  z-index: 2;
+  width: 100%; max-width: 1250px;
+  margin: 0 auto;
+  padding: 10px 12px;
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* =========================
    BUTTONS
 ========================= */
 .buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+  display: flex; flex-wrap: wrap;
+  gap: 7px; justify-content: center;
+  flex-shrink: 0;
 }
-
 .buttons button {
-  flex: 1 1 28%;
-  min-width: 135px;
+  flex: 1 1 calc(16.6% - 7px); min-width: 110px;
   background: linear-gradient(145deg, #f59e0b, #b45309);
-  color: #0b1220;
-  border: none;
-  padding: 11px 12px;
-  font-size: 14px;
-  font-weight: 800;
-  border-radius: 10px;
-  cursor: pointer;
-  box-shadow: 0 6px 0 #0b1220;
+  color: #0b1220; border: none;
+  padding: 9px 10px; font-size: 13px; font-weight: 800;
+  border-radius: 10px; cursor: pointer;
+  box-shadow: 0 4px 0 #0b1220;
   transition: all 0.12s ease;
 }
-
-.buttons button:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.1);
-}
-
-.buttons button:active {
-  transform: translateY(2px);
-  box-shadow: 0 2px 0 #0b1220;
-}
+.buttons button:hover  { transform: translateY(-2px); filter: brightness(1.1); }
+.buttons button:active { transform: translateY(2px); box-shadow: 0 1px 0 #0b1220; }
 
 /* =========================
-   HUD
+   COMBO
 ========================= */
-#hud{
-    width:100%;
-    max-width:800px;
-
-    margin:15px auto;
-    padding:10px;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:6px;
-    flex-wrap:wrap;
-
-    background:#0f172a;
-    border:1px solid #334155;
-    border-radius:10px;
-
-    color:#fbbf24;
-    font-size:13px;
+#comboDisplay {
+  text-align: center; font-size: 13px; font-weight: 800;
+  color: #f59e0b; height: 20px; margin: 3px 0;
+  letter-spacing: 1px; transition: transform 0.15s;
+  flex-shrink: 0;
 }
 
 /* =========================
-   ⭐ SYSTEM COMMENT（已修正置中）
+   INFO BAR（HUD + 任務 + 成就折疊）
+========================= */
+#infoBar {
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin: 4px 0;
+  flex-shrink: 0;
+}
+#infoMain {
+  display: flex; align-items: center;
+  flex-wrap: wrap; gap: 6px;
+  font-size: 12px; color: #fbbf24;
+}
+#hudChip {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#missionChip {
+  flex: 1; color: #94a3b8;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  font-size: 11px;
+}
+#missionProgress { color: #22c55e; font-weight: 700; }
+#infoToggleBtn {
+  background: none; border: 1px solid #334155;
+  color: #64748b; font-size: 11px; padding: 2px 8px;
+  border-radius: 6px; cursor: pointer;
+  white-space: nowrap; flex-shrink: 0;
+}
+#infoToggleBtn:hover { border-color: #f59e0b; color: #f59e0b; }
+
+#stabilityBarInline {
+  height: 3px; background: #1e293b;
+  border-radius: 99px; overflow: hidden;
+  margin-top: 5px;
+}
+#stabilityFill {
+  height: 100%; width: 100%;
+  background: linear-gradient(90deg, #ef4444, #f59e0b, #22c55e);
+  border-radius: 99px; transition: width 0.4s ease;
+}
+
+/* 成就折疊 */
+#achievementPanel {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  justify-content: center;
+  overflow: hidden;
+  max-height: 200px;
+  transition: max-height 0.3s ease, margin-top 0.3s ease;
+  margin-top: 6px;
+}
+#achievementPanel.collapsed { max-height: 0; margin-top: 0; }
+
+.badge {
+  background: #1e293b; border: 1px solid #334155;
+  color: #475569; padding: 3px 8px;
+  border-radius: 20px; font-size: 11px; transition: all 0.3s;
+  white-space: nowrap;
+}
+.badge.unlocked {
+  background: linear-gradient(135deg, #92400e, #b45309);
+  border-color: #f59e0b; color: #fef3c7;
+  box-shadow: 0 0 6px rgba(245,158,11,0.4);
+}
+
+/* =========================
+   SYSTEM COMMENT
 ========================= */
 #systemComment {
-  margin: 12px auto;
-  max-width: 800px;
-
-  padding: 10px 14px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-
-  background: rgba(2, 6, 23, 0.65);
-  border: 1px solid rgba(251, 191, 36, 0.25);
-  border-radius: 10px;
-
-  color: #e5e7eb;
-  font-size: 13px;
-  line-height: 1.6;
-
-  min-height: 44px;
-
-  /* 關鍵：避免動畫偏移 */
+  margin: 4px 0; padding: 7px 12px;
+  display: flex; justify-content: center; align-items: center; text-align: center;
+  background: rgba(2,6,23,0.65);
+  border: 1px solid rgba(251,191,36,0.25);
+  border-radius: 8px; color: #e5e7eb;
+  font-size: 12px; line-height: 1.5; min-height: 34px;
   transition: all 0.25s ease;
+  flex-shrink: 0;
 }
 
 /* =========================
-   RECEIPT CONTAINER
+   RECEIPT CONTAINER — 剩餘空間
 ========================= */
 #receiptContainer {
-  width: 100%;
-  max-width: 1250px;
-  margin: 25px auto;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  justify-content: center;
+  flex: 1; overflow-y: auto;
+  display: flex; flex-wrap: wrap;
+  gap: 16px; justify-content: center;
   align-items: flex-start;
+  padding: 6px 0 10px;
 }
+#receiptContainer::-webkit-scrollbar { width: 4px; }
+#receiptContainer::-webkit-scrollbar-thumb { background: #334155; border-radius: 99px; }
 
 /* =========================
    RECEIPT CARD
 ========================= */
 .receipt {
-  width: 375px;
-  max-width: 100%;
+  width: 340px; max-width: 100%;
   background: rgba(255,255,255,0.98);
-  color: #0f172a;
-  padding: 22px;
-  border-radius: 16px;
-  position: relative;
-  overflow: hidden;
-
-  box-shadow:
-    0 25px 70px rgba(0,0,0,0.55),
-    inset 0 0 0 1px rgba(0,0,0,0.06);
-
+  color: #0f172a; padding: 16px;
+  border-radius: 14px; position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   transition: all 0.25s ease;
 }
-
-.receipt:hover {
-  transform: translateY(-8px) scale(1.01);
+.receipt:hover { transform: translateY(-4px) scale(1.005); }
+.receipt-header { font-weight: 800; font-size: 14px; text-align: center; margin-bottom: 6px; }
+.receipt-row {
+  display: flex; justify-content: space-between;
+  padding: 4px 0; border-bottom: 1px dashed #e2e8f0;
+  font-size: 12px;
 }
-
-/* =========================
-   CONTENT（修正偏左問題）
-========================= */
-.content {
-  margin: 16px 0;
-  padding: 16px;
-
-  font-size: 15px;
-  line-height: 1.7;
-
-  background: #f8fafc;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-
-  /* ⭐ 這個就是你要的「置中修正核心」 */
-  text-align: center;
+.receipt-row:last-of-type { border-bottom: none; }
+.money-row { font-weight: 700; color: #b45309; }
+.result {
+  margin: 10px 0; padding: 10px;
+  font-size: 12px; line-height: 1.65;
+  background: #fefce8; border-radius: 8px;
+  border: 1px solid #fcd34d;
   white-space: pre-line;
+  min-height: 40px;
+  transition: outline 0.2s;
 }
-
-/* result 強化 */
-.content.result {
-  background: #fefce8;
-  border: 2px solid #fcd34d;
-  font-weight: 500;
-}
-
-/* =========================
-   INFO
-========================= */
-.info {
-  background: #f8fafc;
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-}
-
-.info div {
-  display: flex;
-  justify-content: space-between;
-  padding: 7px 0;
-  border-bottom: 1px dashed #cbd5e1;
-  font-size: 14px;
-}
-
-.info div:last-child {
-  border-bottom: none;
-}
-
-.high-salary {
-  color: #c2410c;
-  font-weight: 700;
-}
-
-/* =========================
-   COMPARISON
-========================= */
-.comparison {
-  margin: 16px 0;
-  padding: 14px;
-  border-radius: 10px;
-  background: #fefce8;
-  border: 1px solid #fde047;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-/* =========================
-   FOOTER
-========================= */
 .footer {
-  text-align: center;
-  font-size: 12.5px;
-  color: #475569;
-  margin-top: 18px;
-  line-height: 1.6;
-  letter-spacing: 0.5px;
+  text-align: center; font-size: 11px; color: #64748b;
+  margin-top: 10px; line-height: 1.5;
+}
+
+/* ===== 收據操作按鈕 ===== */
+.receipt-actions {
+  display: flex; gap: 6px; margin: 8px 0 4px;
+}
+.receipt-btn {
+  flex: 1; padding: 6px 4px; border: none;
+  font-size: 11px; font-weight: 700;
+  border-radius: 7px; cursor: pointer;
+  transition: all 0.12s;
+}
+.edit-btn   { background: #e2e8f0; color: #334155; }
+.redraw-btn { background: #fef3c7; color: #92400e; }
+.share-btn  { background: #f59e0b; color: #0b1220; }
+.receipt-btn:hover { filter: brightness(0.92); transform: translateY(-1px); }
+
+/* =========================
+   MODAL
+========================= */
+.modal {
+  position: fixed; inset: 0; display: none;
+  justify-content: center; align-items: center;
+  background: rgba(0,0,0,0.78); z-index: 99999; padding: 16px;
+}
+.modal-box {
+  width: min(520px,95%); background: #0f172a; color: white;
+  border: 2px solid #f59e0b; border-radius: 12px; padding: 18px;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-title { font-size: 17px; font-weight: bold; margin-bottom: 8px; color: #f59e0b; }
+.modal-content { font-size: 13px; line-height: 1.6; white-space: pre-line; }
+.modal-buttons { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.modal-buttons button {
+  flex: 1; padding: 9px; border: none; cursor: pointer;
+  font-weight: bold; border-radius: 8px; min-width: 80px; font-size: 13px;
+}
+.modal-buttons button:first-child { background: #f59e0b; color: black; }
+.modal-buttons button:not(:first-child) { background: #1f2937; color: white; }
+
+/* ===== Share text ===== */
+.share-text-box {
+  background: #1e293b; padding: 10px 12px; border-radius: 8px;
+  margin: 8px 0; font-size: 12px; line-height: 1.7;
+  white-space: pre-line; color: #e5e7eb; max-height: 120px; overflow-y: auto;
+}
+
+/* ===== 社群分享格子 ===== */
+.share-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 8px; margin: 10px 0;
+}
+.share-icon-btn {
+  padding: 10px 6px; border: none; border-radius: 8px;
+  font-size: 12px; font-weight: 800; cursor: pointer;
+  transition: all 0.15s; text-align: center;
+}
+.share-icon-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+.share-icon-btn.fb      { background: #1877f2; color: #fff; }
+.share-icon-btn.twitter { background: #000; color: #fff; }
+.share-icon-btn.threads { background: #1a1a1a; color: #fff; border: 1px solid #333; }
+.share-icon-btn.line    { background: #06c755; color: #fff; }
+.share-icon-btn.ig      { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); color: #fff; }
+.share-icon-btn.ibon    { background: #e60012; color: #fff; }
+
+/* =========================
+   CODEX
+========================= */
+.codex-box { max-width: 620px !important; }
+#codexProgress { color: #f59e0b; font-size: 12px; margin-bottom: 10px; font-weight: 700; }
+#codexGrid { display: flex; flex-wrap: wrap; gap: 7px; }
+.codex-card {
+  padding: 7px 10px; border-radius: 10px;
+  font-size: 11px; font-weight: 700;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 3px;
+  width: 80px; text-align: center;
+  transition: all 0.2s;
+}
+.codex-card.got {
+  background: linear-gradient(135deg,#92400e,#b45309);
+  border: 1px solid #f59e0b; color: #fef3c7;
+  box-shadow: 0 0 5px rgba(245,158,11,0.3);
+  cursor: pointer;
+}
+.codex-card.got:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 0 12px rgba(245,158,11,0.5); }
+.codex-card.locked { background: #1e293b; border: 1px solid #334155; color: #334155; }
+.codex-emoji { font-size: 20px; line-height: 1; }
+.codex-name  { font-size: 10px; line-height: 1.3; word-break: break-all; }
+.char-quote {
+  background: #1e293b; border-left: 3px solid #f59e0b;
+  padding: 8px 12px; border-radius: 0 7px 7px 0;
+  font-size: 12px; line-height: 1.65; color: #e5e7eb;
 }
 
 /* =========================
-   DIVIDER
+   TOAST
 ========================= */
-.divider {
-  height: 1px;
-  background: linear-gradient(to right, transparent, #cbd5e1, transparent);
-  margin: 16px 0;
+#toastContainer {
+  position: fixed; top: 14px; right: 14px;
+  z-index: 99998; display: flex; flex-direction: column;
+  gap: 6px; pointer-events: none;
 }
+.toast {
+  background: #0f172a; border: 1.5px solid #f59e0b;
+  color: #fbbf24; padding: 8px 14px; border-radius: 10px;
+  font-size: 12px; font-weight: 700;
+  opacity: 0; transform: translateX(40px);
+  transition: all 0.3s ease; max-width: 260px;
+}
+.toast.show { opacity: 1; transform: translateX(0); }
+.toast.hide { opacity: 0; transform: translateX(40px); }
 
 /* =========================
-   MOBILE
+   RAID OVERLAY
 ========================= */
-@media (max-width: 900px) {
-  #receiptContainer {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .receipt {
-    width: 100%;
-    max-width: 420px;
-  }
+#raidOverlay {
+  position: fixed; inset: 0; z-index: 999999;
+  background: rgba(0,0,0,0.95);
+  display: none; justify-content: center; align-items: center;
 }
-
-@media (max-width: 600px) {
-  .buttons button {
-    flex: 1 1 100%;
-  }
-
-  .receipt {
-    padding: 18px;
-  }
+#raidOverlay.active { display: flex; animation: raidFlash 0.3s ease; }
+@keyframes raidFlash {
+  0%   { background: rgba(239,68,68,0.9); }
+  20%  { background: rgba(0,0,0,0.95); }
+  40%  { background: rgba(239,68,68,0.6); }
+  100% { background: rgba(0,0,0,0.95); }
 }
+#raidBox { text-align: center; padding: 40px; max-width: 400px; }
+#raidIcon { font-size: 60px; animation: raidPulse 0.5s infinite alternate; }
+@keyframes raidPulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+#raidTitle { font-size: 32px; font-weight: 900; color: #ef4444; margin: 12px 0 8px; letter-spacing: 2px; font-family: monospace; }
+#raidSub   { color: #94a3b8; font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
+#raidBar   { width: 100%; height: 7px; background: #1e293b; border-radius: 99px; overflow: hidden; margin-bottom: 14px; }
+#raidBarFill { height: 100%; width: 0%; background: linear-gradient(90deg,#ef4444,#f59e0b); border-radius: 99px; }
+#raidMsg   { color: #475569; font-size: 11px; font-family: monospace; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0; } }
 
 /* =========================
-   STATES
+   LOCK SCREEN
 ========================= */
-.angry {
-  color: #b91c1c;
-  font-weight: bold;
+#lockScreen {
+  display: none; position: fixed; inset: 0;
+  background: radial-gradient(circle at top, #1a0000, #000);
+  z-index: 999999; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: white; font-family: monospace; text-align: center; padding: 30px;
 }
-
-.thanks {
-  color: #15803d;
-  font-weight: bold;
-}
-
-.warning-text {
-  color: #b45309;
-  font-weight: 600;
-}
+#lockScreen h1 { color: #ef4444; font-size: clamp(22px,5vw,42px); margin-bottom: 10px; }
+#lockScreen p  { color: #94a3b8; font-size: 13px; margin-bottom: 24px; max-width: 440px; line-height: 1.7; }
+.lock-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.lock-btns button { padding: 10px 20px; border: none; cursor: pointer; font-size: 14px; font-weight: 700; border-radius: 10px; }
+#pardonBtn { background: gold; color: #000; }
+#resetBtn  { background: crimson; color: #fff; }
 
 /* =========================
-   INLINE HTML OVERRIDE
+   MOBILE — 恢復捲動
 ========================= */
-/* ===== modal ===== */
-.modal{
-    position: fixed;
-    inset: 0;
-    display: none;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0,0,0,0.75);
-    z-index: 99999;
-    padding: 20px;
+@media (max-width: 768px) {
+  html, body { overflow: auto; height: auto; }
+  .panel { height: auto; overflow: visible; }
+  #receiptContainer { overflow: visible; }
+  .buttons button { flex: 1 1 calc(33% - 7px); min-width: 90px; font-size: 12px; padding: 8px 6px; }
+  .receipt { width: 100%; max-width: 400px; }
+  .share-grid { grid-template-columns: repeat(2, 1fr); }
+  #toastContainer { top: 8px; right: 8px; left: 8px; }
+  .toast { max-width: 100%; }
 }
-.modal-box{
-    width: min(520px, 95%);
-    background: #0f172a;
-    color: white;
-    border: 2px solid #f59e0b;
-    border-radius: 12px;
-    padding: 20px;
-}
-.modal-title{
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #f59e0b;
-}
-.modal-content{
-    font-size: 14px;
-    line-height: 1.7;
-    white-space: pre-line;
-}
-.modal-buttons{
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-}
-.modal-buttons button{
-    flex: 1;
-    padding: 10px;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    border-radius: 8px;
-}
-.modal-buttons button:first-child{
-    background: #f59e0b;
-    color: black;
-}
-.modal-buttons button:last-child{
-    background: #1f2937;
-    color: white;
-}
-
-.lock-screen {
-    text-align: center;
-    padding: 50px;
-    color: white;
-    background: radial-gradient(circle at top, #1a0000, #000);
-    min-height: 100vh;
-    font-family: monospace;
-}
-
-.lock-screen button {
-    margin: 10px;
-    padding: 12px 20px;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 8px;
-}
-
-#pardonBtn {
-    background: gold;
-}
-
-#resetBtn {
-    background: crimson;
-    color: white;
+@media (max-width: 480px) {
+  .buttons button { flex: 1 1 calc(50% - 7px); }
 }

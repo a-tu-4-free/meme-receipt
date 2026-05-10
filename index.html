@@ -4,73 +4,107 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>民眾堂系統 vNEXT // MEME CORE</title>
-
 <link rel="stylesheet" href="style.css">
-
 </head>
-
 <body>
 
-<!-- TOP -->
+<!-- ================= RAID OVERLAY ================= -->
+<div id="raidOverlay">
+  <div id="raidBox">
+    <div id="raidIcon">🚨</div>
+    <div id="raidTitle">特偵組突襲！</div>
+    <div id="raidSub">系統偵測到異常金流<br>正在封存你的收據…</div>
+    <div id="raidBar"><div id="raidBarFill"></div></div>
+    <div id="raidMsg">請勿關閉視窗</div>
+  </div>
+</div>
+
+<!-- ================= LOCK SCREEN ================= -->
+<div id="lockScreen">
+  <h1>⚠ SYSTEM LOCKED</h1>
+  <p>恭喜你達到 Lv.10 堂口最高境界。<br>
+  阿北已將你列入「最危險知情者名單」。<br>
+  特偵組正在趕來的路上。<br><br>
+  <span style="color:#f59e0b">你有兩個選擇：</span></p>
+  <div class="lock-btns">
+    <button id="pardonBtn" onclick="pardonMe()">🙏 求阿北特赦，繼續奉獻</button>
+    <button id="resetBtn"  onclick="hardReset()">💀 清除記憶，重新做草</button>
+  </div>
+</div>
+
+<!-- ================= MAIN PANEL ================= -->
 <div class="panel">
 
-<!-- ================= BUTTONS ================= -->
-<div class="buttons">
-
-    <button onclick="setMode('random')">🎲 隨機撈錢</button>
-    <button onclick="setMode('tangkou')">☀ 堂口模式</button>
-
-    <button onclick="toggleDoubleSun()" id="doubleSunBtn">
-        🌞 雙太陽 OFF
-    </button>
-
+  <!-- BUTTONS -->
+  <div class="buttons">
+    <button onclick="setModeAndGen('random')">🎲 隨機撈錢</button>
+    <button onclick="setModeAndGen('tangkou')">☀ 堂口模式</button>
+    <button onclick="toggleDoubleSun()" id="doubleSunBtn">🌞 雙太陽 OFF</button>
     <button onclick="upgrade()">💰 錢再多一點</button>
-
+    <button onclick="openCodex()">📖 角色圖鑑</button>
     <button onclick="openEvidence()">📦 留下證據</button>
-</div>
+  </div>
 
-<!-- HUD -->
-<div id="hud">
-模式：<span id="mode">-</span> |
-Lv：<span id="level">0</span> |
-混亂值：<span id="chaos">0</span>
-</div>
+  <!-- COMBO -->
+  <div id="comboDisplay"></div>
 
-<!-- SYSTEM TEXT -->
-<div id="systemComment"></div>
-
-<!-- OUTPUT -->
-<div id="receiptContainer"></div>
-
-</div>
-
-<!-- TEMPLATE -->
-<template id="receiptTemplate">
-<div class="receipt">
-
-    <div>MEME CORE SYSTEM</div>
-    <hr>
-
-    <div>收據格式：<span class="rid"></span></div>
-    <div>捐款時間：<span class="rtime"></span></div>
-
-    <div>捐款金額：NT$ <span class="rmoney"></span></div>
-    <div>高層代表：<span class="rhigh"></span></div>
-    <div>高層薪水：NT$ <span class="ractual"></span></div>
-
-    <hr>
-
-    <div class="result"></div>
-
-    <div class="footer" id="footerText">
-        MEME CORE SYSTEM
+  <!-- ====== COLLAPSED INFO BAR ====== -->
+  <div id="infoBar">
+    <div id="infoMain">
+      <span id="hudChip">模式：<b id="mode">-</b> | Lv：<b id="level">1</b> | 混亂：<b id="chaos">0</b> | 穩定：<b id="stabilityText">100</b>% | 累計：NT$<b id="totalMoney">0</b></span>
+      <span id="missionChip">📋 <span id="missionDesc">載入中…</span> <span id="missionProgress"></span></span>
+      <button id="infoToggleBtn" onclick="toggleInfoPanel()">▼ 成就</button>
     </div>
+    <div id="stabilityBarInline">
+      <div id="stabilityFill"></div>
+    </div>
+    <!-- 成就折疊區 -->
+    <div id="achievementPanel" class="collapsed">
+      <div class="badge" id="badge-first"     >🌱 初次奉獻</div>
+      <div class="badge" id="badge-combo5"    >⚡ 連擊5次</div>
+      <div class="badge" id="badge-chaos100"  >🌪 混亂破百</div>
+      <div class="badge" id="badge-jackpot"   >💎 中大獎</div>
+      <div class="badge" id="badge-tangkou"   >☀ 堂口覺醒</div>
+      <div class="badge" id="badge-doublesun" >🌞 雙太陽</div>
+      <div class="badge" id="badge-lv5"       >🔥 Lv.5</div>
+      <div class="badge" id="badge-lv10"      >💀 Lv.10</div>
+      <div class="badge" id="badge-raid"      >🚨 被突襲</div>
+      <div class="badge" id="badge-mission"   >✅ 完成任務</div>
+      <div class="badge" id="badge-codex"     >📖 圖鑑家</div>
+    </div>
+  </div>
+
+  <!-- SYSTEM COMMENT -->
+  <div id="systemComment"></div>
+
+  <!-- RECEIPT OUTPUT -->
+  <div id="receiptContainer"></div>
 
 </div>
+
+<!-- ================= RECEIPT TEMPLATE ================= -->
+<template id="receiptTemplate">
+  <div class="receipt">
+    <div class="receipt-header">MEME CORE SYSTEM</div>
+    <hr>
+    <div class="receipt-row"><span>收據編號</span><span class="rid"></span></div>
+    <div class="receipt-row"><span>捐款時間</span><span class="rtime"></span></div>
+    <div class="receipt-row money-row"><span>捐款金額</span><span>NT$ <b class="rmoney"></b></span></div>
+    <div class="receipt-row"><span>高層代表</span><span class="rhigh"></span></div>
+    <div class="receipt-row"><span>高層薪水</span><span>NT$ <span class="ractual"></span></span></div>
+    <hr>
+    <div class="result"></div>
+    <div class="receipt-actions">
+      <button class="receipt-btn edit-btn" onclick="toggleEdit(this)">✏️ 編輯</button>
+      <button class="receipt-btn redraw-btn" onclick="redrawReceipt()">🔄 再抽一張</button>
+      <button class="receipt-btn share-btn" onclick="openEvidence()">📤 分享</button>
+    </div>
+    <div class="footer"></div>
+  </div>
 </template>
 
-<!-- MODAL -->
-<div id="introModal" class="modal">
+<!-- ================= INTRO MODAL ================= -->
+<div id="introModal" class="modal" style="display:none;">
   <div class="modal-box">
     <div class="modal-title">SYSTEM BOOT</div>
     <div class="modal-content">
@@ -84,71 +118,413 @@ MEME CORE 啟動
   </div>
 </div>
 
-<!-- evidence modal -->
+<!-- ================= EVIDENCE / SHARE MODAL ================= -->
 <div id="evidenceModal" class="modal">
   <div class="modal-box">
-    <div class="modal-title">留下證據，可以避免被阿北牽拖</div>
-    <div class="modal-content">
-選擇操作：
+    <div class="modal-title">📦 留下證據</div>
+
+    <!-- 分享文字預覽 -->
+    <div id="shareTextBox" class="share-text-box"></div>
+
+    <!-- 社群分享按鈕 -->
+    <div class="share-grid">
+      <button class="share-icon-btn fb"      onclick="shareToFB()">Facebook</button>
+      <button class="share-icon-btn twitter" onclick="shareToTwitter()">Twitter / X</button>
+      <button class="share-icon-btn threads" onclick="shareToThreads()">Threads</button>
+      <button class="share-icon-btn line"    onclick="shareToLINE()">LINE</button>
+      <button class="share-icon-btn ig"      onclick="guideIG()">Instagram ↗</button>
+      <button class="share-icon-btn ibon"    onclick="guideIbon()">ibon 列印 ↗</button>
     </div>
-    <div class="modal-buttons">
-      <button onclick="sharePack()">複製連結+圖片分享給你的小草朋友</button>
-      <button onclick="downloadShot()">下載截圖，可避免特偵組對你問A答B</button>
+
+    <div class="modal-buttons" style="margin-top:12px;">
+      <button onclick="copyShareText()">📋 複製分享文字</button>
+      <button onclick="downloadShot()">📸 下載截圖</button>
       <button onclick="closeEvidence()">取消</button>
     </div>
   </div>
 </div>
 
-<!-- scripts -->
-<script type="module" src="script.js"></script>
+<!-- ================= CODEX MODAL ================= -->
+<div id="codexModal" class="modal">
+  <div class="modal-box codex-box">
+    <div class="modal-title">📖 堂口角色圖鑑</div>
+    <div class="modal-content" style="font-size:12px;margin-bottom:6px;">
+      每次生成收據都可能解鎖新角色！點擊已解鎖角色查看專屬語錄。
+    </div>
+    <div id="codexProgress"></div>
+    <div id="codexGrid"></div>
+    <div class="modal-buttons" style="margin-top:12px;">
+      <button onclick="closeCodex()">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CHARACTER DETAIL MODAL ================= -->
+<div id="charModal" class="modal">
+  <div class="modal-box">
+    <div id="charEmoji" style="font-size:44px;text-align:center;margin-bottom:6px;"></div>
+    <div id="charName" class="modal-title" style="text-align:center;"></div>
+    <div id="charQuotes" style="margin-top:10px;display:flex;flex-direction:column;gap:8px;"></div>
+    <div class="modal-buttons" style="margin-top:14px;">
+      <button onclick="closeCharModal()">← 回圖鑑</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= LEADERBOARD MODAL ================= -->
+<div id="leaderModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title">🏆 今日撈錢排行榜</div>
+    <div id="leaderList" style="margin-top:10px;"></div>
+    <div class="modal-buttons" style="margin-top:14px;">
+      <button onclick="closeLeader()">關閉</button>
+      <button onclick="clearLeader()">清除紀錄</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div id="toastContainer"></div>
+
+<!-- ================= SCRIPTS ================= -->
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script type="module" src="script.js"></script>
 
 <script>
-window.onload = () => {
-    document.getElementById("introModal").style.display = "flex";
+// ==================== STATE ====================
+const achievements = {
+  first:false, combo5:false, chaos100:false, jackpot:false,
+  tangkou:false, doublesun:false, lv5:false, lv10:false,
+  raid:false, mission:false, codex:false,
+};
+let comboCount = 0, comboTimer = null;
+const COMBO_TIMEOUT = 3000;
+let infoExpanded = false;
+
+// ==================== INFO BAR TOGGLE ====================
+window.toggleInfoPanel = function() {
+  infoExpanded = !infoExpanded;
+  const panel = document.getElementById("achievementPanel");
+  const btn   = document.getElementById("infoToggleBtn");
+  panel.classList.toggle("collapsed", !infoExpanded);
+  btn.textContent = infoExpanded ? "▲ 成就" : "▼ 成就";
 };
 
+// ==================== CODEX ====================
+const ALL_CHARS = [
+  "白賊阿北","咆嘯戰神","蟑螂小姊姊","堂口之母","政治精算師",
+  "柯學教主","戰神護法","小草總幹事","民眾堂金流師",
+  "橘子運輸中隊長","立法戰狼","D哥女神","朱哥女神",
+  "堂口帳房","白賊阿北的影子","系統剪輯師","賺四代網軍大將",
+  "背骨民代","切割執行長","翻車現場直播主",
+  "大巨蛋總工程師","跳票專業戶","白色薯條供應商",
+  "忠孝橋背鍋仔","支持者收割機","科學數據造假師",
+  "兩岸一家親代言人","選後哭哭小能手","APP治國先知",
+  "清算小組組長","忠誠度檢測官","網軍自肥總監",
+  "白色力量守墓人","餘果市場背鍋仔","空心承諾製造機",
+  "堂口金流洗白師","小草收割者","背骨行動隊長",
+  "醫生人設維修工","民調崩盤救火隊","同志反目協調員",
+  "92共事舔共仔","系統崩壞工程師","白色幻覺維持者",
+  "支持者情緒勒索師","薯餅教授","翻車後援會長",
+  "堂口叛徒終結者","政治精算失敗王","賣我帥臉的小編",
+  "阿北影子財政大臣","關燈專家","切割藝術大師",
+  "澎風安","白色力量耗材管理員","選舉失利背鍋俠",
+  "系統更新拖延症","網軍出征隊長","堂口洗腦總教練",
+  "政治現實逃避者","支持者利用價值評估師","北4科背鍋仔",
+  "堂口金流守護靈","韭菜自動化收割機","白色泡沫吹氣師",
+  "南港BOT開發工程師","肉呆殘響","空心顫神",
+  "舊故鄉基金會主任","民眾堂吃相總監","白色內鬼處理專員"
+];
+let unlockedChars = new Set(JSON.parse(localStorage.getItem("meme_codex") || "[]"));
+let charData = {};
+
+fetch("characters.json?ts=" + Date.now())
+  .then(r => r.json())
+  .then(d => { d.characters.forEach(c => { charData[c.name] = { emoji: c.emoji, quotes: c.quotes }; }); })
+  .catch(() => console.warn("characters.json 載入失敗"));
+
+window.notifyCharUnlocked = function(name) {
+  if (!name || unlockedChars.has(name)) return;
+  unlockedChars.add(name);
+  localStorage.setItem("meme_codex", JSON.stringify([...unlockedChars]));
+  const cd = charData[name];
+  showToast(`📖 解鎖：${cd ? cd.emoji : ""}${name}`);
+  if (unlockedChars.size >= ALL_CHARS.length) unlock("codex","圖鑑蒐集家");
+};
+
+function renderCodexGrid() {
+  const grid = document.getElementById("codexGrid");
+  const prog = document.getElementById("codexProgress");
+  if (!grid) return;
+  prog.textContent = `已解鎖 ${unlockedChars.size} / ${ALL_CHARS.length} 位角色`;
+  grid.innerHTML = ALL_CHARS.map(name => {
+    const got = unlockedChars.has(name);
+    const cd  = charData[name];
+    const emoji = (cd && got) ? cd.emoji : "❓";
+    return got
+      ? `<div class="codex-card got" onclick="openCharModal('${name.replace(/'/g,"\\'")}')">\
+<span class="codex-emoji">${emoji}</span><span class="codex-name">${name}</span></div>`
+      : `<div class="codex-card locked"><span class="codex-emoji">❓</span><span class="codex-name">???</span></div>`;
+  }).join("");
+}
+
+window.openCodex  = function() { renderCodexGrid(); document.getElementById("codexModal").style.display = "flex"; };
+window.closeCodex = function() { document.getElementById("codexModal").style.display = "none"; };
+
+window.openCharModal = function(name) {
+  const cd = charData[name];
+  if (!cd) return;
+  document.getElementById("charEmoji").textContent = cd.emoji;
+  document.getElementById("charName").textContent  = name;
+  document.getElementById("charQuotes").innerHTML  = cd.quotes.map(q => `<div class="char-quote">「${q}」</div>`).join("");
+  document.getElementById("codexModal").style.display = "none";
+  document.getElementById("charModal").style.display  = "flex";
+};
+window.closeCharModal = function() {
+  document.getElementById("charModal").style.display  = "none";
+  document.getElementById("codexModal").style.display = "flex";
+};
+
+// ==================== LEADERBOARD ====================
+function getLeader() { return JSON.parse(localStorage.getItem("meme_leader") || "[]"); }
+function saveLeader(list) { localStorage.setItem("meme_leader", JSON.stringify(list)); }
+
+window.recordScore = function(money) {
+  let list = getLeader();
+  list.push({ money, time: new Date().toLocaleTimeString("zh-TW") });
+  list.sort((a,b) => b.money - a.money);
+  list = list.slice(0, 10);
+  saveLeader(list);
+};
+
+window.openLeader = function() {
+  const list = getLeader();
+  const el   = document.getElementById("leaderList");
+  if (!list.length) { el.innerHTML = "<p style='color:#64748b;font-size:13px'>還沒有紀錄，快去撈錢！</p>"; }
+  else {
+    el.innerHTML = list.map((r,i) => `
+      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed #334155;font-size:13px;">
+        <span>${["🥇","🥈","🥉"][i] || `${i+1}.`} ${r.time}</span>
+        <span style="color:#f59e0b;font-weight:700">NT$ ${r.money.toLocaleString()}</span>
+      </div>`).join("");
+  }
+  document.getElementById("leaderModal").style.display = "flex";
+};
+window.closeLeader = function() { document.getElementById("leaderModal").style.display = "none"; };
+window.clearLeader = function() { saveLeader([]); closeLeader(); showToast("🗑 排行榜已清除"); };
+
+// ==================== MISSIONS ====================
+const MISSIONS = [
+  { desc:"💰 撈到單筆金額超過 100萬",   check: s => (s.lastMoney||0) >= 1000000 },
+  { desc:"📄 累計生成 10 張收據",        check: s => (s.totalGenerated||0) >= 10 },
+  { desc:"🌪 混亂值突破 200",            check: s => (s.chaos||0) >= 200 },
+  { desc:"☀ 堂口模式生成 5 張收據",     check: s => (s.tangkouCount||0) >= 5 },
+  { desc:"⚡ 連擊達到 8 次",             check: s => (s.maxCombo||0) >= 8 },
+  { desc:"📖 解鎖 10 位角色",            check: () => unlockedChars.size >= 10 },
+  { desc:"🔥 升到 Lv.5",                 check: s => (s.level||0) >= 5 },
+  { desc:"🌞 雙太陽模式並生成收據",      check: s => !!s.doubleSunUsed },
+];
+let currentMission = null;
+function initMission() {
+  let idx = sessionStorage.getItem("missionIdx");
+  if (idx === null) { idx = Math.floor(Math.random() * MISSIONS.length); sessionStorage.setItem("missionIdx", idx); }
+  currentMission = MISSIONS[parseInt(idx)];
+  document.getElementById("missionDesc").textContent = currentMission.desc;
+}
+window.checkMission = function(state) {
+  if (!currentMission || achievements.mission) return;
+  if (currentMission.check(state)) {
+    const p = document.getElementById("missionProgress");
+    p.textContent = "✅"; p.style.color = "#22c55e";
+    unlock("mission","完成今日任務");
+  }
+};
+
+// ==================== TOAST ====================
+window.showToast = function(msg) {
+  const c = document.getElementById("toastContainer");
+  const el = document.createElement("div");
+  el.className = "toast"; el.textContent = msg; c.appendChild(el);
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("show")));
+  setTimeout(() => { el.classList.replace("show","hide"); setTimeout(() => el.remove(), 400); }, 2800);
+};
+
+// ==================== BADGE ====================
+function unlock(key, msg) {
+  if (achievements[key]) return;
+  achievements[key] = true;
+  const b = document.getElementById("badge-" + key);
+  if (b) b.classList.add("unlocked");
+  showToast("🏆 成就解鎖：" + msg);
+}
+
+// ==================== COMBO ====================
+window.tickCombo = function() {
+  comboCount++;
+  clearTimeout(comboTimer);
+  const d = document.getElementById("comboDisplay");
+  if (comboCount >= 2) { d.textContent = `🔥 COMBO x${comboCount}！`; d.style.transform = "scale(1.15)"; setTimeout(() => d.style.transform="scale(1)", 150); }
+  else d.textContent = "";
+  if (comboCount >= 5) unlock("combo5","連擊5次");
+  comboTimer = setTimeout(() => { comboCount = 0; d.textContent = ""; }, COMBO_TIMEOUT);
+  return comboCount;
+};
+
+// ==================== STABILITY ====================
+function updateStabilityBar(v) {
+  const pct = Math.max(0, Math.min(100, v));
+  const f = document.getElementById("stabilityFill");
+  if (f) f.style.width = pct + "%";
+}
+
+// ==================== CHECK ACHIEVEMENTS ====================
+window.checkAchievements = function(state) {
+  if (!achievements.first) unlock("first","初次奉獻");
+  if (state.chaos >= 100)  unlock("chaos100","混亂破百");
+  if (state.mode === "tangkou") unlock("tangkou","堂口覺醒");
+  if (state.doubleSun)     unlock("doublesun","雙太陽ON");
+  if (state.jackpotUsed)   unlock("jackpot","中大獎");
+  if (state.level >= 5)    unlock("lv5","Lv.5 金流師");
+  if (state.level >= 10)   unlock("lv10","Lv.10 堂口核心");
+  updateStabilityBar(state.stability);
+  const combo = window.tickCombo();
+  state.maxCombo = Math.max(state.maxCombo || 0, combo);
+  const el = document.getElementById("totalMoney");
+  if (el) el.textContent = (state.totalMoney || 0).toLocaleString();
+  window.checkMission(state);
+  if (state.lastMoney) window.recordScore(state.lastMoney);
+};
+
+// ==================== RAID ====================
+window.triggerRaid = function() {
+  unlock("raid","被特偵組突襲");
+  const overlay = document.getElementById("raidOverlay");
+  const fill    = document.getElementById("raidBarFill");
+  overlay.classList.add("active");
+  fill.style.transition = "none"; fill.style.width = "0%";
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    fill.style.transition = "width 2.8s linear"; fill.style.width = "100%";
+  }));
+  setTimeout(() => overlay.classList.remove("active"), 3000);
+};
+
+// ==================== LOCK SCREEN ====================
+window.showLockScreen = function() { document.getElementById("lockScreen").style.display = "flex"; };
+window.pardonMe  = function() { document.getElementById("lockScreen").style.display = "none"; showToast("🙏 阿北已特赦你，但名單留著"); };
+window.hardReset = function() { location.reload(); };
+
+// ==================== MODE + GENERATE ====================
+window.setModeAndGen = function(m) { window.setMode(m); if (typeof window.generate === "function") window.generate(); };
+
+// ==================== EDIT RECEIPT ====================
+window.toggleEdit = function(btn) {
+  const receipt = btn.closest(".receipt");
+  const result  = receipt.querySelector(".result");
+  if (result.contentEditable === "true") {
+    result.contentEditable = "false";
+    result.style.outline = "none";
+    btn.textContent = "✏️ 編輯";
+    showToast("✅ 收據已修改，可以截圖分享了");
+  } else {
+    result.contentEditable = "true";
+    result.style.outline = "2px dashed #f59e0b";
+    result.style.borderRadius = "6px";
+    result.focus();
+    btn.textContent = "✅ 完成";
+  }
+};
+
+// ==================== REDRAW ====================
+window.redrawReceipt = function() {
+  if (typeof window.generate === "function") window.generate();
+};
+
+// ==================== SHARE ====================
+let _lastReceiptData = null;
+window.setLastReceipt = function(data) {
+  _lastReceiptData = data;
+  // 更新分享文字預覽
+  const box = document.getElementById("shareTextBox");
+  if (box && data) {
+    box.textContent = buildShareText(data);
+  }
+};
+
+function buildShareText(d) {
+  if (!d) return "";
+  return [
+    "【民眾堂收據系統】",
+    `高層代表：${d.highSalary}`,
+    `捐款金額：NT$ ${d.moneyDisplay}`,
+    `收據編號：${d.id}`,
+    "",
+    (d.comparison || "").replace(/<br>/g,"\n").replace(/<[^>]+>/g,""),
+    "",
+    "🔗 " + location.href
+  ].join("\n");
+}
+
+function getShareURL() { return encodeURIComponent(location.href); }
+function getShareMsg() {
+  const d = _lastReceiptData;
+  const base = d ? `【民眾堂收據】高層：${d.highSalary} 捐款：NT$${d.moneyDisplay} ` : "【民眾堂收據系統】";
+  return encodeURIComponent(base + location.href);
+}
+
+window.shareToFB      = function() { window.open(`https://www.facebook.com/sharer/sharer.php?u=${getShareURL()}`, "_blank"); };
+window.shareToTwitter = function() { window.open(`https://twitter.com/intent/tweet?text=${getShareMsg()}`, "_blank"); };
+window.shareToThreads = function() { window.open(`https://www.threads.net/intent/post?text=${getShareMsg()}`, "_blank"); };
+window.shareToLINE    = function() { window.open(`https://line.me/R/msg/text/?${getShareMsg()}`, "_blank"); };
+
+window.guideIG = function() {
+  downloadShot();
+  showToast("📸 已下載截圖！打開 IG 手動貼上分享");
+};
+
+window.guideIbon = function() {
+  downloadShot();
+  setTimeout(() => {
+    window.open("https://www.ibon.com.tw/retail_service.aspx#gsc.tab=0", "_blank");
+    showToast("📄 已下載截圖！請至 ibon 官網上傳列印");
+  }, 800);
+};
+
+window.copyShareText = async function() {
+  const text = document.getElementById("shareTextBox").textContent;
+  if (!text) { showToast("先產生一張收據！"); return; }
+  await navigator.clipboard.writeText(text);
+  showToast("✅ 已複製！快去散播給小草朋友");
+};
+
+window.openEvidence  = function() {
+  if (!_lastReceiptData) { showToast("先產生一張收據！"); return; }
+  document.getElementById("evidenceModal").style.display = "flex";
+};
+window.closeEvidence = function() { document.getElementById("evidenceModal").style.display = "none"; };
+
+window.downloadShot = function() {
+  const receipt = document.querySelector(".receipt");
+  if (!receipt) { showToast("先產生一張收據！"); return; }
+  // 暫時隱藏按鈕再截圖
+  const actions = receipt.querySelector(".receipt-actions");
+  if (actions) actions.style.display = "none";
+  html2canvas(receipt, { backgroundColor: "#ffffff" }).then(canvas => {
+    if (actions) actions.style.display = "";
+    const a = document.createElement("a");
+    a.href = canvas.toDataURL();
+    a.download = "meme-receipt.png";
+    a.click();
+  });
+};
+
+// ==================== INIT ====================
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("introModal").style.display = "flex";
+  initMission();
+});
 window.enter = (ok) => {
-    document.getElementById("introModal").style.display = "none";
-};
-
-window.setMode = (m) => {
-    window.gameMode = m;
-    document.getElementById("mode").innerText = m;
-};
-
-window.upgrade = () => {
-    if (!window.level) window.level = 0;
-    window.level++;
-    document.getElementById("level").innerText = window.level;
-
-    if (window.level >= 10) {
-        document.body.innerHTML = "<h1 style='color:red;text-align:center;padding:50px'>SYSTEM LOCKED</h1>";
-    }
-};
-
-window.openEvidence = () => {
-    document.getElementById("evidenceModal").style.display = "flex";
-};
-
-window.closeEvidence = () => {
-    document.getElementById("evidenceModal").style.display = "none";
-};
-
-window.downloadShot = () => {
-    html2canvas(document.querySelector(".receipt")).then(canvas => {
-        let a = document.createElement("a");
-        a.href = canvas.toDataURL();
-        a.download = "meme.png";
-        a.click();
-    });
-};
-
-window.sharePack = async () => {
-    await navigator.clipboard.writeText(location.href);
-    alert("已複製連結");
+  document.getElementById("introModal").style.display = "none";
 };
 </script>
-
 </body>
 </html>
