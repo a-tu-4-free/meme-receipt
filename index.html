@@ -32,6 +32,33 @@
   </div>
 </div>
 
+<!-- ================= GRASS MODAL（純癡草嘲諷） ================= -->
+<div id="grassModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title" id="grassTitle"></div>
+    <div class="modal-content" id="grassContent" style="margin:10px 0;line-height:1.8;white-space:pre-line;"></div>
+    <div class="modal-buttons" style="margin-top:14px;">
+      <button onclick="grassEnter()">好吧……我進去看看</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= FAKE LEAVE MODAL（假裝離開） ================= -->
+<div id="fakeLeaveModal" class="modal">
+  <div class="modal-box">
+    <div class="modal-title" id="fakeLeaveTitle"></div>
+    <div class="modal-content" id="fakeLeaveContent" style="margin:10px 0;line-height:1.8;white-space:pre-line;"></div>
+    <div id="fakeLeaveStep2" style="display:none;margin-top:10px;">
+      <div style="color:#f59e0b;font-size:12px;margin-bottom:8px;">⚠ 系統要求二次確認：</div>
+      <div class="modal-content" id="fakeLeaveContent2" style="margin-bottom:10px;line-height:1.8;white-space:pre-line;"></div>
+    </div>
+    <div class="modal-buttons" style="margin-top:14px;">
+      <button id="fakeLeaveBtn" onclick="fakeLeaveNext()">確認退出</button>
+      <button onclick="cancelLeave()">等等……我再想想</button>
+    </div>
+  </div>
+</div>
+
 <!-- ================= MAIN PANEL ================= -->
 <div class="panel">
 
@@ -42,7 +69,7 @@
     <button onclick="toggleDoubleSun()" id="doubleSunBtn">🌞 雙太陽 OFF</button>
     <button onclick="upgrade()">💰 錢再多一點</button>
     <button onclick="openCodex()">📖 角色圖鑑</button>
-    <button onclick="openEvidence()">📦 留下證據</button>
+    <button onclick="quickSaveShot()">📦 留下證據</button>
   </div>
 
   <!-- COMBO -->
@@ -95,38 +122,34 @@
     <hr>
     <div class="result"></div>
     <div class="receipt-actions">
-      <button class="receipt-btn edit-btn" onclick="toggleEdit(this)">✏️ 編輯</button>
+      <button class="receipt-btn edit-btn"   onclick="toggleEdit(this)">✏️ 編輯</button>
       <button class="receipt-btn redraw-btn" onclick="redrawReceipt()">🔄 再抽一張</button>
-      <button class="receipt-btn share-btn" onclick="openEvidence()">📤 分享</button>
+      <button class="receipt-btn share-btn"  onclick="openShareModal()">📤 分享</button>
     </div>
     <div class="footer"></div>
   </div>
 </template>
 
-<!-- ================= INTRO MODAL ================= -->
+<!-- ================= INTRO MODAL（原版邏輯保留，只改文字） ================= -->
 <div id="introModal" class="modal" style="display:none;">
   <div class="modal-box">
-    <div class="modal-title">SYSTEM BOOT</div>
-    <div class="modal-content">
-MEME CORE 啟動
-是否進入堂口雙標收據系統？
-    </div>
-    <div class="modal-buttons">
-      <button onclick="enter(true)">想奉獻，則進入</button>
-      <button onclick="enter(false)">想不開，則離開</button>
+    <div class="modal-title">⚠ SYSTEM BOOT</div>
+    <div class="modal-content">MEME CORE 啟動中…
+偵測到您正在存取堂口雙標收據系統
+
+請確認您的身份：</div>
+    <div class="modal-buttons" style="flex-direction:column;gap:10px;margin-top:14px;">
+      <button class="btn-grass" onclick="enterGrass()">✅ 我是純癡草，我堅定支持阿北，帶我離開這個邪惡系統</button>
+      <button class="btn-leave" onclick="tryLeave()">❌ 我對堂口有疑問，我不想留在這裡</button>
     </div>
   </div>
 </div>
 
-<!-- ================= EVIDENCE / SHARE MODAL ================= -->
-<div id="evidenceModal" class="modal">
+<!-- ================= SHARE MODAL ================= -->
+<div id="shareModal" class="modal">
   <div class="modal-box">
-    <div class="modal-title">📦 留下證據</div>
-
-    <!-- 分享文字預覽 -->
+    <div class="modal-title">📤 分享這張收據</div>
     <div id="shareTextBox" class="share-text-box"></div>
-
-    <!-- 社群分享按鈕 -->
     <div class="share-grid">
       <button class="share-icon-btn fb"      onclick="shareToFB()">Facebook</button>
       <button class="share-icon-btn twitter" onclick="shareToTwitter()">Twitter / X</button>
@@ -135,11 +158,9 @@ MEME CORE 啟動
       <button class="share-icon-btn ig"      onclick="guideIG()">Instagram ↗</button>
       <button class="share-icon-btn ibon"    onclick="guideIbon()">ibon 列印 ↗</button>
     </div>
-
     <div class="modal-buttons" style="margin-top:12px;">
       <button onclick="copyShareText()">📋 複製分享文字</button>
-      <button onclick="downloadShot()">📸 下載截圖</button>
-      <button onclick="closeEvidence()">取消</button>
+      <button onclick="closeShareModal()">關閉</button>
     </div>
   </div>
 </div>
@@ -200,6 +221,90 @@ const achievements = {
 let comboCount = 0, comboTimer = null;
 const COMBO_TIMEOUT = 3000;
 let infoExpanded = false;
+
+// ==================== INIT（原版邏輯完全保留） ====================
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("introModal").style.display = "flex";
+  initMission();
+});
+
+// 原版 enter：script.js 內部也呼叫這個
+window.enter = function(ok) {
+  document.getElementById("introModal").style.display = "none";
+  if (ok) {
+    // 直接觸發 loadMemes，跟原版完全一致
+    if (typeof window.loadMemesGlobal === "function") window.loadMemesGlobal();
+  }
+};
+
+// ==================== 純癡草嘲諷（新增，不影響原版 enter） ====================
+const GRASS_MSGS = [
+  { title:"🌱 純癡草認證成功",    content:"系統已確認您的小草身份。\n\n感謝您的堅定支持，阿北在睡夢中點讚了。\n您的政治獻金已自動轉入木可帳戶。\n\n由於您身份特殊，系統決定讓您免費參觀一下……" },
+  { title:"✅ 身份驗證：純癡草",  content:"歡迎回家，小草。\n\n堂口已將您列入『永遠不會被背刺』名單（第三頁，備注欄）。\n\n系統溫馨提示：進來看看，保證不收政治獻金。\n（大概）" },
+  { title:"🌾 小草資料已建檔",    content:"您的忠誠度：★★★★★\n您的利用價值：評估中…\n\n阿北說：這種支持者最珍貴，也最好用。\n\n既然來了，不如先看一眼收據長什麼樣子？" },
+  { title:"💚 純癡草，你辛苦了",  content:"系統偵測到您長期承受認知失調之苦。\n建議您進入本系統，接受科學治療。\n\n療程免費，副作用是從此看清堂口真面目。" }
+];
+
+window.enterGrass = function() {
+  const msg = GRASS_MSGS[Math.floor(Math.random() * GRASS_MSGS.length)];
+  document.getElementById("grassTitle").textContent   = msg.title;
+  document.getElementById("grassContent").textContent = msg.content;
+  document.getElementById("introModal").style.display = "none";
+  document.getElementById("grassModal").style.display = "flex";
+};
+
+// 純癡草看完嘲諷後進入 → 呼叫原版 enter(true)
+window.grassEnter = function() {
+  document.getElementById("grassModal").style.display = "none";
+  window.enter(true);
+};
+
+// ==================== 假裝離開（新增，不影響原版 enter） ====================
+const FAKE_LEAVE_1 = [
+  { title:"🚪 確定要離開？",          content:"系統記錄到您正在嘗試逃離堂口真相。\n\n大多數人第一次看到收據都會想跑。\n\n但系統建議您再想想——\n外面的世界沒有這麼多梗。" },
+  { title:"⚠ 離開警告",              content:"您即將離開民眾堂系統。\n\n請注意：離開後，您將無法假裝不知道這些事。\n\n但事實上您已經知道了。\n所以……要走嗎？" },
+  { title:"🔒 系統偵測到異常行為",    content:"有人試圖在看到真相之前逃跑。\n\n這種行為在堂口內部稱為：『識人不明，用人不當』。\n\n阿北說：沒關係，這種人最後都會回來的。" },
+  { title:"📋 離開申請書",            content:"您的離開申請已收到。\n\n審核中……\n審核中……\n\n系統判定：申請不合格。\n理由：您還沒看過收據，怎麼知道要離開？" }
+];
+const FAKE_LEAVE_2 = [
+  { content:"好，系統尊重您的選擇。\n\n正在準備退出……\n\n啊，對了——系統發現您其實很想留下來。\n歡迎加入堂口嘲諷俱樂部。" },
+  { content:"再按一次確認退出。\n\n或者……\n\n您也可以直接留下來，省得麻煩。\n系統已幫您做好決定。" },
+  { content:"最後確認：您真的要離開？\n\n想想看——出去之後要做什麼？\n看新聞？新聞比這更讓人崩潰。\n\n系統建議：留下來比較快樂。" },
+  { content:"系統正在處理退出請求……\n\n很抱歉，退出功能目前因『政治因素』暫停服務。\n請繼續留在系統內。" }
+];
+let fakeLeaveStep = 0;
+
+window.tryLeave = function() {
+  fakeLeaveStep = 1;
+  const msg = FAKE_LEAVE_1[Math.floor(Math.random() * FAKE_LEAVE_1.length)];
+  document.getElementById("fakeLeaveTitle").textContent   = msg.title;
+  document.getElementById("fakeLeaveContent").textContent = msg.content;
+  document.getElementById("fakeLeaveStep2").style.display = "none";
+  document.getElementById("fakeLeaveBtn").textContent     = "確認退出";
+  document.getElementById("introModal").style.display     = "none";
+  document.getElementById("fakeLeaveModal").style.display = "flex";
+};
+
+window.fakeLeaveNext = function() {
+  if (fakeLeaveStep === 1) {
+    fakeLeaveStep = 2;
+    const msg2 = FAKE_LEAVE_2[Math.floor(Math.random() * FAKE_LEAVE_2.length)];
+    document.getElementById("fakeLeaveStep2").style.display  = "block";
+    document.getElementById("fakeLeaveContent2").textContent = msg2.content;
+    document.getElementById("fakeLeaveBtn").textContent      = "我真的要走了";
+  } else {
+    // 第三次：假裝離開，實際進入 → 呼叫原版 enter(true)
+    document.getElementById("fakeLeaveModal").style.display = "none";
+    showToast("👋 再見……欸？你還在這裡？");
+    setTimeout(() => showToast("🎉 系統已將你強制採入，歡迎！"), 1200);
+    window.enter(true);
+  }
+};
+
+window.cancelLeave = function() {
+  document.getElementById("fakeLeaveModal").style.display = "none";
+  document.getElementById("introModal").style.display     = "flex";
+};
 
 // ==================== INFO BAR TOGGLE ====================
 window.toggleInfoPanel = function() {
@@ -268,9 +373,8 @@ function renderCodexGrid() {
   }).join("");
 }
 
-window.openCodex  = function() { renderCodexGrid(); document.getElementById("codexModal").style.display = "flex"; };
-window.closeCodex = function() { document.getElementById("codexModal").style.display = "none"; };
-
+window.openCodex     = function() { renderCodexGrid(); document.getElementById("codexModal").style.display = "flex"; };
+window.closeCodex    = function() { document.getElementById("codexModal").style.display = "none"; };
 window.openCharModal = function(name) {
   const cd = charData[name];
   if (!cd) return;
@@ -288,26 +392,18 @@ window.closeCharModal = function() {
 // ==================== LEADERBOARD ====================
 function getLeader() { return JSON.parse(localStorage.getItem("meme_leader") || "[]"); }
 function saveLeader(list) { localStorage.setItem("meme_leader", JSON.stringify(list)); }
-
 window.recordScore = function(money) {
   let list = getLeader();
   list.push({ money, time: new Date().toLocaleTimeString("zh-TW") });
   list.sort((a,b) => b.money - a.money);
-  list = list.slice(0, 10);
-  saveLeader(list);
+  saveLeader(list.slice(0, 10));
 };
-
 window.openLeader = function() {
   const list = getLeader();
   const el   = document.getElementById("leaderList");
-  if (!list.length) { el.innerHTML = "<p style='color:#64748b;font-size:13px'>還沒有紀錄，快去撈錢！</p>"; }
-  else {
-    el.innerHTML = list.map((r,i) => `
-      <div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed #334155;font-size:13px;">
-        <span>${["🥇","🥈","🥉"][i] || `${i+1}.`} ${r.time}</span>
-        <span style="color:#f59e0b;font-weight:700">NT$ ${r.money.toLocaleString()}</span>
-      </div>`).join("");
-  }
+  el.innerHTML = list.length
+    ? list.map((r,i) => `<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed #334155;font-size:13px;"><span>${["🥇","🥈","🥉"][i]||(i+1)+"."} ${r.time}</span><span style="color:#f59e0b;font-weight:700">NT$ ${r.money.toLocaleString()}</span></div>`).join("")
+    : "<p style='color:#64748b;font-size:13px'>還沒有紀錄，快去撈錢！</p>";
   document.getElementById("leaderModal").style.display = "flex";
 };
 window.closeLeader = function() { document.getElementById("leaderModal").style.display = "none"; };
@@ -315,14 +411,14 @@ window.clearLeader = function() { saveLeader([]); closeLeader(); showToast("🗑
 
 // ==================== MISSIONS ====================
 const MISSIONS = [
-  { desc:"💰 撈到單筆金額超過 100萬",   check: s => (s.lastMoney||0) >= 1000000 },
-  { desc:"📄 累計生成 10 張收據",        check: s => (s.totalGenerated||0) >= 10 },
-  { desc:"🌪 混亂值突破 200",            check: s => (s.chaos||0) >= 200 },
-  { desc:"☀ 堂口模式生成 5 張收據",     check: s => (s.tangkouCount||0) >= 5 },
-  { desc:"⚡ 連擊達到 8 次",             check: s => (s.maxCombo||0) >= 8 },
-  { desc:"📖 解鎖 10 位角色",            check: () => unlockedChars.size >= 10 },
-  { desc:"🔥 升到 Lv.5",                 check: s => (s.level||0) >= 5 },
-  { desc:"🌞 雙太陽模式並生成收據",      check: s => !!s.doubleSunUsed },
+  { desc:"💰 撈到單筆金額超過 100萬",  check: s => (s.lastMoney||0) >= 1000000 },
+  { desc:"📄 累計生成 10 張收據",       check: s => (s.totalGenerated||0) >= 10 },
+  { desc:"🌪 混亂值突破 200",           check: s => (s.chaos||0) >= 200 },
+  { desc:"☀ 堂口模式生成 5 張收據",    check: s => (s.tangkouCount||0) >= 5 },
+  { desc:"⚡ 連擊達到 8 次",            check: s => (s.maxCombo||0) >= 8 },
+  { desc:"📖 解鎖 10 位角色",           check: () => unlockedChars.size >= 10 },
+  { desc:"🔥 升到 Lv.5",                check: s => (s.level||0) >= 5 },
+  { desc:"🌞 雙太陽模式並生成收據",     check: s => !!s.doubleSunUsed },
 ];
 let currentMission = null;
 function initMission() {
@@ -443,11 +539,8 @@ window.redrawReceipt = function() {
 let _lastReceiptData = null;
 window.setLastReceipt = function(data) {
   _lastReceiptData = data;
-  // 更新分享文字預覽
   const box = document.getElementById("shareTextBox");
-  if (box && data) {
-    box.textContent = buildShareText(data);
-  }
+  if (box && data) box.textContent = buildShareText(data);
 };
 
 function buildShareText(d) {
@@ -477,18 +570,16 @@ window.shareToThreads = function() { window.open(`https://www.threads.net/intent
 window.shareToLINE    = function() { window.open(`https://line.me/R/msg/text/?${getShareMsg()}`, "_blank"); };
 
 window.guideIG = function() {
-  downloadShot();
-  showToast("📸 已下載截圖！打開 IG 手動貼上分享");
+  quickSaveShot();
+  setTimeout(() => showToast("📸 截圖已下載！打開 IG 手動貼上"), 1000);
 };
-
 window.guideIbon = function() {
-  downloadShot();
+  quickSaveShot();
   setTimeout(() => {
     window.open("https://www.ibon.com.tw/retail_service.aspx#gsc.tab=0", "_blank");
-    showToast("📄 已下載截圖！請至 ibon 官網上傳列印");
-  }, 800);
+    showToast("📄 截圖已下載！請至 ibon 官網上傳列印");
+  }, 1000);
 };
-
 window.copyShareText = async function() {
   const text = document.getElementById("shareTextBox").textContent;
   if (!text) { showToast("先產生一張收據！"); return; }
@@ -496,35 +587,34 @@ window.copyShareText = async function() {
   showToast("✅ 已複製！快去散播給小草朋友");
 };
 
-window.openEvidence  = function() {
+// 收據下方分享 → 開 Modal
+window.openShareModal  = function() {
   if (!_lastReceiptData) { showToast("先產生一張收據！"); return; }
-  document.getElementById("evidenceModal").style.display = "flex";
+  document.getElementById("shareModal").style.display = "flex";
 };
-window.closeEvidence = function() { document.getElementById("evidenceModal").style.display = "none"; };
+window.closeShareModal = function() { document.getElementById("shareModal").style.display = "none"; };
 
-window.downloadShot = function() {
+// 頂部「留下證據」→ 直接截圖下載
+window.quickSaveShot = function() {
   const receipt = document.querySelector(".receipt");
   if (!receipt) { showToast("先產生一張收據！"); return; }
-  // 暫時隱藏按鈕再截圖
   const actions = receipt.querySelector(".receipt-actions");
   if (actions) actions.style.display = "none";
+  showToast("📸 正在截圖，請稍候…");
   html2canvas(receipt, { backgroundColor: "#ffffff" }).then(canvas => {
     if (actions) actions.style.display = "";
     const a = document.createElement("a");
     a.href = canvas.toDataURL();
     a.download = "meme-receipt.png";
     a.click();
+    showToast("✅ 收據已下載！可以留下當證據");
   });
 };
 
-// ==================== INIT ====================
-document.addEventListener("DOMContentLoaded", () => {
-  document.getElementById("introModal").style.display = "flex";
-  initMission();
-});
-window.enter = (ok) => {
-  document.getElementById("introModal").style.display = "none";
-};
+// 相容舊版
+window.downloadShot  = window.quickSaveShot;
+window.openEvidence  = window.openShareModal;
+window.closeEvidence = window.closeShareModal;
 </script>
 </body>
 </html>
