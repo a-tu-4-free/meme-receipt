@@ -103,27 +103,4 @@ meme-receipt/
 
 本專案以 **MIT License** 授權開放使用。
 
----
-
-## About 欄位
-
-> 在 GitHub repo 右上角點齒輪 ⚙️，填入以下內容：
-
-**Description：
-```
-民眾堂雙標收據生成系統 — 台灣政治嘲諷互動網頁 🧾
-```
-
-**Website：
-```
-https://a-tu-4-free.github.io/meme-receipt/
-```
-
-**Topics（標籤）：
-```
-taiwan  politics  meme  satire  javascript  github-pages
-```
-
----
-
 *MEME CORE SYSTEM — 由鄉民自費維護，歡迎斗內 711 禮券*
